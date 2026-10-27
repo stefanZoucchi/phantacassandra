@@ -35,14 +35,19 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .title .sub{color:var(--muted);font-size:14px}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 
-.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
-.brand{font-size:20px;text-transform:uppercase;color:var(--accent);font-weight:700}
+.topbar{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap}
+.topbar .right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end}
+.brand{font-size:clamp(26px,7.5vw,38px);overflow-wrap:anywhere;line-height:1;letter-spacing:.02em;text-transform:uppercase;color:var(--accent);font-weight:700}
 .seg{display:flex;background:var(--chip);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
 .seg a{padding:7px 14px;border-radius:8px;text-decoration:none;color:var(--fg);font-weight:600;font-size:14px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .seg a[aria-current="page"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12);color:var(--accent)}
 .home{display:flex;flex-direction:column;gap:14px}
-.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-@media (max-width:700px){.cards{grid-template-columns:1fr}}
+.cards{display:flex;flex-wrap:wrap;gap:22px;padding-block:20px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:10px;text-decoration:none;color:var(--fg);background:none;border:0;padding:0;cursor:pointer;font:700 18px var(--display);text-transform:uppercase;letter-spacing:.03em;width:150px;text-align:center}
+.logo.big{width:150px;height:150px;border-radius:28px;font-size:56px;transition:transform .15s}
+.tile:hover .logo.big{transform:translateY(-3px)}
+.logo.plus{background:var(--chip);color:var(--muted);border:2px dashed var(--line);font-size:64px}
+@media (max-width:420px){.tile{width:130px}.logo.big{width:130px;height:130px}}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;text-decoration:none;color:var(--fg)}
 .card:hover{border-color:var(--accent)}
 .card .top{display:flex;gap:14px;align-items:center}
@@ -63,21 +68,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .msg{font-size:14px;padding:8px 12px;border-radius:8px;background:var(--warnbg)}
 
 .tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
-table{border-collapse:collapse;width:100%;min-width:860px;font-variant-numeric:tabular-nums}
-th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+table{border-collapse:collapse;width:auto;font-variant-numeric:tabular-nums}
+.tablewrap{width:fit-content;max-width:100%}
+th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
 thead th{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--surface);position:sticky;top:0}
-th.src{text-align:center;width:44px;padding:6px 2px}
+th.src{text-align:center;width:38px;padding:5px 1px}
 th.src a{display:block;color:var(--fg);text-decoration:none;font:700 13px var(--display);letter-spacing:.04em}
 th.src a:hover{color:var(--accent);text-decoration:underline}
 th.src small{display:block;font:400 10px var(--body);color:var(--muted);text-transform:none;letter-spacing:0}
 td.dc{text-align:center}
-td.name{position:sticky;left:0;background:var(--surface);min-width:190px;z-index:1}
+td.name{position:sticky;left:0;background:var(--surface);min-width:150px;max-width:230px;z-index:1}
 .pname{font-weight:700}
-.pmeta{font-size:12px;color:var(--muted)}
+.pmeta{font-size:12px;color:var(--muted);white-space:nowrap}
 tr.role td{background:var(--chip);font:700 14px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;position:static}
 .role-tag{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font:700 13px var(--display);color:#fff;margin-right:8px;vertical-align:middle}
 .r-P{background:#c98a00}.r-D{background:#2f7d4a}.r-C{background:#2d64b3}.r-A{background:#b5352a}.r-X{background:#6b756f}
-.pct{font:700 20px var(--display);min-width:54px}
+.pct{font:700 19px var(--display);min-width:44px;text-align:right}
 .bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;width:54px;margin-top:2px}
 .bar i{display:block;height:100%;background:var(--ok)}
 .badge{display:inline-block;font:700 11px var(--body);text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:999px;white-space:nowrap}
@@ -87,7 +93,9 @@ th.uff{color:var(--accent);font:700 13px var(--display);letter-spacing:.04em}
 th.uff small{display:block;font:400 10px var(--body);color:var(--muted)}
 .lastupd{font-size:12px;color:var(--muted);text-align:right;margin-top:4px}
 .rank td,.rank th{white-space:nowrap}
-.rank .pos{font:700 22px var(--display);width:40px}
+.rank .pos{font:700 20px var(--display);width:28px}
+.rank td.pct{text-align:right}
+.rank td{padding:5px 10px}
 .empty{padding:28px;text-align:center;color:var(--muted)}
 .empty .disp{font-size:24px;color:var(--fg);margin-bottom:6px}
 
@@ -107,9 +115,9 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
   <nav class="topbar">
     <div class="brand disp">PhantaCassandra</div>
     <div class="seg" role="tablist">
-      <a href="#home">Home</a><a href="#squadra-1" id="tab1">Squadra 1</a><a href="#squadra-2" id="tab2">Squadra 2</a><a href="#fonti">Fonti</a>
+      <a href="#home">Home</a><span id="sqTabs" style="display:contents"></span><a href="#fonti">Fonti</a>
     </div>
-    <div><button class="primary" id="btnRefresh" type="button">Aggiorna dai siti</button><div class="lastupd" id="lastUpd"></div></div>
+    <div class="right"><button class="primary" id="btnRefresh" type="button">Aggiorna dai siti</button><div class="lastupd" id="lastUpd"></div></div>
   </nav>
   <section id="fontiView" class="home" hidden></section>
 
@@ -166,6 +174,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
       <button type="button" id="btnCancel">Chiudi</button>
       <button type="button" id="btnExport">Esporta rose</button>
       <label class="btn" for="inImport">Importa rose</label><input type="file" id="inImport" accept=".json" hidden>
+      <button type="button" id="btnDel">Elimina squadra</button>
       <span class="note" id="saveNote"></span>
     </div>
     <div class="unres" id="unres"></div>
@@ -194,7 +203,7 @@ const SOURCES = [
 const TEAM_ALIASES = {juve:"Juventus",inter:"Inter",milan:"Milan",roma:"Roma",lazio:"Lazio",napoli:"Napoli",atalanta:"Atalanta",dea:"Atalanta",viola:"Fiorentina",toro:"Torino",granata:"Torino"};
 
 let DATA = null, busy = false;
-let STORE = {squads:[{name:"Squadra 1",logo:null,players:[]},{name:"Squadra 2",logo:null,players:[]}]};
+let STORE = {squads:[{name:"Squadra 1",logo:null,players:[]}]};
 let CUR = null; // null = home, 0/1 = squadra
 let ROSA = STORE.squads[0];
 let mcp = null, sample = null, artifact = null;
@@ -312,7 +321,17 @@ function rowsFor(SQ){
   });
 }
 function logoHTML(SQ){return SQ.logo?`<img src="${SQ.logo}" alt="Logo">`:esc((SQ.name||"FC").split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase())}
+function renderTabs(){
+  const here=location.hash;
+  $("sqTabs").innerHTML=STORE.squads.map((q,i)=>`<a href="#squadra-${i+1}" aria-current="${here==="#squadra-"+(i+1)?"page":"false"}">${esc(q.name)}</a>`).join("");
+}
 function renderHome(){
+  $("homeSub").textContent="";
+  $("cards").innerHTML=STORE.squads.map((SQ,i)=>`<a class="tile" href="#squadra-${i+1}"><div class="logo big">${logoHTML(SQ)}</div><span>${esc(SQ.name)}</span></a>`).join("")+
+    `<button type="button" class="tile add" id="btnAdd" aria-label="Aggiungi squadra"><div class="logo big plus">+</div><span>Aggiungi squadra</span></button>`;
+  $("btnAdd").onclick=()=>{STORE.squads.push({name:"Squadra "+(STORE.squads.length+1),logo:null,players:[]});try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(e){};location.hash="#squadra-"+STORE.squads.length};
+}
+function renderHomeOld(){
   $("homeSub").textContent=DATA?`Serie A · ${DATA.giornata}ª giornata · dati aggiornati ${DATA.generated} · ${DATA.sources.filter(s=>s.ok).length} fonti su ${DATA.sources.length} pubblicate`:"Dati non disponibili";
   $("cards").innerHTML=STORE.squads.map((SQ,i)=>{
     if(!DATA) return "";
@@ -347,17 +366,16 @@ function renderFonti(){
   const nOff=Object.values(DATA.teams).filter(T=>T.official).length;
   const pctS=v=>v&&v.total?Math.round(v.hits/v.total*1000)/10+"%":"—";
   let pos=0;
-  el.innerHTML=`<div class="panel"><h2>Classifica di attendibilità</h2>
-   <div class="note">Per ogni squadra confronto gli 11 titolari previsti da ciascuna fonte con la formazione ufficiale: la percentuale è la quota di titolari indovinati. La classifica somma tutte le giornate registrate; la giornata in corso si aggiorna man mano che escono le ufficiali (ora ${nOff} squadre su ${Object.keys(DATA.teams).length}).</div></div>
-   <div class="tablewrap"><table class="rank" style="min-width:560px"><thead><tr><th>#</th><th>Fonte</th><th>Successo totale</th><th>Titolari indovinati</th><th>${DATA.giornata}ª giornata</th><th>Giornate</th></tr></thead><tbody>`+
-   rows.map(x=>`<tr><td class="pos">${x.t?++pos:"–"}</td><td><a href="${esc(x.s.url)}" target="_blank" rel="noopener">${esc(x.s.name)}</a>${x.s.note?`<div class="pmeta">${esc(x.s.note)}</div>`:""}</td><td class="pct">${pctS(x.t)}</td><td>${x.t?x.t.hits+" / "+x.t.total:"—"}</td><td>${pctS(x.c)}</td><td>${x.t?x.t.g:0}</td></tr>`).join("")+
-   `</tbody></table></div>`+(nOff||rounds.length>1?"":`<div class="empty"><div class="disp">Classifica in attesa</div>Si riempie quando escono le prime formazioni ufficiali, circa un'ora prima di ogni partita.</div>`);
+  el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Attendibilità delle fonti</h2>
+   <div class="tablewrap"><table class="rank"><thead><tr><th>#</th><th>Fonte</th><th>Totale</th><th>Indovinati</th><th>${DATA.giornata}ª g.</th><th>Giornate</th></tr></thead><tbody>`+
+   rows.map(x=>`<tr><td class="pos">${x.t?++pos:"–"}</td><td><a href="${esc(x.s.url)}" target="_blank" rel="noopener">${esc(x.s.name)}</a>${x.s.key==="corriere"?' <span class="pmeta">= Tuttosport</span>':x.s.key==="tmw"?' <span class="pmeta">= Sportitalia</span>':""}</td><td class="pct">${pctS(x.t)}</td><td>${x.t?x.t.hits+"/"+x.t.total:"—"}</td><td>${pctS(x.c)}</td><td>${x.t?x.t.g:0}</td></tr>`).join("")+
+   `</tbody></table></div><div class="note">Titolari previsti che poi compaiono nella formazione ufficiale. ${nOff?`Giornata in corso: ${nOff} squadre su ${Object.keys(DATA.teams).length} con l'ufficiale.`:"La classifica parte con le prime formazioni ufficiali, circa un'ora prima di ogni partita."}</div>`;
 }
 function render(){
   $("lastUpd").textContent=DATA?`Ultimo aggiornamento: ${DATA.generated} · ${DATA.mode||"manuale"}`:"";
-  $("tab1").textContent=STORE.squads[0].name; $("tab2").textContent=STORE.squads[1].name;
+  renderTabs();
   if(CUR==="fonti"){renderFonti();return}
-  $("tab1").textContent=STORE.squads[0].name; $("tab2").textContent=STORE.squads[1].name;
+  renderTabs();
   if(CUR===null){renderHome();return}
   renderHeader();
   const wrap=$("tableWrap");
@@ -370,15 +388,15 @@ function render(){
   const rows=rowsFor(ROSA);
   const order=["P","D","C","A",null];
   const names={P:"Portieri",D:"Difensori",C:"Centrocampisti",A:"Attaccanti",null:"Senza ruolo"};
-  let html=`<table><thead><tr><th class="name" style="position:sticky;left:0;z-index:2">Giocatore</th><th>Impiego</th><th class="src uff" title="Formazione ufficiale: quando esce sostituisce i pronostici">UFF<small>ufficiale</small></th>`+
-    srcs.map(s=>`<th class="src"><a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.name)}${s.note?": "+esc(s.note):""}">${ABBR[s.key]||s.key}</a><small>${esc(s.updated||"—")}</small></th>`).join("")+`<th>Stato</th></tr></thead><tbody>`;
+  let html=`<table><thead><tr><th class="name" style="position:sticky;left:0;z-index:2">Giocatore</th><th>%</th>`+
+    srcs.map(s=>`<th class="src"><a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.name)}${s.note?": "+esc(s.note):""}">${ABBR[s.key]||s.key}</a><small>${esc(s.updated||"—")}</small></th>`).join("")+`<th class="src uff" title="Formazione ufficiale: quando esce sostituisce i pronostici">UFF<small>ufficiale</small></th><th>Stato</th></tr></thead><tbody>`;
   for(const ro of order){
     const g=rows.filter(x=>(x.p.ruolo||null)===ro).sort((a,b)=>(isOut(a)-isOut(b))||((b.pct??-1)-(a.pct??-1))||((DATA.teams[b.p.team]?.pct?.[b.p.canon]||0)-(DATA.teams[a.p.team]?.pct?.[a.p.canon]||0)));
     if(!g.length) continue;
     html+=`<tr class="role"><td colspan="${srcs.length+4}">${names[ro]}</td></tr>`;
     for(const x of g){
       const T=x.p.team?DATA.teams[x.p.team]:null;
-      const meta=T?`${esc(x.p.team)} · ${T.home?"in casa con":"in trasferta a"} ${esc(T.opp)} · ${esc(T.when)}`:"";
+      const meta=T?`${esc(x.p.team)} ${T.home?"vs":"@"} ${esc(T.opp)} · ${esc(T.when)}`:"";
       let badge="";
       if(!x.p.canon) badge=`<span class="badge b-nf">Non trovato</span>`;
       else if(x.o?.k==="inf") badge=`<span class="badge b-inf">Infortunato</span>`;
@@ -387,8 +405,8 @@ function render(){
       const label={ok:"titolare",bench:"panchina",out:"infortunato/squalificato",na:"non pubblicato"};
       html+=`<tr><td class="name"><div class="pname">${x.p.ruolo?`<span class="role-tag r-${x.p.ruolo}">${x.p.ruolo}</span>`:""}${esc(String(x.p.nome).toUpperCase())}</div><div class="pmeta">${meta||"Controlla nome e squadra nella rosa"}</div></td>`+
         `<td><div class="pct">${x.pct==null?"—":x.pct+"%"}</div>${x.off?'<div class="pmeta">ufficiale</div>':""}</td>`+
-        `<td class="dc uffc"><i class="dot d-${x.off||"na"}" title="Formazione ufficiale: ${x.off?label[x.off]:"non ancora uscita"}"></i></td>`+
         x.cells.map((c,i)=>`<td class="dc"><i class="dot d-${c}" title="${esc(srcs[i].name)}: ${label[c]}"></i></td>`).join("")+
+        `<td class="dc uffc"><i class="dot d-${x.off||"na"}" title="Formazione ufficiale: ${x.off?label[x.off]:"non ancora uscita"}"></i></td>`+
         `<td>${badge}</td></tr>`;
     }
   }
@@ -442,8 +460,15 @@ $("inLogo").addEventListener("change",e=>{
   const img=new Image(); img.onload=()=>{const c=document.createElement("canvas");c.width=c.height=160;const x=c.getContext("2d");const s=Math.min(img.width,img.height);x.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,160,160);ROSA.logo=c.toDataURL("image/png");renderHeader();URL.revokeObjectURL(img.src)};
   img.src=URL.createObjectURL(f);
 });
+$("btnDel").onclick=async()=>{
+  const b=$("btnDel");
+  if(STORE.squads.length<2){$("saveNote").textContent="Serve almeno una squadra.";return}
+  if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Conferma eliminazione";setTimeout(()=>{b.dataset.armed="";b.textContent="Elimina squadra"},4000);return}
+  STORE.squads.splice(CUR,1);try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(e){}
+  location.hash="#home"; await saveFiles({"rose.json":JSON.stringify(STORE)});
+};
 $("btnExport").onclick=()=>{const b=new Blob([JSON.stringify(STORE)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="rose.json";document.body.append(a);a.click();a.remove()};
-$("inImport").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!Array.isArray(j.squads))throw 0;STORE.squads=j.squads.slice(0,2).map((q,i)=>({name:q.name||"Squadra "+(i+1),logo:q.logo||null,players:(q.players||[]).map(p=>resolve(p))}));try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(_){}
+$("inImport").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!Array.isArray(j.squads)||!j.squads.length)throw 0;STORE.squads=j.squads.map((q,i)=>({name:q.name||"Squadra "+(i+1),logo:q.logo||null,players:(q.players||[]).map(p=>resolve(p))}));try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(_){}
 route();$("saveNote").textContent="Rose importate."}catch(_){$("saveNote").textContent="File non valido: usa un rose.json esportato da PhantaCassandra."}e.target.value=""});
 $("btnNoLogo").onclick=()=>{ROSA.logo=null;renderHeader()};
 $("btnEdit").onclick=()=>showEditor($("editor").hidden);
@@ -620,8 +645,8 @@ $("btnRefresh").onclick=()=>{
 
 /* ---------- boot & routing ---------- */
 function route(){
-  const m=location.hash.match(/^#squadra-([12])$/);
-  CUR=location.hash==="#fonti"?"fonti":m?Number(m[1])-1:null;
+  const m=location.hash.match(/^#squadra-(\d+)$/);
+  CUR=location.hash==="#fonti"?"fonti":(m&&STORE.squads[Number(m[1])-1])?Number(m[1])-1:null;
   const isSq=typeof CUR==="number";
   if(isSq) ROSA=STORE.squads[CUR];
   $("homeView").hidden=CUR!==null; $("squadView").hidden=!isSq; $("fontiView").hidden=CUR!=="fonti";
@@ -637,7 +662,7 @@ async function boot(){
   let saved=null;
   try{saved=JSON.parse(localStorage.getItem("rose")||"null")}catch(e){}
   if(!saved){try{saved=await fetch("rose.json",{cache:"no-store"}).then(r=>r.ok?r.json():null)}catch(e){}}
-  if(saved&&Array.isArray(saved.squads)) saved.squads.slice(0,2).forEach((q,i)=>{STORE.squads[i]={name:q.name||("Squadra "+(i+1)),logo:q.logo||null,players:Array.isArray(q.players)?q.players:[]}});
+  if(saved&&Array.isArray(saved.squads)&&saved.squads.length) STORE.squads=saved.squads.map((q,i)=>({name:q.name||("Squadra "+(i+1)),logo:q.logo||null,players:Array.isArray(q.players)?q.players:[]}));
   for(const sq of STORE.squads) sq.players=sq.players.map(p=>p.canon&&DATA?.teams?.[p.team]?p:resolve(p));
   window.addEventListener("hashchange",route);
   route();
