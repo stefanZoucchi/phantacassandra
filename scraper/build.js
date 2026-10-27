@@ -69,11 +69,11 @@ function build(raw, prev, mode = "automatico", log = console.log) {
       const cands = [...teams[t].roster];
       let xi = [];
       for (const p of L.xi) {
-        const c = matchName(p, cands, t);
-        if (c) { xi.push(c); continue; }
         const parts = p.split(/\s+/); // "Politano Hojlund" (virgola mancante sul sito)
-        const split = parts.length === 2 ? parts.map(x => matchName(x, cands, t)) : [];
-        if (split.length === 2 && split.every(Boolean)) xi.push(...split); else xi.push(p);
+        const split = L.xi.length === 10 && parts.length === 2 ? parts.map(x => matchName(x, cands, t)) : [];
+        if (split.length === 2 && split.every(Boolean) && split[0] !== split[1]) { xi.push(...split); continue; }
+        const c = matchName(p, cands, t);
+        xi.push(c || p);
       }
       xi = [...new Set(xi)];
       if (xi.length !== 11) { log(`  ${s.name} ${t}: ${xi.length} titolari, scartata`); continue; }

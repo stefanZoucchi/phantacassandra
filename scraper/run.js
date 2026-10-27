@@ -21,8 +21,8 @@ const PLAN = [
 ];
 
 async function open(page, url) {
-  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
-  await page.waitForTimeout(3500);
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+  await page.waitForTimeout(2500);
   // chiude i banner dei cookie scegliendo il rifiuto quando c'è
   for (const label of ["Rifiuta", "Rifiuta tutto", "Continua senza accettare", "Non accetto"]) {
     const b = page.getByRole("button", { name: label }).first();
@@ -36,7 +36,7 @@ async function readSource(page, s) {
   await open(page, s.hub);
   if (s.multi) {
     const seen = new Set(await links(page, s.multi)); const done = new Set(); const all = { giornata: null, teams: {}, out: {}, updated: "" };
-    while (done.size < 12) {
+    while (done.size < 10) {
       const next = [...seen].find(u => !done.has(u)); if (!next) break; done.add(next);
       try { await open(page, next); const r = await page.evaluate(s.fn); Object.assign(all.teams, r.teams); all.giornata = all.giornata ?? r.giornata; (await links(page, s.multi)).forEach(u => seen.add(u)); } catch (e) {}
     }
@@ -55,10 +55,14 @@ async function readSource(page, s) {
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ locale: "it-IT", timezoneId: "Europe/Rome", viewport: { width: 1280, height: 2000 },
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" });
+  // niente immagini, video e font: le pagine si caricano molto più in fretta
+  await ctx.route("**/*", route => ["image", "media", "font"].includes(route.request().resourceType()) ? route.abort() : route.continue());
   const page = await ctx.newPage();
+  const withTimeout = (p, ms, what) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(what + ": troppo lento, saltato")), ms))]);
   const raw = {};
   for (const s of PLAN) {
-    try { raw[s.key] = await readSource(page, s); console.log(`letto ${s.key}: giornata ${raw[s.key].giornata ?? "?"}, ${Object.keys(raw[s.key].teams || {}).length} squadre`); }
+    const t0 = Date.now();
+    try { raw[s.key] = await withTimeout(readSource(page, s), s.multi ? 240000 : 120000, s.key); console.log(`letto ${s.key}: giornata ${raw[s.key].giornata ?? "?"}, ${Object.keys(raw[s.key].teams || {}).length} squadre (${Math.round((Date.now() - t0) / 1000)}s)`); }
     catch (e) { raw[s.key] = { error: String(e.message || e).slice(0, 120) }; console.log(`errore ${s.key}: ${raw[s.key].error}`); }
   }
   await browser.close();

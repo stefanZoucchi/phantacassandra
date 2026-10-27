@@ -11,7 +11,7 @@ const lineFormat = function () {
   hits.forEach((h, k) => {
     const body = h.body.replace(/\.?\s*(All\.|Allenatore:?)\s.*$/i, "");
     const xi = body.split(/[;,]/).map(s => s.trim().replace(/\.$/, "")).filter(Boolean);
-    if (xi.length !== 11 || teams[h.name]) return;
+    if (xi.length < 10 || xi.length > 12 || teams[h.name]) return; // 10: virgola mancante sul sito, sistemata dopo
     teams[h.name] = { mod: h.mod, xi };
     const tail = t.slice(h.end, k + 1 < hits.length ? hits[k + 1].i : h.end + 800);
     const list = (lab) => { const r = tail.match(new RegExp(lab + "\\s*:\\s*([^\\n]+)", "i")); return r ? r[1].split(/,\s*/).map(s => s.replace(/\(.*?\)/g, "").trim()).filter(s => s && !/^nessun/i.test(s) && s !== "-") : []; };
