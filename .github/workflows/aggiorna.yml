@@ -1,0 +1,40 @@
+name: Aggiorna PhantaCassandra
+
+on:
+  schedule:
+    # Orari in UTC: 8:36 e 14:36 UTC = 9:36 e 15:36 in Italia con l'ora solare.
+    # Con l'ora legale (fine marzo - fine ottobre) diventano 10:36 e 16:36.
+    - cron: "36 8,14 * * *"
+  workflow_dispatch: {}   # pulsante "Run workflow" per aggiornare a mano
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aggiorna
+  cancel-in-progress: false
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Installa il browser automatico
+        run: |
+          npm install --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+      - name: Leggi i siti
+        env:
+          MODE: ${{ github.event_name == 'workflow_dispatch' && 'manuale' || 'automatico' }}
+        run: node scraper/run.js
+      - name: Salva i dati
+        run: |
+          git config user.name "PhantaCassandra"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/data.json
+          git diff --cached --quiet || git commit -m "Aggiornamento formazioni $(TZ=Europe/Rome date '+%d/%m %H:%M')"
+          git push
