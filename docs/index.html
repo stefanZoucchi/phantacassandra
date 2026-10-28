@@ -333,7 +333,7 @@ function renderHome(){
   $("homeSub").textContent="";
   $("cards").innerHTML=STORE.squads.map((SQ,i)=>`<a class="tile" href="#squadra-${i+1}"><div class="logo big">${logoHTML(SQ)}</div><span>${esc(SQ.name)}</span></a>`).join("")+
     `<button type="button" class="tile add" id="btnAdd" aria-label="Aggiungi squadra"><div class="logo big plus">+</div><span>Aggiungi squadra</span></button>`;
-  $("btnAdd").onclick=()=>{STORE.squads.push({name:"Squadra "+(STORE.squads.length+1),logo:null,players:[]});try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(e){};location.hash="#squadra-"+STORE.squads.length};
+  $("btnAdd").onclick=()=>{STORE.squads.push({name:"Squadra "+(STORE.squads.length+1),logo:null,players:[]});try{(STORE.savedAt=Date.now(),localStorage.setItem("rose",JSON.stringify(STORE)))}catch(e){};location.hash="#squadra-"+STORE.squads.length};
 }
 function renderHomeOld(){
   $("homeSub").textContent=DATA?`Serie A · ${DATA.giornata}ª giornata · dati aggiornati ${DATA.generated} · ${DATA.sources.filter(s=>s.ok).length} fonti su ${DATA.sources.length} pubblicate`:"Dati non disponibili";
@@ -469,11 +469,11 @@ $("btnDel").onclick=async()=>{
   const b=$("btnDel");
   if(STORE.squads.length<2){$("saveNote").textContent="Serve almeno una squadra.";return}
   if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Conferma eliminazione";setTimeout(()=>{b.dataset.armed="";b.textContent="Elimina squadra"},4000);return}
-  STORE.squads.splice(CUR,1);try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(e){}
+  STORE.squads.splice(CUR,1);try{(STORE.savedAt=Date.now(),localStorage.setItem("rose",JSON.stringify(STORE)))}catch(e){}
   location.hash="#home"; await saveFiles({"rose.json":JSON.stringify(STORE)});
 };
 $("btnExport").onclick=async()=>{
-  const json=JSON.stringify({app:"PhantaCassandra",version:1,squads:STORE.squads},null,1);
+  const json=JSON.stringify({app:"PhantaCassandra",version:1,savedAt:STORE.savedAt||Date.now(),squads:STORE.squads},null,1);
   const dl=window.claude?await claude.use("downloads").catch(()=>null):null;
   if(dl){
     try{await dl.save({filename:"rose-phantacassandra.json",data:new Blob([json],{type:"application/json"})});$("saveNote").textContent="Rose esportate.";}
@@ -490,7 +490,7 @@ $("inImport").addEventListener("change",async e=>{
     if(!Array.isArray(j.squads)||!j.squads.length) throw 0;
     STORE.squads=j.squads.map((q,i)=>({name:q.name||("Squadra "+(i+1)),logo:typeof q.logo==="string"&&q.logo.startsWith("data:image/")?q.logo:null,
       players:(Array.isArray(q.players)?q.players:[]).map(p=>resolve({nome:String(p.nome||""),ruolo:p.ruolo||null,club:p.club||p.team||null})).filter(p=>p.nome)}));
-    try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(_){}
+    try{(STORE.savedAt=Date.now(),localStorage.setItem("rose",JSON.stringify(STORE)))}catch(_){}
     location.hash="#home"; route();
     const r=await saveFiles({"rose.json":JSON.stringify(STORE)});
     $("saveNote").textContent=r===true?`Importate ${STORE.squads.length} squadre e salvate.`:r;
@@ -503,14 +503,14 @@ $("btnCancel").onclick=()=>showEditor(false);
 $("btnSave").onclick=async()=>{
   ROSA.name=$("inName").value.trim()||("Squadra "+(CUR+1));
   ROSA.players=draft.map(p=>({nome:p.nome,ruolo:p.ruolo||null,club:p.club||null,team:p.team,canon:p.canon}));
-  try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(e){}
+  try{(STORE.savedAt=Date.now(),localStorage.setItem("rose",JSON.stringify(STORE)))}catch(e){}
   render();
   $("saveNote").textContent="Salvataggio…";
   const ok=await saveFiles({"rose.json":JSON.stringify(STORE)});
   $("saveNote").textContent=ok===true?"Rosa salvata.":ok;
 };
 async function saveFiles(files){
-  if(!artifact) return "Salvata in questo browser. Per averla su un altro dispositivo usa Esporta rose e poi Importa rose.";
+  if(!artifact) return "Salvata in questo browser. Per averla su tutti i dispositivi: Esporta rose e carica il file nella cartella docs su GitHub.";
   try{await artifact.publish(files);return true}
   catch(e){
     if(e.code==="conflict") return "La pagina è stata aggiornata altrove: si ricarica, poi ripeti il salvataggio.";
@@ -716,10 +716,15 @@ function route(){
 async function boot(){
   try{DATA=await fetch("data.json",{cache:"no-store"}).then(r=>r.ok?r.json():null)}catch(e){}
   if(!DATA){try{DATA=JSON.parse(document.getElementById("seed")?.textContent||"null")}catch(e){}}
-  let saved=null;
-  try{saved=JSON.parse(localStorage.getItem("rose")||"null")}catch(e){}
-  if(!saved){try{saved=await fetch("rose.json",{cache:"no-store"}).then(r=>r.ok?r.json():null)}catch(e){}}
-  if(saved&&Array.isArray(saved.squads)&&saved.squads.length) STORE.squads=saved.squads.map((q,i)=>({name:q.name||("Squadra "+(i+1)),logo:q.logo||null,players:Array.isArray(q.players)?q.players:[]}));
+  // rose: quella del browser oppure il file caricato su GitHub (rose-phantacassandra.json o rose.json), vince la più recente
+  let saved=null, local=null, remote=null;
+  try{local=JSON.parse(localStorage.getItem("rose")||"null")}catch(e){}
+  for(const f of ["rose-phantacassandra.json","rose.json"]){
+    if(remote) break;
+    try{remote=await fetch(f,{cache:"no-store"}).then(r=>r.ok?r.json():null)}catch(e){}
+  }
+  saved=!local?remote:!remote?local:((remote.savedAt||0)>(local.savedAt||0)?remote:local);
+  if(saved&&Array.isArray(saved.squads)&&saved.squads.length) STORE.savedAt=saved.savedAt||0, STORE.squads=saved.squads.map((q,i)=>({name:q.name||("Squadra "+(i+1)),logo:q.logo||null,players:Array.isArray(q.players)?q.players:[]}));
   for(const sq of STORE.squads) sq.players=sq.players.map(p=>p.canon&&DATA?.teams?.[p.team]?p:resolve(p));
   window.addEventListener("hashchange",route);
   route();
