@@ -173,4 +173,53 @@ const lega = function () {
   return { teams: { [m[1].trim()]: { mod: m[2], xi: names.slice(0, 11) }, [m[3].trim()]: { mod: m[4], xi: names.slice(11, 22) } } };
 };
 
-module.exports = { lega, skyMatch, lineFormat, fantacalcio, gazzetta, corriere, sosfanta };
+// SportMediaset: una pagina per partita (?match=id1:id2). Testo tipico:
+// TEAM1\nMOD1\nDATA\nORA\nTEAM2\nMOD2\nALLENATORE\nCoach1\n11 giocatori\nALLENATORE\nCoach2\n11 giocatori
+// poi PANCHINA / INDISPONIBILI (due righe: casa, trasferta) / SQUALIFICATI
+const sportmediaset = function () {
+  const t = document.body.innerText;
+  const g = t.match(/(?:Formazioni Serie A - )?Giornata\s+(\d+)/i);
+  const teams = {}, out = {};
+  // blocchi ALLENATORE: coach + 11 titolari, si ferma al prossimo ALLENATORE/PANCHINA/ecc.
+  const blocks = [];
+  const re = /ALLENATORE\n([^\n]+)\n([\s\S]*?)(?=\nALLENATORE\n|\nPANCHINA\n|\nINDISPONIBILI\n|\nSQUALIFICATI\n|$)/gi;
+  let m;
+  while ((m = re.exec(t))) {
+    const xi = m[2].split("\n").map(s => s.trim()).filter(s =>
+      s && !/^(ALLENATORE|PANCHINA|INDISPONIBILI|SQUALIFICATI|LE ULTIME)$/i.test(s) &&
+      !/^\d(?:-\d){2,3}$/.test(s) && !/^\d{1,2}\/\d{1,2}/.test(s) && !/^\d{1,2}:\d{2}$/.test(s)
+    ).slice(0, 11);
+    if (xi.length >= 10) blocks.push({ coach: m[1].trim(), xi });
+  }
+  // intestazione: TEAM1 MOD1 DATA ORA TEAM2 MOD2
+  const head = t.match(/\n([A-ZÀ-Ü][A-Za-zÀ-ÿ' .]{2,30})\n(\d(?:-\d){2,3})\n(\d{1,2}\/\d{1,2}\/\d{4})\n(\d{1,2}:\d{2})\n([A-ZÀ-Ü][A-Za-zÀ-ÿ' .]{2,30})\n(\d(?:-\d){2,3})\n/i);
+  if (head && blocks.length >= 2) {
+    const home = head[1].trim(), away = head[5].trim();
+    teams[home] = { mod: head[2], xi: blocks[0].xi };
+    teams[away] = { mod: head[6], xi: blocks[1].xi };
+    // INDISPONIBILI: due righe consecutive dopo la label (casa poi trasferta), elenco separato da virgole
+    const ind = t.match(/INDISPONIBILI\n([^\n]*)\n([^\n]*)/i);
+    if (ind) {
+      const parseList = (line, team) => {
+        const names = line.split(/,\s*/).map(s => s.trim()).filter(s => s && !/^nessun/i.test(s) && s !== "-");
+        if (names.length) out[team] = names.map(n => ({ n, k: "inf" }));
+      };
+      parseList(ind[1], home);
+      parseList(ind[2], away);
+    }
+    // SQUALIFICATI (stessa struttura, se presenti)
+    const sq = t.match(/SQUALIFICATI\n([^\n]*)\n([^\n]*)/i);
+    if (sq) {
+      const addSq = (line, team) => {
+        const names = line.split(/,\s*/).map(s => s.trim()).filter(s => s && !/^nessun/i.test(s) && s !== "-" && !/^LE ULTIME/i.test(s));
+        if (!names.length) return;
+        out[team] = (out[team] || []).concat(names.map(n => ({ n, k: "squal" })));
+      };
+      addSq(sq[1], home);
+      addSq(sq[2], away);
+    }
+  }
+  return { giornata: g ? +g[1] : null, teams, out, updated: head ? head[3] : "" };
+};
+
+module.exports = { lega, skyMatch, lineFormat, fantacalcio, gazzetta, corriere, sosfanta, sportmediaset };

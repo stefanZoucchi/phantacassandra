@@ -23,6 +23,8 @@ const PLAN = [
   // formazioni ufficiali dalla Lega Serie A (una pagina per partita)
   { key: "lega", legaHub: "https://www.legaseriea.it/it/serie-a", link: /legaseriea\.it\/(?:it\/)?serie-a\/match\/[0-9a-f]{32}\/[a-z0-9-]+-vs-[a-z0-9-]+/, fn: X.lega },
   { key: "goal", hub: "https://www.goal.com/it/notizie", link: /goal\.com\/it\/liste\/probabili-formazioni-serie-a-giornata-\d+[^"#?\s]*/, fn: X.lineFormat },
+  // SportMediaset: hub con tab per partita (?match=idCasa:idTrasferta) — chiave "spm" come nel frontend
+  { key: "spm", hub: "https://www.sportmediaset.mediaset.it/probabili-formazioni/serie-a/", multi: /sportmediaset\.mediaset\.it\/probabili-formazioni\/serie-a\/\?match=[0-9%A-Fa-f:]+/, fn: X.sportmediaset },
 ];
 
 async function open(page, url) {

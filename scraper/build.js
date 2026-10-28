@@ -11,6 +11,7 @@ const SOURCES = [
   { key: "eurosport", name: "Eurosport" },
   { key: "goal", name: "Goal.com" },
   { key: "calciomercato", name: "Calciomercato.com", note: "Stesso gruppo editoriale di Goal.com" },
+  { key: "spm", name: "SportMediaset" },
 ];
 
 function accuracy(D) {
@@ -128,7 +129,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   // Indisponibili: unione delle liste di Gazzetta, Sky e degli altri siti che le pubblicano.
   // Squalificato se lo dice almeno uno; infortunato se almeno uno lo dà fuori senza dubbi; altrimenti in dubbio.
   const RANK = { dubbio: 1, inf: 2, squal: 3 };
-  const outKeys = ["fantacalcio", "gazzetta", "sky", "tmw", "goal", "calciomercato", "eurosport"];
+  const outKeys = ["fantacalcio", "gazzetta", "sky", "tmw", "goal", "calciomercato", "eurosport", "spm"];
   // nomi conosciuti per squadra: rosa di Fantacalcio.it + indisponibili segnalati dalle altre fonti
   const known = t => { const c = new Set(teams[t].roster);
     for (const k of outKeys.slice(1)) { const R = raw[k]; if (!R?.out) continue; const tn = Object.keys(R.out).find(x => sameTeam(x, t)); (tn ? R.out[tn] : []).forEach(o => c.add(o.n)); }
