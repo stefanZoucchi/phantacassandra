@@ -126,4 +126,4 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   return { giornata: P.giornata, generated: now.full, mode, history, sources, teams };
 }
 
-module.exports = { build, accuracy, SOURCES };
+module.exports = { build, accuracy, SOURCES, nowRome };

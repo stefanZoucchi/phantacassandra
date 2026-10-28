@@ -23,7 +23,7 @@ const PLAN = [
 
 async function open(page, url) {
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
-  await page.waitForTimeout(2500);
+  await page.waitForTimeout(2000);
   // chiude i banner dei cookie scegliendo il rifiuto quando c'è
   for (const label of ["Rifiuta", "Rifiuta tutto", "Continua senza accettare", "Non accetto"]) {
     const b = page.getByRole("button", { name: label }).first();
@@ -73,21 +73,41 @@ async function readSource(page, s) {
   return { ...(await page.evaluate(s.fn)), url: pick };
 }
 
+// legge piu' siti insieme (ognuno nella sua scheda): il giro dura 2-3 minuti invece di 8
+const PARALLEL = 4;
+
+function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di Roma, basta per confronti vicini)
+  const m = String(str || "").match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/); if (!m) return null;
+  return Date.UTC(+m[3], +m[2] - 1, +m[1], +m[4], +m[5]) / 60000;
+}
+
 (async () => {
   const prev = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, "utf8")) : null;
+  // giro automatico di riserva di GitHub: se cron-job.org ha gia' aggiornato da poco, non serve rifarlo
+  if (process.env.EVENT === "schedule" && prev) {
+    const { full } = require("./build").nowRome();
+    const a = romeMinutes(prev.generated), b = romeMinutes(full);
+    if (a != null && b != null && b - a >= 0 && b - a < 25) { console.log(`Dati gia' aggiornati alle ${prev.generated}: giro di riserva saltato.`); return; }
+  }
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ locale: "it-IT", timezoneId: "Europe/Rome", viewport: { width: 1280, height: 2000 },
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" });
-  // niente immagini, video e font: le pagine si caricano molto più in fretta
+  // niente immagini, video e font: le pagine si caricano molto piu' in fretta
   await ctx.route("**/*", route => ["image", "media", "font"].includes(route.request().resourceType()) ? route.abort() : route.continue());
-  const page = await ctx.newPage();
   const withTimeout = (p, ms, what) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(what + ": troppo lento, saltato")), ms))]);
   const raw = {};
-  for (const s of PLAN) {
-    const t0 = Date.now();
-    try { raw[s.key] = await withTimeout(readSource(page, s), s.multi ? 240000 : 120000, s.key); console.log(`letto ${s.key}: giornata ${raw[s.key].giornata ?? "?"}, ${Object.keys(raw[s.key].teams || {}).length} squadre (${Math.round((Date.now() - t0) / 1000)}s)`); }
-    catch (e) { raw[s.key] = { error: String(e.message || e).slice(0, 120) }; console.log(`errore ${s.key}: ${raw[s.key].error}`); }
+  const T0 = Date.now();
+  const queue = [...PLAN];
+  async function worker() {
+    for (let s; (s = queue.shift());) {
+      const page = await ctx.newPage(), t0 = Date.now();
+      try { raw[s.key] = await withTimeout(readSource(page, s), s.multi ? 240000 : 120000, s.key); console.log(`letto ${s.key}: giornata ${raw[s.key].giornata ?? "?"}, ${Object.keys(raw[s.key].teams || {}).length} squadre (${Math.round((Date.now() - t0) / 1000)}s)`); }
+      catch (e) { raw[s.key] = { error: String(e.message || e).slice(0, 120) }; console.log(`errore ${s.key}: ${raw[s.key].error}`); }
+      await page.close().catch(() => {});
+    }
   }
+  await Promise.all(Array.from({ length: PARALLEL }, worker));
+  console.log(`Siti letti in ${Math.round((Date.now() - T0) / 1000)}s`);
   await browser.close();
   try {
     const data = build(raw, prev, MODE);
