@@ -338,6 +338,7 @@ function outInfo(p){const T=DATA.teams[p.team];return (T?.out||[]).find(o=>o.n==
 function offCell(p){
   const O=DATA.teams[p.team]?.official; if(!O) return null;
   if(O.xi.includes(p.canon)) return "ok";
+  if((O.bench||[]).includes(p.canon)) return "bench"; // era in panchina: le fonti che lo davano fuori hanno sbagliato
   const o=outInfo(p); if(o&&(o.k==="inf"||o.k==="squal")) return o.k;
   return "bench";
 }
@@ -409,10 +410,15 @@ function renderFonti(){
   const el=$("fontiView");
   if(!DATA){el.innerHTML="";return}
   const cur=accuracy(DATA);
+  { const cs=spmCurStats(); if(cs) cur.spm={hits:cs.hits,total:cs.total,teams:cs.teams}; else delete cur.spm; } // SPM: solo partite incollate prima dell'ufficiale
   const rounds=[...(DATA.history||[]).filter(h=>h.giornata!=DATA.giornata),{giornata:DATA.giornata,stats:cur,live:true}];
   const tot={};
   for(const r of rounds) for(const [k,v] of Object.entries(r.stats||{})){tot[k]=tot[k]||{hits:0,total:0,g:0};tot[k].hits+=v.hits;tot[k].total+=v.total;tot[k].g++}
-  const srcs=DATA.sources;
+  // Sportmediaset: conteggi salvati sul server (giornate passate) + giornata in corso (da questo browser o dal server)
+  for(const [g,v] of Object.entries(SPMSTATS||{})){ if(g==String(DATA.giornata)&&cur.spm) continue; if(!v||!v.total) continue;
+    tot.spm=tot.spm||{hits:0,total:0,g:0}; tot.spm.hits+=v.hits; tot.spm.total+=v.total; tot.spm.g++;
+    if(g==String(DATA.giornata)) cur.spm={hits:v.hits,total:v.total,teams:v.teams}; }
+  const srcs=DATA.sources.some(x=>x.key==="spm")||!tot.spm?DATA.sources:[...DATA.sources,{key:"spm",name:"Sportmediaset",url:SPM_URL,note:"Inserito a mano"}];
   const rows=srcs.map(s=>({s,t:tot[s.key],c:cur[s.key]})).sort((a,b)=>((b.t?b.t.hits/b.t.total:-1)-(a.t?a.t.hits/a.t.total:-1)));
   const nOff=Object.values(DATA.teams).filter(T=>T.official).length;
   const pctS=v=>v&&v.total?Math.round(v.hits/v.total*1000)/10+"%":"—";
@@ -766,7 +772,7 @@ async function ghUpdate(){
     if(Date.now()-t0<60000) return;
     try{
       const d=await freshData();
-      if(d&&d.generated!==before){clearInterval(ghTimer);DATA=d;applySPM();b.disabled=false;route();$("refreshPanel").hidden=false;note.textContent=`Fatto: dati aggiornati alle ${d.generated}.`;return}
+      if(d&&d.generated!==before){clearInterval(ghTimer);DATA=d;applySPM();spmSync();b.disabled=false;route();$("refreshPanel").hidden=false;note.textContent=`Fatto: dati aggiornati alle ${d.generated}.`;return}
       const runs=await ghApi("/actions/workflows/aggiorna.yml/runs?per_page=1").then(r=>r.json());
       const run=runs.workflow_runs?.[0];
       if(run&&run.status==="completed"&&new Date(run.created_at).getTime()>t0-60000&&run.conclusion!=="success"){clearInterval(ghTimer);b.disabled=false;note.innerHTML=`L'aggiornamento non è andato a buon fine. <a href="${run.html_url}" target="_blank" rel="noopener">Vedi il dettaglio su GitHub</a>.`}
@@ -796,41 +802,90 @@ function applySPM(){
 }
 // testo copiato dalla pagina di una partita: "MILAN\n4-2-3-1\n28/10/2026\n18:30\nBOLOGNA\n3-4-2-1\nALLENATORE\nAmorim\n(11 nomi)\nALLENATORE\n..."
 function parseSPM(text){
+  // Il testo copiato non sempre contiene i nomi delle squadre (sono loghi): le riconosco dai giocatori.
+  // Struttura: "ALLENATORE / allenatore / 11 titolari / ALLENATORE / allenatore / 11 titolari ... Indisponibili / riga casa / riga trasferta"
   const L=String(text||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-  const isMod=x=>/^\d(-\d){2,3}$/.test(x), out=[];
-  for(let i=0;i+6<L.length;i++){
-    if(!(isMod(L[i+1])&&/^\d{2}\/\d{2}\/\d{4}$/.test(L[i+2])&&/^\d{1,2}:\d{2}$/.test(L[i+3])&&isMod(L[i+5])&&/^ALLENATORE$/i.test(L[i+6]))) continue;
-    const h=teamFor(L[i]), a=teamFor(L[i+4]); if(!h||!a) continue;
-    const a2=L.findIndex((x,k)=>k>i+6&&/^ALLENATORE$/i.test(x));
-    const hx=L.slice(i+8,a2), ax=L.slice(a2+2,a2+13);
-    if(a2<0||hx.length!==11||ax.length!==11) continue;
-    const sec=(lab,ends)=>{const k=L.findIndex((x,j)=>j>a2&&x.toUpperCase()===lab);if(k<0)return [];const r=[];for(let j=k+1;j<L.length&&!ends.includes(L[j].toUpperCase());j++)r.push(L[j]);return r.join(",").split(/\s*,\s*/).filter(Boolean)};
-    const ind=sec("INDISPONIBILI",["SQUALIFICATI","LE ULTIME","PANCHINA"]), sq=sec("SQUALIFICATI",["LE ULTIME","INDISPONIBILI","PANCHINA"]);
+  const isName=x=>x.length<=32&&!/^•/.test(x)&&!/^\d/.test(x)&&!/^(ALLENATORE|PANCHINA|INDISPONIBILI|SQUALIFICATI)$/i.test(x);
+  const al=L.map((x,i)=>/^ALLENATORE$/i.test(x)?i:-1).filter(i=>i>=0);
+  const teamsAll=Object.keys(DATA.teams), out=[], used=new Set();
+  const best=(xi,only)=>{let bt=null,bs=0;for(const t of (only||teamsAll)){const c=candsOf(t);const sc=xi.filter(n=>matchName(n,c)).length;if(sc>bs){bs=sc;bt=t}}return bs>=7?bt:null};
+  for(let k=0;k+1<al.length;k++){
+    const i=al[k], j=al[k+1];
+    const hx=L.slice(i+2,i+13), ax=L.slice(j+2,j+13);
+    if(j-i!==13||hx.length!==11||ax.length!==11||!hx.every(isName)||!ax.every(isName)) continue;
+    const h=best(hx); if(!h||used.has(h)) continue;
+    const a=best(ax,[DATA.teams[h].opp])||best(ax); if(!a||a===h) continue;
+    used.add(h); used.add(a);
+    // indisponibili e squalificati dopo questa partita (prima della prossima coppia di ALLENATORE)
+    const end=k+2<al.length?al[k+2]:L.length;
+    const sec=lab=>{const s0=L.findIndex((x,q)=>q>j+12&&q<end&&x.toUpperCase()===lab);if(s0<0)return [];const r=[];
+      for(let q=s0+1;q<end;q++){const x=L[q];if(/^(SQUALIFICATI|INDISPONIBILI|LE ULTIME|PANCHINA)$/i.test(x)||/^•/.test(x)||/Scegli un giocatore/i.test(x)||/^\d/.test(x))break;r.push(x)}
+      return r.join(",").split(/\s*,\s*/).map(x=>x.replace(/\.$/,"").trim()).filter(x=>x&&!/^nessun/i.test(x))};
+    const ind=sec("INDISPONIBILI"), sq=sec("SQUALIFICATI");
     const teams={};
-    for(const [t,xi,mod] of [[h,hx,L[i+1]],[a,ax,L[i+5]]]){
+    for(const [t,xi] of [[h,hx],[a,ax]]){
       const c=candsOf(t), st={};
       for(const n of ind){const m=matchName(n,c); if(m) st[m]="inf";}
       for(const n of sq){const m=matchName(n,c); if(m) st[m]="squal";}
-      teams[t]={mod,xi:[...new Set(xi.map(n=>matchName(n,c)||n))],st};
+      teams[t]={mod:"",xi:[...new Set(xi.map(n=>matchName(n,c)||n))],st};
     }
-    out.push({key:h+"-"+a,teams});
-    i=a2+12;
+    const home=DATA.teams[h].home?h:a, away=home===h?a:h;
+    out.push({key:home+"-"+away,teams});
+    k++;
   }
   return out;
+}
+// classifica: dalla pagina partono solo i conteggi (indovinati/totali), non le formazioni di Sportmediaset
+let SPMSTATS={};
+async function loadSpmStats(){
+  try{ let d=null;
+    if(GH){const r=await ghApi(`/contents/docs/spm-stats.json?t=${Date.now()}`,{headers:{Accept:"application/vnd.github.raw+json"},cache:"no-store"}); if(r.ok) d=await r.json();}
+    if(!d) d=await fetch("spm-stats.json",{cache:"no-store"}).then(r=>r.ok?r.json():null);
+    SPMSTATS=d||{};
+  }catch(e){SPMSTATS={}}
+}
+function spmCurStats(){
+  const S=spmLoad(); if(!DATA||S.giornata!=DATA.giornata) return null;
+  let hits=0,total=0,teams=0;
+  for(const M of Object.values(S.matches||{})){ if(M.late) continue;
+    for(const [t,L] of Object.entries(M.teams)){const O=DATA.teams[t]?.official; if(!O) continue; const off=new Set(O.xi); hits+=L.xi.filter(n=>off.has(n)).length; total+=off.size; teams++;}
+  }
+  return teams?{giornata:DATA.giornata,hits,total,teams}:null;
+}
+async function spmSync(){
+  const c=spmCurStats(); if(!c||!GH||!ghTok()) return;
+  const sv=SPMSTATS[String(c.giornata)];
+  if(sv&&sv.teams>=c.teams&&sv.hits===c.hits&&sv.total===c.total) return;
+  if(sv&&sv.teams>c.teams) return; // sul server c'è già di più (inserito da un altro dispositivo)
+  const sig=JSON.stringify(c); try{if(localStorage.getItem("spmSent")===sig) return}catch(e){}
+  try{
+    const r=await ghApi("/actions/workflows/spm.yml/dispatches",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ref:"main",inputs:{stats:sig}})});
+    if(r.ok){try{localStorage.setItem("spmSent",sig)}catch(e){} SPMSTATS[String(c.giornata)]={hits:c.hits,total:c.total,teams:c.teams};}
+  }catch(e){}
 }
 function spmRender(msg){
   const S=spmLoad(), have=S.giornata==DATA?.giornata?Object.keys(S.matches||{}):[];
   const all=DATA?[...new Set(Object.values(DATA.teams).map(T=>T.match))]:[];
-  $("spmMsg").innerHTML=(msg?`<b>${esc(msg)}</b><br>`:"")+(all.length?`Partite inserite: ${have.length} di ${all.length}`+(have.length?` (${have.map(esc).join(", ")})`:""):"");
+  // partite che contano per le tue rose (tutte le squadre), non ancora inserite e non ancora con l'ufficiale
+  const mine=new Set(STORE.squads.flatMap(q=>q.players.map(p=>p.team)).filter(Boolean).map(t=>DATA.teams[t]?.match).filter(Boolean));
+  const todo=[...mine].filter(m=>!have.includes(m)&&!m.split("-").some(t=>DATA.teams[t]?.official));
+  $("spmMsg").innerHTML=(msg?`<b>${esc(msg)}</b><br>`:"")+(all.length?`Partite inserite: ${have.length} di ${all.length}`+(have.length?` (${have.map(esc).join(", ")})`:""):"")+
+    (todo.length?`<br>Ti servono ancora (ci sono tuoi giocatori): <b>${todo.map(esc).join(", ")}</b>`:mine.size?"<br>Hai inserito tutte le partite dei tuoi giocatori.":"");
 }
 function spmRead(){
   const r=parseSPM($("spmIn").value);
   if(!r.length){spmRender("Non ho trovato una formazione nel testo incollato: copia tutta la pagina della partita.");return}
   const S=spmLoad(); if(S.giornata!=DATA.giornata){S.giornata=DATA.giornata;S.matches={}}
   const d=new Date(), at=`${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
-  for(const m of r) S.matches[m.key]={at,teams:m.teams};
+  const kept=[];
+  for(const m of r){
+    const late=Object.keys(m.teams).some(t=>DATA.teams[t]?.official);
+    if(late&&S.matches[m.key]&&!S.matches[m.key].late){kept.push(m.key);continue} // partita già con l'ufficiale: tengo i dati di prima
+    S.matches[m.key]={at,teams:m.teams,...(late?{late:true}:{})};
+  }
   spmSave(S); applySPM(); $("spmIn").value=""; render(); $("spmPanel").hidden=false;
-  spmRender(`Aggiunta: ${r.map(m=>m.key).join(", ")}`);
+  spmRender(kept.length?`${kept.join(", ")}: formazione ufficiale già uscita, tengo i dati incollati prima.`:`Aggiunta: ${r.map(m=>m.key).join(", ")}`+(r.some(m=>S.matches[m.key]?.late)?" (incollata dopo l'ufficiale: si vede ma non conta in classifica)":""));
+  spmSync();
 }
 $("btnSpm").onclick=()=>{const P=$("spmPanel");P.hidden=!P.hidden;if(!P.hidden){spmRender();$("spmIn").focus()}};
 $("spmClose").onclick=()=>{$("spmPanel").hidden=true};
@@ -856,6 +911,7 @@ async function boot(){
   if(!DATA){try{DATA=JSON.parse(document.getElementById("seed")?.textContent||"null")}catch(e){}}
   if(GH){try{const d=await Promise.race([freshData(),new Promise(r=>setTimeout(()=>r(null),4000))]);if(d&&d.generated&&d.generated!==DATA?.generated)DATA=d}catch(e){}}
   applySPM();
+  loadSpmStats().then(()=>{spmSync(); if(CUR==="fonti") render();});
   // rose: quella del browser oppure il file caricato su GitHub (rose-phantacassandra.json o rose.json), vince la più recente
   let saved=null, local=null, remote=null;
   try{local=JSON.parse(localStorage.getItem("rose")||"null")}catch(e){}
