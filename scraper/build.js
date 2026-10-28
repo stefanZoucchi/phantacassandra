@@ -92,7 +92,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   const outKeys = ["gazzetta", "sky", "tmw", "goal", "calciomercato", "eurosport"];
   for (const [t, T] of Object.entries(teams)) {
     const lists = outKeys.map(k => { const R = raw[k]; if (!R || !results[k] || !R.out) return null; const tn = Object.keys(R.out).find(x => sameTeam(x, t)); return tn ? R.out[tn] : null; }).filter(L => L && L.length);
-    if (!lists.length) continue;
+    if (!lists.length) { const PT = prev && prev.giornata == P.giornata && prev.teams?.[t]; if (PT?.out?.length) T.out = PT.out; continue; } // nessuna lista nuova: tengo quella di prima
     const canon = n => matchName(n, T.roster, t) || n;
     const all = [];
     lists.forEach(L => L.forEach(o => {

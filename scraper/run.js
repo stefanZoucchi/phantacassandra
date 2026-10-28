@@ -30,6 +30,20 @@ async function open(page, url) {
     if (await b.isVisible().catch(() => false)) { await b.click().catch(() => {}); await page.waitForTimeout(800); break; }
   }
 }
+// legge la pagina; se il sito la ricarica mentre leggiamo (es. Gazzetta con ?refresh_ce) aspetta e riprova
+async function evalSafe(page, fn) {
+  for (let i = 0; ; i++) {
+    try {
+      await page.waitForLoadState("load", { timeout: 15000 }).catch(() => {});
+      const r = await page.evaluate(fn);
+      if (i < 2 && r && r.teams && !Object.keys(r.teams).length) { await page.waitForTimeout(3000); continue; } // pagina non ancora pronta
+      return r;
+    } catch (e) {
+      if (i >= 2 || !/context|navigat|destroyed/i.test(String(e.message))) throw e;
+      await page.waitForTimeout(3000);
+    }
+  }
+}
 // link presenti nella pagina, anche quelli scritti nel codice e non come <a>
 async function allLinks(page, re) {
   const a = await links(page, re);
@@ -42,12 +56,12 @@ async function allLinks(page, re) {
 const links = (page, re) => page.$$eval("a[href]", (as, src) => { const r = new RegExp(src); return [...new Set(as.map(a => a.href).filter(h => r.test(h)))]; }, re.source);
 
 async function readSource(page, s) {
-  if (s.url) { await open(page, s.url); return { ...(await page.evaluate(s.fn)), url: s.url }; }
+  if (s.url) { await open(page, s.url); return { ...(await evalSafe(page, s.fn)), url: s.url }; }
   if (s.pages) { // l'articolo della giornata si trova scorrendo le pagine delle notizie
     for (let i = 1; i <= 8; i++) {
       await open(page, s.pages + i);
       const u = (await allLinks(page, s.link))[0];
-      if (u) { await open(page, u); return { ...(await page.evaluate(s.fn)), url: u }; }
+      if (u) { await open(page, u); return { ...(await evalSafe(page, s.fn)), url: u }; }
     }
     throw new Error("articolo della giornata non trovato");
   }
@@ -61,7 +75,7 @@ async function readSource(page, s) {
     const done = new Set(); const all = { giornata: null, teams: {}, out: {}, updated: "" };
     while (done.size < 10) {
       const next = [...seen].find(u => !done.has(u)); if (!next) break; done.add(next);
-      try { await open(page, next); const r = await page.evaluate(s.fn); Object.assign(all.teams, r.teams); all.giornata = all.giornata ?? r.giornata; (await allLinks(page, s.multi)).forEach(u => seen.add(u)); } catch (e) {}
+      try { await open(page, next); const r = await evalSafe(page, s.fn); Object.assign(all.teams, r.teams); all.giornata = all.giornata ?? r.giornata; (await allLinks(page, s.multi)).forEach(u => seen.add(u)); } catch (e) {}
     }
     return { ...all, url: s.hub };
   }
@@ -70,11 +84,15 @@ async function readSource(page, s) {
   // l'articolo con il numero di giornata più alto
   const pick = found.sort((a, b) => (+(b.match(/(\d+)a?-giornata|giornata-(\d+)/) || []).slice(1).find(Boolean) || 0) - (+(a.match(/(\d+)a?-giornata|giornata-(\d+)/) || []).slice(1).find(Boolean) || 0))[0];
   await open(page, pick);
-  return { ...(await page.evaluate(s.fn)), url: pick };
+  return { ...(await evalSafe(page, s.fn)), url: pick };
 }
 
 // legge piu' siti insieme (ognuno nella sua scheda): il giro dura 2-3 minuti invece di 8
 const PARALLEL = 4;
+// tutto quello che viene scritto nel registro finisce anche in docs/ultimo-giro.txt (utile per capire cosa non va)
+const LOG = [];
+for (const k of ["log", "error"]) { const o = console[k].bind(console); console[k] = (...a) => { LOG.push(a.join(" ")); o(...a); }; }
+const saveLog = () => { try { fs.writeFileSync(path.join(__dirname, "..", "docs", "ultimo-giro.txt"), LOG.join("\n") + "\n"); } catch (e) {} };
 
 function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di Roma, basta per confronti vicini)
   const m = String(str || "").match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/); if (!m) return null;
@@ -110,13 +128,14 @@ function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di R
   console.log(`Siti letti in ${Math.round((Date.now() - T0) / 1000)}s`);
   await browser.close();
   try {
-    const data = build(raw, prev, MODE);
+    const data = build(raw, prev, MODE, console.log);
     fs.writeFileSync(OUT, JSON.stringify(data));
     const off = Object.values(data.teams).filter(t => t.official).length;
     const nOut = Object.values(data.teams).reduce((a, t) => a + t.out.length, 0);
     console.log(`OK: ${data.giornata}ª giornata, ${data.sources.filter(s => s.ok).length} fonti, ${off} formazioni ufficiali, ${nOut} indisponibili. Salvato ${data.generated}.`);
+    saveLog();
   } catch (e) {
-    console.error("Aggiornamento non salvato: " + e.message);
+    console.error("Aggiornamento non salvato: " + e.message); saveLog();
     process.exit(1);
   }
 })();
