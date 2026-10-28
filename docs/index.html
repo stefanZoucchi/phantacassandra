@@ -1,5 +1,24 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1d6b45"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon.png"><style>[hidden]{display:none!important}body{margin:0}:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}</style></head><body>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1d6b45"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon.png"><link rel="icon" href="icon-192.png"><style>[hidden]{display:none!important}body{margin:0}:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+/* App installata su Android: sempre in orizzontale, intestazione compatta */
+@media (orientation:landscape) and (max-height:560px){
+  .wrap{padding-block:8px 24px;gap:10px}
+  .brand{font-size:24px}
+  .seg a{padding:5px 10px;font-size:13px}
+  button,.btn{padding:6px 12px;font-size:13px}
+  .lastupd{font-size:11px;margin-top:2px}
+  .band{gap:10px}.logo{width:44px;height:44px;font-size:18px;border-radius:10px}
+  .title h1{font-size:24px}.title .sub{font-size:12px}
+  .legend{font-size:12px;gap:10px}
+  .legend span:last-child{display:none}
+  .cards{padding-block:8px}
+  .logo.big{width:120px;height:120px}.tile{width:120px}
+}
+.rotate-hint{display:none}
+@media (orientation:portrait) and (max-width:600px){
+  .rotate-hint{display:block;font-size:13px;padding:8px 12px;border-radius:8px;background:var(--warnbg);color:var(--fg)}
+}
+</style></head><body>
 <title>PhantaCassandra</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -123,6 +142,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
     </div>
     <div class="right"><button class="primary" id="btnRefresh" type="button">Aggiorna dai siti</button><div class="lastupd" id="lastUpd"></div></div>
   </nav>
+  <div class="rotate-hint" id="rotateHint">Le tabelle sono larghe: gira il telefono oppure installa PhantaCassandra come app (menu ⋮ → Installa app), che si apre sempre in orizzontale.</div>
   <section id="fontiView" class="home" hidden></section>
 
   <section class="panel" id="refreshPanel" hidden>
@@ -738,4 +758,10 @@ if(window.claude){
 })();
 </script>
 
+<script>
+// App installata: registra il service worker e prova a bloccare l'orizzontale
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+const standalone=matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches;
+if(standalone){ document.getElementById("rotateHint")?.remove(); screen.orientation?.lock?.("landscape").catch(()=>{}); }
+</script>
 </body></html>
