@@ -186,7 +186,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
     <span><i class="lt lt-I">I</i>Infortunato</span>
     <span><i class="lt lt-S">S</i>Squalificato</span>
     <span><i class="lt lt-na">–</i>Non ancora pubblicato</span>
-    <span>% impiego = fonti che lo danno titolare ÷ fonti che hanno pubblicato · sotto ogni fonte: data e ora del suo ultimo aggiornamento</span>
+    <span>% impiego = fonti che lo danno titolare ÷ fonti che hanno pubblicato (le fonti storicamente più accurate pesano un po' di più) · sotto ogni fonte: aggiornamento e n. squadre coperte</span>
   </div>
 
 
@@ -250,16 +250,17 @@ let mcp = null, sample = null, artifact = null;
 function norm(s){return String(s||"").replace(/[øØ]/g,"o").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[’']/g,"").replace(/[^a-z ]/g," ").split(/\s+/).filter(Boolean)}
 function base(c){let t=norm(c);while(t.length>1&&t[t.length-1].length<=2)t=t.slice(0,-1);return t}
 function inits(c){const t=norm(c);const b=base(c);return t.slice(b.length)}
-const ALIAS={"nuno tavares":"Tavares N.","diogo leite":"Leite","rodrigo mora":"Mora","lucas perri":"Perri","yan couto":"Couto","nico paz":"Paz N.","goncalo ramos":"Ramos G.","cisse":"Cissè A.","estupinian":"Estupinan","hutchison":"Hutchinson","kike perez":"Perez K.","josep martinez":"Martinez Jo.","anguissa":"Zambo Anguissa","rafa marin":"Marin R.","valde":"Valdepenas","pote":"Goncalves P.","goncalves":"Goncalves P.","dodo":"Dodò","junior messias":"Messias","floriani":"Floriani Mussolini","sebastiano esposito":"Esposito Se.","pio esposito":"Esposito F.P.","lautaro":"Martinez L.","lautaro martinez":"Martinez L.","danilo veiga":"Veiga D.","petar sucic":"Sucic P.","daniel braganca":"Braganca","ricardo mangas":"Mangas","dany mota":"Mota","gustavo varela":"Varela G.","schmidt":"Schmid"};
+const ALIAS={"nuno tavares":"Tavares N.","diogo leite":"Leite","rodrigo mora":"Mora","lucas perri":"Perri","yan couto":"Couto","nico paz":"Paz N.","goncalo ramos":"Ramos G.","g ramos":"Ramos G.","cisse":"Cissè A.","alphadjo cisse":"Cissè A.","estupinian":"Estupinan","hutchison":"Hutchinson","kike perez":"Perez K.","josep martinez":"Martinez Jo.","anguissa":"Zambo Anguissa","rafa marin":"Marin R.","valde":"Valdepenas","pote":"Goncalves P.","goncalves":"Goncalves P.","pedro goncalves":"Goncalves P.","dodo":"Dodò","junior messias":"Messias","floriani":"Floriani Mussolini","sebastiano esposito":"Esposito Se.","pio esposito":"Esposito F.P.","lautaro":"Martinez L.","lautaro martinez":"Martinez L.","danilo veiga":"Veiga D.","petar sucic":"Sucic P.","daniel braganca":"Braganca","ricardo mangas":"Mangas","dany mota":"Mota","gustavo varela":"Varela G.","schmidt":"Schmid","mctominay":"McTominay","scott mctominay":"McTominay","calhanoglu":"Çalhanoğlu","ndicka":"N'Dicka","kolo muani":"Kolo Muani","de ketelaere":"De Ketelaere","soule":"Soulé","soulè":"Soulé","carlos augusto":"Carlos Augusto","c augusto":"Carlos Augusto","luis henrique":"Luis Henrique","hojlund":"Højlund","akinsanmiro":"Akinsanmiro","ghedjemis":"Ghedjemis","akor adams":"Adams A.","che adams":"Adams C.","mbala nzola":"Nzola","douglas luiz":"Douglas Luiz","ze pedro":"Zé Pedro"};
 function matchName(name, cands){
   const n=norm(name), key=n.join(" ");
   if(!n.length) return null;
   if(ALIAS[key] && cands.includes(ALIAS[key])) return ALIAS[key];
+  if(ALIAS[key]){const hitA=cands.find(c=>c===ALIAS[key]||norm(c).join(" ")===norm(ALIAS[key]).join(" ")); if(hitA) return hitA;}
   let hit=cands.find(c=>norm(c).join(" ")===key); if(hit) return hit;
   hit=cands.filter(c=>base(c).join(" ")===key); if(hit.length===1) return hit[0];
   const n2=n.filter(x=>x.length>2); const k2=(n2.length?n2:n).join(" ");
   hit=cands.filter(c=>base(c).join(" ")===k2);
-  if(hit.length>1){ // disambiguate by initials (e.g. "Lautaro Martinez" vs Martinez L. / Martinez Jo.)
+  if(hit.length>1){
     const short=n.filter(x=>!base(hit[0]).includes(x));
     const h2=hit.filter(c=>inits(c).some(i=>short.some(s=>s.startsWith(i))));
     if(h2.length===1) return h2[0];
@@ -268,6 +269,7 @@ function matchName(name, cands){
   hit=cands.filter(c=>{const b=base(c);return b.every(x=>n.includes(x))});
   if(hit.length===1) return hit[0];
   const last=(n2.length?n2:n).slice(-1)[0];
+  if(last&&last.length>=3){hit=cands.filter(c=>{const b=base(c);return b[b.length-1]===last}); if(hit.length===1) return hit[0];}
   hit=cands.filter(c=>{const b=base(c);return b[b.length-1]===last||b[0]===last});
   return hit.length===1?hit[0]:null;
 }
@@ -351,15 +353,26 @@ function renderHeader(){
   if(DATA) $("sub").textContent=`Serie A · ${DATA.giornata}ª giornata · aggiornato ${DATA.generated} · ${ROSA.players.length} giocatori`;
 }
 const isOut=x=>!x.o?0:(x.o.k==="inf"||x.o.k==="squal")?2:x.o.k==="dubbio"?1:0; // in fondo: prima gli in dubbio, poi infortunati e squalificati
+// peso fonte da accuracy storica (0.75–1.25); con pochi dati resta 1
+function srcWeight(key){
+  let hits=0, total=0;
+  for(const r of (DATA.history||[])){ const v=r.stats&&r.stats[key]; if(v&&v.total){ hits+=v.hits; total+=v.total; } }
+  try{ const cur=accuracy(DATA)[key]; if(cur&&cur.total){ hits+=cur.hits; total+=cur.total; } }catch(e){}
+  if(total<40) return 1;
+  const p=hits/total;
+  return Math.round((0.75+0.5*p)*100)/100; // ~0.75 se pessima, ~1.25 se ottima
+}
 function rowsFor(SQ){
   const srcs=DATA.sources;
+  const wts=srcs.map(s=>srcWeight(s.key));
   return SQ.players.map(p=>{
     const r=p.canon?p:resolve(p);
     const cells=srcs.map(s=>r.team&&r.canon?cellFor(r,s):"na");
     const balls=srcs.map((s,i)=>(cells[i]==="ok"||cells[i]==="bench")&&!!DATA.teams[r.team]?.lineups?.[s.key]?.b?.includes(r.canon));
-    const pub=cells.filter(c=>c!=="na").length, ok=cells.filter(c=>c==="ok").length;
+    let wOk=0, wPub=0;
+    cells.forEach((c,i)=>{ if(c==="na") return; const w=wts[i]; wPub+=w; if(c==="ok") wOk+=w; });
     const off=r.team&&r.canon?offCell(r):null;
-    return {p:r,cells,balls,off,pct:off?(off==="ok"?100:0):(pub?Math.round(ok/pub*100):null),o:r.team&&r.canon?outInfo(r):null};
+    return {p:r,cells,balls,off,pct:off?(off==="ok"?100:0):(wPub?Math.round(wOk/wPub*100):null),o:r.team&&r.canon?outInfo(r):null};
   });
 }
 function logoHTML(SQ){return SQ.logo?`<img src="${SQ.logo}" alt="Logo">`:esc((SQ.name||"FC").split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase())}
@@ -431,8 +444,18 @@ function renderFonti(){
    }).join("")+
    `</tbody></table></div><div class="note">Titolari previsti che poi compaiono nella formazione ufficiale (tutte le partite di Serie A, non solo le tue rose). La % è hits/total; con poche partite il margine di errore è alto — sotto ${MIN_TEAMS} squadre ufficiali confrontate la fonte resta fuori classifica (n.c.). ${nOff?`Giornata in corso: ${nOff} squadre su ${Object.keys(DATA.teams).length} con l'ufficiale.`:"La classifica parte con le prime formazioni ufficiali, circa un'ora prima di ogni partita."}</div>`;
 }
+function nextGiroHint(){
+  // orari di riserva IT (solare): 11:55 14:25 17:25 17:55 20:10 — indicativi
+  const slots=[[11,55],[14,25],[17,25],[17,55],[20,10]];
+  const now=new Date();
+  const parts=new Intl.DateTimeFormat("it-IT",{timeZone:"Europe/Rome",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(now);
+  const hh=+parts.find(p=>p.type==="hour").value, mm=+parts.find(p=>p.type==="minute").value;
+  const cur=hh*60+mm;
+  for(const [h,m] of slots){ if(h*60+m>cur+2) return `prossimo giro ~${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`; }
+  return "prossimo giro ~11:55";
+}
 function render(){
-  $("lastUpd").textContent=DATA?`Ultimo aggiornamento: ${DATA.generated} · ${DATA.mode||"manuale"}`:"";
+  $("lastUpd").textContent=DATA?`Ultimo aggiornamento: ${DATA.generated} · ${DATA.mode||"manuale"} · ${nextGiroHint()}`:"";
   renderTabs();
   if(CUR==="fonti"){renderFonti();return}
   renderTabs();
@@ -449,7 +472,11 @@ function render(){
   const order=["P","D","C","A",null];
   const names={P:"Portieri",D:"Difensori",C:"Centrocampisti",A:"Attaccanti",null:"Senza ruolo"};
   let html=`<table><thead><tr><th class="name" style="position:sticky;left:0;z-index:2">Giocatore</th><th>%</th>`+
-    srcs.map(s=>`<th class="src"><a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.name)}${s.note?": "+esc(s.note):""}">${ABBR[s.key]||s.key}</a><small>${esc(s.updated||"—")}</small></th>`).join("")+`<th class="src uff" title="Formazione ufficiale: quando esce sostituisce i pronostici">UFF<small>ufficiale</small></th></tr></thead><tbody>`;
+    srcs.map(s=>{
+      const cov=s.teams!=null?`${s.teams} sq`:"";
+      const tip=esc(s.name)+(s.note?": "+esc(s.note):"")+(s.teams!=null?` · ${s.teams} squadre coperte`:"");
+      return `<th class="src"><a href="${esc(s.url)}" target="_blank" rel="noopener" title="${tip}">${ABBR[s.key]||s.key}</a><small>${esc(s.updated||"—")}${cov?` · ${cov}`:""}</small></th>`;
+    }).join("")+`<th class="src uff" title="Formazione ufficiale: quando esce sostituisce i pronostici">UFF<small>ufficiale</small></th></tr></thead><tbody>`;
   for(const ro of order){
     const g=rows.filter(x=>(x.p.ruolo||null)===ro).sort((a,b)=>(isOut(a)-isOut(b))||((b.pct??-1)-(a.pct??-1))||((DATA.teams[b.p.team]?.pct?.[b.p.canon]||0)-(DATA.teams[a.p.team]?.pct?.[a.p.canon]||0)));
     if(!g.length) continue;
@@ -819,6 +846,24 @@ async function boot(){
   route();
 }
 boot();
+// controlla periodicamente se data.json è più recente (dopo un giro Actions)
+let lastGen=DATA&&DATA.generated;
+async function pollData(){
+  try{
+    const d=await fetch("data.json",{cache:"no-store"}).then(r=>r.ok?r.json():null);
+    if(d&&d.generated&&d.generated!==lastGen){
+      lastGen=d.generated; DATA=d;
+      const bar=$("lastUpd");
+      if(bar&&!bar.dataset.fresh){
+        bar.dataset.fresh="1";
+        bar.innerHTML=`Ultimo aggiornamento: ${DATA.generated} · <button type="button" id="btnFresh" style="margin-left:6px">Nuovi dati — aggiorna vista</button>`;
+        $("btnFresh").onclick=()=>{ delete bar.dataset.fresh; render(); };
+      }
+    }
+  }catch(e){}
+}
+setInterval(pollData, 120000);
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") pollData(); });
 if(window.claude){
   claude.use("mcp").then(m=>{mcp=m}).catch(()=>{});
   claude.use("sample").then(s=>{sample=s;if(!$("editor").hidden)updateDraft()}).catch(()=>{});
