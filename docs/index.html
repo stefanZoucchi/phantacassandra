@@ -79,6 +79,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);align-items:center}
 .dot{width:14px;height:14px;border-radius:50%;display:inline-block;flex:none}
 .d-ok{background:var(--ok)} .d-bench{background:var(--bench)} .d-out{background:var(--out)} .d-na{background:var(--na)}
+.dot.ball{display:inline-flex;align-items:center;justify-content:center;font:800 9px/1 system-ui,sans-serif;color:#fff}
+.dot.d-bench.ball{color:#1b1400}
 .legend span{display:inline-flex;gap:6px;align-items:center}
 
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -173,6 +175,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
     <span><i class="dot d-bench"></i>Panchina</span>
     <span><i class="dot d-out"></i>Infortunato o squalificato</span>
     <span><i class="dot d-na"></i>Non ancora pubblicato</span>
+    <span><i class="dot d-ok ball">B</i><i class="dot d-bench ball" style="margin-left:3px">B</i>In ballottaggio: in vantaggio / in svantaggio</span>
     <span>% impiego = fonti che lo danno titolare ÷ fonti che hanno pubblicato · sotto ogni fonte: data e ora del suo ultimo aggiornamento</span>
   </div>
 
@@ -339,9 +342,10 @@ function rowsFor(SQ){
   return SQ.players.map(p=>{
     const r=p.canon?p:resolve(p);
     const cells=srcs.map(s=>r.team&&r.canon?cellFor(r,s):"na");
+    const balls=srcs.map((s,i)=>(cells[i]==="ok"||cells[i]==="bench")&&!!DATA.teams[r.team]?.lineups?.[s.key]?.b?.includes(r.canon));
     const pub=cells.filter(c=>c!=="na").length, ok=cells.filter(c=>c==="ok").length;
     const off=r.team&&r.canon?offCell(r):null;
-    return {p:r,cells,off,pct:off?(off==="ok"?100:0):(pub?Math.round(ok/pub*100):null),o:r.team&&r.canon?outInfo(r):null};
+    return {p:r,cells,balls,off,pct:off?(off==="ok"?100:0):(pub?Math.round(ok/pub*100):null),o:r.team&&r.canon?outInfo(r):null};
   });
 }
 function logoHTML(SQ){return SQ.logo?`<img src="${SQ.logo}" alt="Logo">`:esc((SQ.name||"FC").split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase())}
@@ -430,7 +434,7 @@ function render(){
       const label={ok:"titolare",bench:"panchina",out:"infortunato/squalificato",na:"non pubblicato"};
       html+=`<tr><td class="name"><div class="pname">${x.p.ruolo?`<span class="role-tag r-${x.p.ruolo}">${x.p.ruolo}</span>`:""}${esc(String(x.p.nome).toUpperCase())}</div><div class="pmeta">${meta||"Controlla nome e squadra nella rosa"}</div></td>`+
         `<td><div class="pct">${x.pct==null?"—":x.pct+"%"}</div>${x.off?'<div class="pmeta">ufficiale</div>':""}</td>`+
-        x.cells.map((c,i)=>`<td class="dc"><i class="dot d-${c}" title="${esc(srcs[i].name)}: ${label[c]}"></i></td>`).join("")+
+        x.cells.map((c,i)=>{const b=x.balls?.[i];return `<td class="dc"><i class="dot d-${c}${b?" ball":""}" title="${esc(srcs[i].name)}: ${label[c]}${b?(c==="ok"?", in ballottaggio (in vantaggio)":", in ballottaggio (in svantaggio)"):""}">${b?"B":""}</i></td>`}).join("")+
         `<td class="dc uffc"><i class="dot d-${x.off||"na"}" title="Formazione ufficiale: ${x.off?label[x.off]:"non ancora uscita"}"></i></td>`+
         `<td>${badge}</td></tr>`;
     }
