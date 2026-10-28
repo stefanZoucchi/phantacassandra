@@ -14,8 +14,8 @@ const lineFormat = function () {
     if (xi.length < 10 || xi.length > 12 || teams[h.name]) return; // 10: virgola mancante sul sito, sistemata dopo
     teams[h.name] = { mod: h.mod, xi };
     const tail = t.slice(h.end, k + 1 < hits.length ? hits[k + 1].i : h.end + 800);
-    const list = (lab) => { const r = tail.match(new RegExp(lab + "\\s*:\\s*([^\\n]+)", "i")); return r ? r[1].split(/,\s*/).map(s => s.replace(/\(.*?\)/g, "").trim()).filter(s => s && !/^nessun/i.test(s) && s !== "-") : []; };
-    const o = [...list("Squalificati").map(n => ({ n, k: "squal" })), ...list("Indisponibili").map(n => ({ n, k: "inf" }))];
+    const list = (lab) => { const r = tail.match(new RegExp(lab + "\\s*:\\s*([^\\n]+)", "i")); return r ? r[1].split(/,\s*(?![^()]*\))/).map(s => ({ n: s.replace(/\(.*?\)/g, "").trim().replace(/\.$/, ""), note: (s.match(/\((.*?)\)/) || [])[1] || "" })).filter(o => o.n && !/^nessun/i.test(o.n) && o.n !== "-") : []; };
+    const o = [...list("Squalificat[io]").map(x => ({ n: x.n, k: "squal" })), ...list("(?:Indisponibili|Infortunati|Assenti)").map(x => ({ n: x.n, k: /valutar|dubbi|recuper/i.test(x.note) ? "dubbio" : "inf" }))];
     if (o.length) out[h.name] = o;
   });
   const g = t.match(/(\d{1,2})\s*(?:\^|ª|a|°)\s*giornata/i) || t.match(/giornata\s+(\d{1,2})\b/i);
@@ -80,10 +80,12 @@ const gazzetta = function () {
     }
     if (hx.length !== 11 || ax.length !== 11) continue;
     teams[home] = { mod: mods[0], xi: hx }; teams[away] = { mod: mods[1], xi: ax };
-    const grab = lab => L.filter(s => s.startsWith(lab + ":")).map(s => s.slice(lab.length + 1).split(/,\s*/).map(x => x.replace(/\(.*?\)/g, "").trim()).filter(x => x && !/^nessuno$/i.test(x)));
+    // "Indisponibili: Stones (Da valutare), Lautaro Martínez (Rientro alla 12)" -> "da valutare" diventa in dubbio
+    const grab = lab => L.filter(s => s.startsWith(lab + ":")).map(s => s.slice(lab.length + 1).split(/,\s*(?![^()]*\))/).map(x => ({ n: x.replace(/\(.*?\)/g, "").trim(), note: (x.match(/\((.*?)\)/) || [])[1] || "" })).filter(x => x.n && !/^nessuno$/i.test(x.n)));
     const sq = grab("Squalificati"), ind = grab("Indisponibili");
-    out[home] = [...(sq[0] || []).map(n => ({ n, k: "squal" })), ...(ind[0] || []).map(n => ({ n, k: "inf" }))];
-    out[away] = [...(sq[1] || []).map(n => ({ n, k: "squal" })), ...(ind[1] || []).map(n => ({ n, k: "inf" }))];
+    const kind = o => /valutar|dubbi|recuper/i.test(o.note) ? "dubbio" : "inf";
+    out[home] = [...(sq[0] || []).map(o => ({ n: o.n, k: "squal" })), ...(ind[0] || []).map(o => ({ n: o.n, k: kind(o) }))];
+    out[away] = [...(sq[1] || []).map(o => ({ n: o.n, k: "squal" })), ...(ind[1] || []).map(o => ({ n: o.n, k: kind(o) }))];
   }
   return { giornata: g ? +g[1] : null, teams, out, updated: upd };
 };

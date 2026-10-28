@@ -86,17 +86,20 @@ function build(raw, prev, mode = "automatico", log = console.log) {
     else log(`- ${s.name}: nessuna squadra utilizzabile`);
   }
 
-  // Indisponibili: Gazzetta + Sky. Infortunati segnati da entrambi (o da quella che c'è), squalificati da almeno una.
+  // Indisponibili: unione delle liste di Gazzetta, Sky e degli altri siti che le pubblicano.
+  // Squalificato se lo dice almeno uno; infortunato se almeno uno lo dà fuori senza dubbi; altrimenti in dubbio.
+  const RANK = { dubbio: 1, inf: 2, squal: 3 };
+  const outKeys = ["gazzetta", "sky", "tmw", "goal", "calciomercato", "eurosport"];
   for (const [t, T] of Object.entries(teams)) {
-    const lists = ["gazzetta", "sky"].map(k => { const R = raw[k]; if (!R || !results[k] || !R.out) return null; const tn = Object.keys(R.out).find(x => sameTeam(x, t)); return tn ? R.out[tn] : []; }).filter(Boolean);
+    const lists = outKeys.map(k => { const R = raw[k]; if (!R || !results[k] || !R.out) return null; const tn = Object.keys(R.out).find(x => sameTeam(x, t)); return tn ? R.out[tn] : null; }).filter(L => L && L.length);
     if (!lists.length) continue;
     const canon = n => matchName(n, T.roster, t) || n;
     const all = [];
-    lists.forEach((L, i) => L.forEach(o => {
+    lists.forEach(L => L.forEach(o => {
       const c = canon(o.n); const ex = all.find(a => a.n === c || matchName(o.n, [a.n], t));
-      if (ex) { ex.src.add(i); if (o.k === "squal") ex.k = "squal"; } else all.push({ n: c, k: o.k, src: new Set([i]) });
+      if (ex) { if (RANK[o.k] > RANK[ex.k]) ex.k = o.k; } else all.push({ n: c, k: o.k });
     }));
-    T.out = all.filter(a => a.k === "squal" || a.src.size === lists.length).map(a => ({ n: a.n, k: a.k }));
+    T.out = all;
   }
 
   let history = prev?.history || [];

@@ -93,7 +93,8 @@ async function readSource(page, s) {
     const data = build(raw, prev, MODE);
     fs.writeFileSync(OUT, JSON.stringify(data));
     const off = Object.values(data.teams).filter(t => t.official).length;
-    console.log(`OK: ${data.giornata}ª giornata, ${data.sources.filter(s => s.ok).length} fonti, ${off} formazioni ufficiali. Salvato ${data.generated}.`);
+    const nOut = Object.values(data.teams).reduce((a, t) => a + t.out.length, 0);
+    console.log(`OK: ${data.giornata}ª giornata, ${data.sources.filter(s => s.ok).length} fonti, ${off} formazioni ufficiali, ${nOut} indisponibili. Salvato ${data.generated}.`);
   } catch (e) {
     console.error("Aggiornamento non salvato: " + e.message);
     process.exit(1);
