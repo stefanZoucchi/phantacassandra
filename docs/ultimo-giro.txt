@@ -1,14 +1,14 @@
-letto corriere: giornata 9, 14 squadre (4s)
-letto fantacalcio: giornata 9, 20 squadre (6s)
-letto gazzetta: giornata 9, 14 squadre (15s)
-letto tmw: giornata 9, 18 squadre (20s)
-letto sosfanta: giornata ?, 20 squadre (19s)
-letto goal: giornata 9, 20 squadre (17s)
-letto calciomercato: giornata ?, 20 squadre (20s)
-letto eurosport: giornata 9, 14 squadre (56s)
-letto sky: giornata 9, 7 squadre (90s)
-Siti letti in 90s
-+ Sky Sport: 7 squadre
+letto corriere: giornata 9, 14 squadre (3s)
+letto fantacalcio: giornata 9, 20 squadre (4s)
+letto sky: giornata 9, 20 squadre (7s)
+letto gazzetta: giornata 9, 14 squadre (9s)
+letto tmw: giornata 9, 18 squadre (9s)
+letto goal: giornata 9, 20 squadre (8s)
+letto sosfanta: giornata ?, 20 squadre (18s)
+letto calciomercato: giornata ?, 20 squadre (18s)
+letto eurosport: giornata 9, 14 squadre (37s)
+Siti letti in 45s
++ Sky Sport: 20 squadre
 + Gazzetta: 14 squadre
 + Corriere dello Sport: 14 squadre
   TuttoMercatoWeb Como: 12 titolari, scartata
@@ -17,4 +17,4 @@ Siti letti in 90s
 + Eurosport: 14 squadre
 + Goal.com: 20 squadre
 + Calciomercato.com: 20 squadre
-OK: 9ª giornata, 9 fonti, 6 formazioni ufficiali, 70 indisponibili. Salvato 28/10/2026 12:13.
+OK: 9ª giornata, 9 fonti, 6 formazioni ufficiali, 99 indisponibili. Salvato 28/10/2026 12:22.
