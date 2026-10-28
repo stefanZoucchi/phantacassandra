@@ -67,6 +67,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
     teams[t] = { match: m.home + "-" + m.away, home: side === "home", opp: m[opp], when: m.when, roster: [...T.xi, ...(T.bench || [])], pct: T.pct || {},
       lineups: T.official ? {} : { fantacalcio: { mod: T.mod, xi: T.xi } }, out: [] };
     if (T.official) teams[t].official = { xi: T.xi, src: "Fantacalcio.it" };
+    else { const bn = ballOf(P, t, t, teams[t].roster); if (bn.length) teams[t].lineups.fantacalcio.b = bn; }
   }
   const teamKey = n => Object.keys(teams).find(k => sameTeam(k, n));
   const pairsOk = R => { // the source must describe the same fixtures
@@ -109,9 +110,14 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   // Indisponibili: unione delle liste di Gazzetta, Sky e degli altri siti che le pubblicano.
   // Squalificato se lo dice almeno uno; infortunato se almeno uno lo dà fuori senza dubbi; altrimenti in dubbio.
   const RANK = { dubbio: 1, inf: 2, squal: 3 };
-  const outKeys = ["gazzetta", "sky", "tmw", "goal", "calciomercato", "eurosport"];
+  const outKeys = ["fantacalcio", "gazzetta", "sky", "tmw", "goal", "calciomercato", "eurosport"];
   for (const [t, T] of Object.entries(teams)) {
-    const lists = outKeys.map(k => { const R = raw[k]; if (!R || !results[k] || !R.out) return null; const tn = Object.keys(R.out).find(x => sameTeam(x, t)); return tn ? R.out[tn] : null; }).filter(L => L && L.length);
+    const lists = outKeys.map(k => {
+      const R = raw[k]; if (!R || (!results[k] && k !== "fantacalcio") || !R.out) return null;
+      const tn = Object.keys(R.out).find(x => sameTeam(x, t)); if (!tn) return null;
+      // liste con le due squadre mescolate: tengo solo i giocatori della rosa di questa squadra
+      return R.mixed ? R.out[tn].filter(o => matchName(o.n, T.roster, t)) : R.out[tn];
+    }).filter(L => L && L.length);
     if (!lists.length) { const PT = prev && prev.giornata == P.giornata && prev.teams?.[t]; if (PT?.out?.length) T.out = PT.out; continue; } // nessuna lista nuova: tengo quella di prima
     const canon = n => matchName(n, T.roster, t) || n;
     const all = [];

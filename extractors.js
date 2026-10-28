@@ -33,11 +33,20 @@ const fantacalcio = function () {
   const parts = t.split(/\n(Lunedì|Martedì|Mercoledì|Giovedì|Venerdì|Sabato|Domenica) (\d{1,2}) (\w+), (\d{1,2}:\d{2})\n/);
   const isMod = s => /^\d(-\d){2,3}$/.test(s);
   const isPct = s => /^\d{1,3}%$/.test(s);
-  const matches = [], teams = {};
+  const matches = [], teams = {}, ball = {}, out = {};
   let updated = "";
   for (let i = 1; i + 4 < parts.length + 1; i += 5) {
     const when = `${DAYS[parts[i]] || parts[i]} ${parts[i + 1].padStart(2, "0")}/${MONTHS[parts[i + 2].toLowerCase()] || "??"} ${parts[i + 3]}`;
     const body = (parts[i + 4] || "").split("Presentazione squadre")[0];
+    // "Dettaglio calciatori": Ballottaggi (nome, %, nome, %), Squalificati, Infortunati (nome + descrizione). Le due squadre
+    // sono mescolate (colonna sinistra e destra): l'abbinamento alla squadra lo fa build.js con le rose.
+    const det = ((parts[i + 4] || "").split("Dettaglio calciatori")[1] || "");
+    const sec = (lab, next) => (det.split(new RegExp("\\n" + lab + "\\n"))[1] || "").split(new RegExp("\\n(?:" + next + ")\\n"))[0];
+    const bl = sec("Ballottaggi", "Squalificati").split("\n").map(x => x.trim()).filter(x => x && !/^\d{1,3}%$/.test(x) && !/^Nessun/i.test(x));
+    const pairs = []; for (let k = 0; k + 1 < bl.length; k += 2) pairs.push(bl[k] + " - " + bl[k + 1]);
+    const names = txt => txt.split(/\n\s*\n/).map(x => x.trim()).filter(Boolean).flatMap(x => x.split("\n")).map(x => x.trim())
+      .filter(x => x && !/^Nessun/i.test(x) && x.length <= 30 && !/\s(di|del|della|al|alla|contro|da|in|out|e)\s/i.test(" " + x + " ") && /^[A-ZÀ-Ý]/.test(x));
+    const outs = [...names(sec("Squalificati", "Diffidati")).map(n => ({ n, k: "squal" })), ...names(sec("Infortunati", "In dubbio")).map(n => ({ n, k: "inf" }))];
     const L = body.split("\n").map(s => s.trim()).filter(s => s && !/connection is too slow/i.test(s));
     const tIdx = L.map((s, k) => (isMod(L[k + 1] || "") ? k : -1)).filter(k => k >= 0);
     if (tIdx.length < 2) continue;
@@ -59,9 +68,9 @@ const fantacalcio = function () {
     if (H.xi.length !== 11 || A.xi.length !== 11) continue;
     matches.push({ home: H.name, away: A.name, when });
     // formazione ufficiale: Fantacalcio.it mette tutti gli 11 titolari al 100%
-    for (const S of [H, A]) teams[S.name] = { mod: S.mod, xi: S.xi, pct: S.pct, bench: S.bench, official: S.xi.every(n => S.pct[n] === 100) };
+    for (const S of [H, A]) { teams[S.name] = { mod: S.mod, xi: S.xi, pct: S.pct, bench: S.bench, official: S.xi.every(n => S.pct[n] === 100) }; ball[S.name] = pairs; out[S.name] = outs; }
   }
-  return { giornata: g ? +g[1] : null, matches, teams, updated };
+  return { giornata: g ? +g[1] : null, matches, teams, ball, out, mixed: true, updated };
 };
 
 const gazzetta = function () {
