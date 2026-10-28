@@ -11,7 +11,9 @@ const MODE = process.env.MODE || "automatico";
 
 const PLAN = [
   { key: "fantacalcio", url: "https://www.fantacalcio.it/probabili-formazioni-serie-a", fn: X.fantacalcio },
-  { key: "sky", hub: "https://sport.sky.it/calcio/serie-a", link: /sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/probabili-formazioni-serie-a[^"#?\s]*/, fn: X.lineFormat },
+  { key: "sky", hub: "https://sport.sky.it/calcio/serie-a", link: /sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/probabili-formazioni-serie-a[^"#?\s]*/, fn: X.lineFormat,
+    // nei turni infrasettimanali Sky pubblica un articolo per partita
+    perMatch: { hubs: ["https://sport.sky.it/calcio/serie-a/probabili-formazioni", "https://sport.sky.it/calcio/serie-a"], link: /sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/[a-z0-9-]+-probabili-formazioni-\d+-giornata/, fn: X.skyMatch } },
   { key: "gazzetta", url: "https://www.gazzetta.it/Calcio/prob_form/", fn: X.gazzetta },
   { key: "corriere", url: "https://www.corrieredellosport.it/probabili-formazioni/calcio/serie-a", fn: X.corriere },
   { key: "tmw", hub: "https://www.tuttomercatoweb.com/probabili-formazioni/", link: /tuttomercatoweb\.com\/probabili-formazioni\/probabili-formazioni-serie-a-ultime-\d+a-giornata[^"#?\s]*/, fn: X.lineFormat },
@@ -55,6 +57,21 @@ async function allLinks(page, re) {
 }
 const links = (page, re) => page.$$eval("a[href]", (as, src) => { const r = new RegExp(src); return [...new Set(as.map(a => a.href).filter(h => r.test(h)))]; }, re.source);
 
+// un articolo per partita: prende quelli della giornata più alta e li legge uno per uno
+async function readPerMatch(page, s) {
+  const P = s.perMatch, all = new Set();
+  for (const h of P.hubs) { try { await open(page, h); (await allLinks(page, P.link)).forEach(u => all.add(u.replace(/[?#].*$/, ""))); } catch (e) {} }
+  const gOf = u => +((u.match(/-(\d+)-giornata/) || [])[1] || 0);
+  const g = Math.max(0, ...[...all].map(gOf));
+  const urls = [...all].filter(u => gOf(u) === g).slice(0, 10);
+  if (!urls.length) throw new Error("articoli delle partite non trovati");
+  const res = { giornata: g || null, teams: {}, out: {}, updated: "" };
+  for (const u of urls) {
+    try { await open(page, u); const r = await evalSafe(page, P.fn); Object.assign(res.teams, r.teams); if (r.updated > res.updated) res.updated = r.updated; } catch (e) {}
+  }
+  return { ...res, url: P.hubs[0] };
+}
+
 async function readSource(page, s) {
   if (s.url) { await open(page, s.url); return { ...(await evalSafe(page, s.fn)), url: s.url }; }
   if (s.pages) { // l'articolo della giornata si trova scorrendo le pagine delle notizie
@@ -80,6 +97,7 @@ async function readSource(page, s) {
     return { ...all, url: s.hub };
   }
   const found = await links(page, s.link);
+  if (!found.length && s.perMatch) return readPerMatch(page, s);
   if (!found.length) throw new Error("articolo della giornata non trovato");
   // l'articolo con il numero di giornata più alto
   const pick = found.sort((a, b) => (+(b.match(/(\d+)a?-giornata|giornata-(\d+)/) || []).slice(1).find(Boolean) || 0) - (+(a.match(/(\d+)a?-giornata|giornata-(\d+)/) || []).slice(1).find(Boolean) || 0))[0];
@@ -119,7 +137,7 @@ function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di R
   async function worker() {
     for (let s; (s = queue.shift());) {
       const page = await ctx.newPage(), t0 = Date.now();
-      try { raw[s.key] = await withTimeout(readSource(page, s), s.multi ? 240000 : 120000, s.key); console.log(`letto ${s.key}: giornata ${raw[s.key].giornata ?? "?"}, ${Object.keys(raw[s.key].teams || {}).length} squadre (${Math.round((Date.now() - t0) / 1000)}s)`); }
+      try { raw[s.key] = await withTimeout(readSource(page, s), (s.multi || s.perMatch) ? 240000 : 120000, s.key); console.log(`letto ${s.key}: giornata ${raw[s.key].giornata ?? "?"}, ${Object.keys(raw[s.key].teams || {}).length} squadre (${Math.round((Date.now() - t0) / 1000)}s)`); }
       catch (e) { raw[s.key] = { error: String(e.message || e).slice(0, 120) }; console.log(`errore ${s.key}: ${raw[s.key].error}`); }
       await page.close().catch(() => {});
     }

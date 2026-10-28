@@ -121,4 +121,21 @@ const sosfanta = function () {
   return { giornata: null, teams, firstDate: date, updated: "" };
 };
 
-module.exports = { lineFormat, fantacalcio, gazzetta, corriere, sosfanta };
+// Sky, articolo di una singola partita: "GENOA (4-2-3-1), la probabile formazione" + elenco (la seconda squadra è in una scheda nascosta)
+const skyMatch = function () {
+  const teams = {};
+  const heads = [...document.querySelectorAll("h2,h3,h4,strong,p,div")].filter(e => e.children.length === 0 && /\(\d(?:-\d){2,3}\),\s*la probabile formazione/i.test(e.textContent));
+  for (const e of heads) {
+    const m = e.textContent.trim().match(/^(.+?)\s*\((\d(?:-\d){2,3})\)/); if (!m || teams[m[1]]) continue;
+    let txt = "", n = e;
+    for (let k = 0; k < 6 && !txt; k++) { for (let x = n.nextElementSibling; x && !txt; x = x.nextElementSibling) if (/;.*;.*;/.test(x.textContent)) txt = x.textContent.trim().split("\n")[0]; n = n.parentElement; if (!n) break; }
+    const body = txt.replace(/\.?\s*(All\.|Allenatore:?)\s.*$/i, "");
+    const xi = body.split(/[;,]/).map(x => x.trim().replace(/\.$/, "")).filter(Boolean);
+    if (xi.length >= 10 && xi.length <= 12) teams[m[1]] = { mod: m[2], xi };
+  }
+  const g = location.href.match(/(\d{1,2})-giornata/);
+  const d = location.href.match(/\/(\d{4})\/(\d{2})\/(\d{2})\//);
+  return { giornata: g ? +g[1] : null, teams, out: {}, updated: d ? `${d[3]}/${d[2]}` : "" };
+};
+
+module.exports = { skyMatch, lineFormat, fantacalcio, gazzetta, corriere, sosfanta };
