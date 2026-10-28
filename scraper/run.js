@@ -16,7 +16,8 @@ const PLAN = [
   { key: "corriere", url: "https://www.corrieredellosport.it/probabili-formazioni/calcio/serie-a", fn: X.corriere },
   { key: "tmw", hub: "https://www.tuttomercatoweb.com/probabili-formazioni/", link: /tuttomercatoweb\.com\/probabili-formazioni\/probabili-formazioni-serie-a-ultime-\d+a-giornata[^"#?\s]*/, fn: X.lineFormat },
   { key: "sosfanta", url: "https://www.sosfanta.com/lista-formazioni/probabili-formazioni-serie-a/", fn: X.sosfanta },
-  { key: "eurosport", hub: "https://www.eurosport.it/calcio/serie-a/", multi: /eurosport\.it\/calcio\/serie-a\/[^"#?\s]*-probabili-formazioni-statistiche[^"#?\s]*story\.shtml/, fn: X.lineFormat },
+  { key: "eurosport", hub: "https://www.eurosport.it/calcio/serie-a/", summary: /eurosport\.it\/calcio\/serie-a\/[^"#?\s]*probabili-formazioni-\d+a-giornata[^"#?\s]*story\.shtml/, multi: /eurosport\.it\/calcio\/serie-a\/[^"#?\s]*-probabili-formazioni-statistiche[^"#?\s]*story\.shtml/, fn: X.lineFormat },
+  { key: "calciomercato", pages: "https://www.calciomercato.com/notizie/", link: /calciomercato\.com\/liste\/serie-a-probabili-formazioni-[a-z]+-giornata[^"#?\s]*/, fn: X.lineFormat },
   { key: "goal", hub: "https://www.goal.com/it/notizie", link: /goal\.com\/it\/liste\/probabili-formazioni-serie-a-giornata-\d+[^"#?\s]*/, fn: X.lineFormat },
 ];
 
@@ -29,16 +30,38 @@ async function open(page, url) {
     if (await b.isVisible().catch(() => false)) { await b.click().catch(() => {}); await page.waitForTimeout(800); break; }
   }
 }
+// link presenti nella pagina, anche quelli scritti nel codice e non come <a>
+async function allLinks(page, re) {
+  const a = await links(page, re);
+  const html = await page.content();
+  const b = [...html.matchAll(new RegExp(re.source, "g"))].map(m => m[0].startsWith("http") ? m[0] : "https://www." + m[0]);
+  const host = new URL(page.url()).origin;
+  const c = [...html.matchAll(/"(\/[^"\s]+?story\.shtml)"/g)].map(m => host + m[1]).filter(u => re.test(u));
+  return [...new Set([...a, ...b, ...c])];
+}
 const links = (page, re) => page.$$eval("a[href]", (as, src) => { const r = new RegExp(src); return [...new Set(as.map(a => a.href).filter(h => r.test(h)))]; }, re.source);
 
 async function readSource(page, s) {
   if (s.url) { await open(page, s.url); return { ...(await page.evaluate(s.fn)), url: s.url }; }
+  if (s.pages) { // l'articolo della giornata si trova scorrendo le pagine delle notizie
+    for (let i = 1; i <= 8; i++) {
+      await open(page, s.pages + i);
+      const u = (await allLinks(page, s.link))[0];
+      if (u) { await open(page, u); return { ...(await page.evaluate(s.fn)), url: u }; }
+    }
+    throw new Error("articolo della giornata non trovato");
+  }
   await open(page, s.hub);
   if (s.multi) {
-    const seen = new Set(await links(page, s.multi)); const done = new Set(); const all = { giornata: null, teams: {}, out: {}, updated: "" };
+    const seen = new Set(await allLinks(page, s.multi));
+    if (s.summary) { // pagina riassuntiva della giornata: contiene i link a tutte le partite
+      const sum = (await links(page, s.summary))[0];
+      if (sum) { await open(page, sum); (await allLinks(page, s.multi)).forEach(u => seen.add(u)); }
+    }
+    const done = new Set(); const all = { giornata: null, teams: {}, out: {}, updated: "" };
     while (done.size < 10) {
       const next = [...seen].find(u => !done.has(u)); if (!next) break; done.add(next);
-      try { await open(page, next); const r = await page.evaluate(s.fn); Object.assign(all.teams, r.teams); all.giornata = all.giornata ?? r.giornata; (await links(page, s.multi)).forEach(u => seen.add(u)); } catch (e) {}
+      try { await open(page, next); const r = await page.evaluate(s.fn); Object.assign(all.teams, r.teams); all.giornata = all.giornata ?? r.giornata; (await allLinks(page, s.multi)).forEach(u => seen.add(u)); } catch (e) {}
     }
     return { ...all, url: s.hub };
   }

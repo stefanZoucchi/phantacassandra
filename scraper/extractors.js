@@ -37,7 +37,6 @@ const fantacalcio = function () {
     const when = `${DAYS[parts[i]] || parts[i]} ${parts[i + 1].padStart(2, "0")}/${MONTHS[parts[i + 2].toLowerCase()] || "??"} ${parts[i + 3]}`;
     const body = (parts[i + 4] || "").split("Presentazione squadre")[0];
     const L = body.split("\n").map(s => s.trim()).filter(s => s && !/connection is too slow/i.test(s));
-    const official = /ufficial/i.test(body);
     const tIdx = L.map((s, k) => (isMod(L[k + 1] || "") ? k : -1)).filter(k => k >= 0);
     if (tIdx.length < 2) continue;
     const side = (from, to) => {
@@ -57,7 +56,8 @@ const fantacalcio = function () {
     const H = side(tIdx[0], tIdx[1]), A = side(tIdx[1], endIdx > 0 ? endIdx : L.length);
     if (H.xi.length !== 11 || A.xi.length !== 11) continue;
     matches.push({ home: H.name, away: A.name, when });
-    for (const S of [H, A]) teams[S.name] = { mod: S.mod, xi: S.xi, pct: S.pct, bench: S.bench, official };
+    // formazione ufficiale: Fantacalcio.it mette tutti gli 11 titolari al 100%
+    for (const S of [H, A]) teams[S.name] = { mod: S.mod, xi: S.xi, pct: S.pct, bench: S.bench, official: S.xi.every(n => S.pct[n] === 100) };
   }
   return { giornata: g ? +g[1] : null, matches, teams, updated };
 };

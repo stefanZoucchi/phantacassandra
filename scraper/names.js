@@ -12,7 +12,7 @@ const ALIAS = {
   "akinsamiro": "Akinsanmiro", "junior messias": "Messias", "floriani": "Floriani Mussolini", "sebastiano esposito": "Esposito Se.",
   "pio esposito": "Esposito F.P.", "lautaro": "Martinez L.", "lautaro martinez": "Martinez L.", "mbala nzola": "Nzola", "gustavo varela": "Varela G.",
   "ricardo mangas": "Mangas", "dany mota": "Mota", "fali cande": "Candè", "danilo veiga": "Veiga D.", "petar sucic": "Sucic P.", "daniel braganca": "Braganca",
-  "akor adams": "Adams A.", "ismael kone": "Konè I.", "manu kone": "Konè M."
+  "akor adams": "Adams A.", "ismael kone": "Konè I.", "manu kone": "Konè M.", "schmidt": "Schmid"
 };
 const TEAM_ALIAS = { "cagliari|carlos": "Kevin Carlos", "inter|martinez": "Martinez Jo.", "inter|esposito": "Esposito F.P.", "inter|stankovic": "Stankovic A.",
   "venezia|stankovic": "Stankovic F.", "venezia|adams": "Adams A.", "torino|adams": "Adams C.", "atalanta|orbic": "Obric", "sassuolo|esposito": "Esposito Se." };

@@ -10,6 +10,7 @@ const SOURCES = [
   { key: "sosfanta", name: "SOS Fanta" },
   { key: "eurosport", name: "Eurosport" },
   { key: "goal", name: "Goal.com" },
+  { key: "calciomercato", name: "Calciomercato.com", note: "Stesso gruppo editoriale di Goal.com" },
 ];
 
 function accuracy(D) {
@@ -103,7 +104,11 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   if (same) {
     for (const [t, T] of Object.entries(teams)) {
       const PT = prev.teams?.[t]; if (!PT) continue;
-      if (PT.official) { T.official = PT.official; T.lineups = PT.lineups; }
+      if (PT.official) { T.official = PT.official; T.lineups = PT.lineups; T.pct = PT.pct; }
+      else if (T.official) { // ufficiale appena uscita: i pronostici restano quelli letti prima
+        T.lineups = { ...T.lineups, ...PT.lineups };
+        if (PT.pct && Object.keys(PT.pct).length) T.pct = PT.pct;
+      }
       else for (const [k, L] of Object.entries(PT.lineups || {})) if (!T.lineups[k] && !results[k]) T.lineups[k] = L;
     }
   } else if (prev) {
