@@ -15,7 +15,7 @@ const lineFormat = function () {
     teams[h.name] = { mod: h.mod, xi };
     const tail = t.slice(h.end, k + 1 < hits.length ? hits[k + 1].i : h.end + 800);
     const list = (lab) => { const r = tail.match(new RegExp(lab + "\\s*:\\s*([^\\n]+)", "i")); return r ? r[1].split(/,\s*(?![^()]*\))/).map(s => ({ n: s.replace(/\(.*?\)/g, "").trim().replace(/\.$/, ""), note: (s.match(/\((.*?)\)/) || [])[1] || "" })).filter(o => o.n && !/^nessun/i.test(o.n) && o.n !== "-") : []; };
-    const o = [...list("Squalificat[io]").map(x => ({ n: x.n, k: "squal" })), ...list("(?:Indisponibili|Infortunati|Assenti)").map(x => ({ n: x.n, k: /valutar|dubbi|recuper/i.test(x.note) ? "dubbio" : "inf" }))];
+    const o = [...list("Squalificat[io]").map(x => ({ n: x.n, k: "squal" })), ...list("(?:Indisponibili|Infortunati|Assenti)").map(x => ({ n: x.n, k: /\bin dubbio\b|\bin forse\b/i.test(x.note) ? "dubbio" : "inf" }))];
     if (o.length) out[h.name] = o;
   });
   const g = t.match(/(\d{1,2})\s*(?:\^|ª|a|°)\s*giornata/i) || t.match(/giornata\s+(\d{1,2})\b/i);
@@ -83,7 +83,7 @@ const gazzetta = function () {
     // "Indisponibili: Stones (Da valutare), Lautaro Martínez (Rientro alla 12)" -> "da valutare" diventa in dubbio
     const grab = lab => L.filter(s => s.startsWith(lab + ":")).map(s => s.slice(lab.length + 1).split(/,\s*(?![^()]*\))/).map(x => ({ n: x.replace(/\(.*?\)/g, "").trim(), note: (x.match(/\((.*?)\)/) || [])[1] || "" })).filter(x => x.n && !/^nessuno$/i.test(x.n)));
     const sq = grab("Squalificati"), ind = grab("Indisponibili");
-    const kind = o => /valutar|dubbi|recuper/i.test(o.note) ? "dubbio" : "inf";
+    const kind = o => /\bin dubbio\b|\bin forse\b/i.test(o.note) ? "dubbio" : "inf";
     out[home] = [...(sq[0] || []).map(o => ({ n: o.n, k: "squal" })), ...(ind[0] || []).map(o => ({ n: o.n, k: kind(o) }))];
     out[away] = [...(sq[1] || []).map(o => ({ n: o.n, k: "squal" })), ...(ind[1] || []).map(o => ({ n: o.n, k: kind(o) }))];
   }
@@ -109,15 +109,18 @@ const corriere = function () {
 const sosfanta = function () {
   const t = document.querySelector("main")?.innerText || document.body.innerText;
   const teams = {};
-  const re = /\n([A-Za-zÀ-ÿ' ]+)\n(\d(?:-\d){2,3})\n(\d{2}\/\d{2}\/\d{4}) - (\d{2}:\d{2})\n([A-Za-zÀ-ÿ' ]+)\n(\d(?:-\d){2,3})\nTitolari\n([\s\S]*?)\nBALLOTTAGGI/g;
-  let m, date = "";
-  while ((m = re.exec(t))) {
-    const names = m[7].split("\n").map(s => s.trim()).filter(s => s && !/^\d{1,3}%$/.test(s));
-    if (names.length < 22) continue;
+  // intestazione di ogni partita; il blocco finisce dove inizia la partita dopo (le partite già giocate non hanno BALLOTTAGGI)
+  const re = /\n([A-Za-zÀ-ÿ' ]+)\n(\d(?:-\d){2,3})\n(\d{2}\/\d{2}\/\d{4}) - (\d{2}:\d{2})\n([A-Za-zÀ-ÿ' ]+)\n(\d(?:-\d){2,3})\nTitolari\n/g;
+  const H = [...t.matchAll(re)];
+  let date = "";
+  H.forEach((m, i) => {
+    const body = t.slice(m.index + m[0].length, i + 1 < H.length ? H[i + 1].index : t.length).split(/\n(?:BALLOTTAGGI|INDISPONIBILI|SQUALIFICATI|PANCHINA|Panchina)\b/)[0];
+    const names = body.split("\n").map(s => s.trim()).filter(s => s && !/^\d{1,3}%$/.test(s));
+    if (names.length < 22) return;
     teams[m[1]] = { mod: m[2], xi: names.slice(0, 11) };
     teams[m[5]] = { mod: m[6], xi: names.slice(11, 22) };
     date = date || m[3];
-  }
+  });
   return { giornata: null, teams, firstDate: date, updated: "" };
 };
 
