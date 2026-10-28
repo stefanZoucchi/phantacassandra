@@ -40,6 +40,22 @@ function nowRome() {
   return { full: `${p.day}/${p.month}/${p.year} ${p.hour}:${p.minute}`, day: `${p.day}/${p.month}` };
 }
 
+// Ballottaggi: "Zielinski-Barella" oppure "Estupinan - Diawara S." -> nomi della rosa di quella squadra.
+// Con i cognomi col trattino ("Loftus-Cheek-Fofana") prova tutti i punti di taglio.
+function ballOf(R, tn, team, cands) {
+  const pairs = R.ball?.[tn] || []; const res = new Set();
+  for (const p of pairs) {
+    let opts = / - /.test(p) ? [p.split(/\s+-\s+/)] : [];
+    const parts = p.split("-");
+    for (let i = 1; i < parts.length; i++) opts.push([parts.slice(0, i).join("-"), parts.slice(i).join("-")]);
+    for (const [a, b] of opts) {
+      const ma = matchName(a.trim(), cands, team), mb = matchName(b.trim(), cands, team);
+      if (ma && mb && ma !== mb) { res.add(ma); res.add(mb); break; }
+    }
+  }
+  return [...res];
+}
+
 // raw: {fantacalcio:{giornata,matches,teams,updated}, sky:{...,url}, ...}; prev: data.json precedente (o null)
 function build(raw, prev, mode = "automatico", log = console.log) {
   const P = raw.fantacalcio;
@@ -51,6 +67,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
     teams[t] = { match: m.home + "-" + m.away, home: side === "home", opp: m[opp], when: m.when, roster: [...T.xi, ...(T.bench || [])], pct: T.pct || {},
       lineups: T.official ? {} : { fantacalcio: { mod: T.mod, xi: T.xi } }, out: [] };
     if (T.official) teams[t].official = { xi: T.xi, src: "Fantacalcio.it" };
+    else { const bn = ballOf(P, t, t, teams[t].roster); if (bn.length) teams[t].lineups.fantacalcio.b = bn; }
   }
   const teamKey = n => Object.keys(teams).find(k => sameTeam(k, n));
   const pairsOk = R => { // the source must describe the same fixtures
@@ -79,7 +96,11 @@ function build(raw, prev, mode = "automatico", log = console.log) {
       xi = [...new Set(xi)];
       if (xi.length !== 11) { log(`  ${s.name} ${t}: ${xi.length} titolari, scartata`); continue; }
       if (L.official) { if (!teams[t].official) teams[t].official = { xi, src: s.name }; }
-      else teams[t].lineups[s.key] = { mod: L.mod, xi };
+      else {
+        teams[t].lineups[s.key] = { mod: L.mod, xi };
+        const bn = ballOf(R, tn, t, [...new Set([...cands, ...xi])]);
+        if (bn.length) teams[t].lineups[s.key].b = bn;
+      }
       n++;
     }
     if (n) { results[s.key] = { url: R.url, updated: shortDate(R.updated) || now.day }; log(`+ ${s.name}: ${n} squadre`); }
@@ -89,9 +110,14 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   // Indisponibili: unione delle liste di Gazzetta, Sky e degli altri siti che le pubblicano.
   // Squalificato se lo dice almeno uno; infortunato se almeno uno lo dà fuori senza dubbi; altrimenti in dubbio.
   const RANK = { dubbio: 1, inf: 2, squal: 3 };
-  const outKeys = ["gazzetta", "sky", "tmw", "goal", "calciomercato", "eurosport"];
+  const outKeys = ["fantacalcio", "gazzetta", "sky", "tmw", "goal", "calciomercato", "eurosport"];
   for (const [t, T] of Object.entries(teams)) {
-    const lists = outKeys.map(k => { const R = raw[k]; if (!R || !results[k] || !R.out) return null; const tn = Object.keys(R.out).find(x => sameTeam(x, t)); return tn ? R.out[tn] : null; }).filter(L => L && L.length);
+    const lists = outKeys.map(k => {
+      const R = raw[k]; if (!R || (!results[k] && k !== "fantacalcio") || !R.out) return null;
+      const tn = Object.keys(R.out).find(x => sameTeam(x, t)); if (!tn) return null;
+      // liste con le due squadre mescolate: tengo solo i giocatori della rosa di questa squadra
+      return R.mixed ? R.out[tn].filter(o => matchName(o.n, T.roster, t)) : R.out[tn];
+    }).filter(L => L && L.length);
     if (!lists.length) { const PT = prev && prev.giornata == P.giornata && prev.teams?.[t]; if (PT?.out?.length) T.out = PT.out; continue; } // nessuna lista nuova: tengo quella di prima
     const canon = n => matchName(n, T.roster, t) || n;
     const all = [];
