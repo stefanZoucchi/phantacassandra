@@ -123,7 +123,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
     const all = [];
     lists.forEach(L => L.forEach(o => {
       const c = canon(o.n); const ex = all.find(a => a.n === c || matchName(o.n, [a.n], t));
-      const k = o.k === "squal" ? "squal" : "inf"; // niente "in dubbio": chi è nelle liste è fuori
+      const k = o.k; // se una fonte lo dà fuori e un'altra in dubbio, vince "fuori"
       if (ex) { if (RANK[k] > RANK[ex.k]) ex.k = k; } else all.push({ n: c, k });
     }));
     T.out = all;

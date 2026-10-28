@@ -15,7 +15,7 @@ const lineFormat = function () {
     teams[h.name] = { mod: h.mod, xi };
     const tail = t.slice(h.end, k + 1 < hits.length ? hits[k + 1].i : h.end + 800);
     const list = (lab) => { const r = tail.match(new RegExp(lab + "\\s*:\\s*([^\\n]+)", "i")); return r ? r[1].split(/,\s*(?![^()]*\))/).map(s => ({ n: s.replace(/\(.*?\)/g, "").trim().replace(/\.$/, ""), note: (s.match(/\((.*?)\)/) || [])[1] || "" })).filter(o => o.n && !/^nessun/i.test(o.n) && o.n !== "-") : []; };
-    const o = [...list("Squalificat[io]").map(x => ({ n: x.n, k: "squal" })), ...list("(?:Indisponibili|Infortunati|Assenti)").map(x => ({ n: x.n, k: /\bin dubbio\b|\bin forse\b/i.test(x.note) ? "dubbio" : "inf" }))];
+    const o = [...list("Squalificat[io]").map(x => ({ n: x.n, k: "squal" })), ...list("(?:Indisponibili|Infortunati|Assenti)").map(x => ({ n: x.n, k: /valutar|\bin dubbio\b|\bin forse\b/i.test(x.note) ? "dubbio" : "inf" }))];
     if (o.length) out[h.name] = o;
     const b = list("Ballottagg[io]").map(x => x.n.replace(/\s*\d+\s*%.*$/, "").trim()).filter(x => /-/.test(x));
     if (b.length) ball[h.name] = b;
@@ -46,7 +46,7 @@ const fantacalcio = function () {
     const pairs = []; for (let k = 0; k + 1 < bl.length; k += 2) pairs.push(bl[k] + " - " + bl[k + 1]);
     const names = txt => txt.split(/\n\s*\n/).map(x => x.trim()).filter(Boolean).flatMap(x => x.split("\n")).map(x => x.trim())
       .filter(x => x && !/^Nessun/i.test(x) && x.length <= 30 && !/\s(di|del|della|al|alla|contro|da|in|out|e)\s/i.test(" " + x + " ") && /^[A-ZÀ-Ý]/.test(x));
-    const outs = [...names(sec("Squalificati", "Diffidati")).map(n => ({ n, k: "squal" })), ...names(sec("Infortunati", "In dubbio")).map(n => ({ n, k: "inf" }))];
+    const outs = [...names(sec("Squalificati", "Diffidati")).map(n => ({ n, k: "squal" })), ...names(sec("Infortunati", "In dubbio")).map(n => ({ n, k: "inf" })), ...names(sec("In dubbio", "Presentazione squadre|Dettaglio calciatori")).map(n => ({ n, k: "dubbio" }))];
     const L = body.split("\n").map(s => s.trim()).filter(s => s && !/connection is too slow/i.test(s));
     const tIdx = L.map((s, k) => (isMod(L[k + 1] || "") ? k : -1)).filter(k => k >= 0);
     if (tIdx.length < 2) continue;
@@ -97,7 +97,7 @@ const gazzetta = function () {
     // "Ballottaggio: Halhal-Schingtienne 60-40%, Diouf-Spence, 60-40%" -> ["Halhal-Schingtienne", "Diouf-Spence"]
     const bl = L.filter(x => /^Ballottagg(io|i):/i.test(x)).map(x => x.replace(/^Ballottagg(io|i):\s*/i, "").split(/%\s*,?\s*/).map(seg => seg.replace(/,?\s*\d+\s*-\s*\d+\s*%?\s*$/, "").replace(/\.$/, "").trim()).filter(seg => /-/.test(seg) && !/^nessun/i.test(seg)));
     ball[home] = bl[0] || []; ball[away] = bl[1] || [];
-    const kind = o => /\bin dubbio\b|\bin forse\b/i.test(o.note) ? "dubbio" : "inf";
+    const kind = o => /valutar|\bin dubbio\b|\bin forse\b/i.test(o.note) ? "dubbio" : "inf";
     out[home] = [...(sq[0] || []).map(o => ({ n: o.n, k: "squal" })), ...(ind[0] || []).map(o => ({ n: o.n, k: kind(o) }))];
     out[away] = [...(sq[1] || []).map(o => ({ n: o.n, k: "squal" })), ...(ind[1] || []).map(o => ({ n: o.n, k: kind(o) }))];
   }

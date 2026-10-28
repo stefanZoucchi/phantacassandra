@@ -11,7 +11,7 @@ const MODE = process.env.MODE || "automatico";
 
 const PLAN = [
   { key: "fantacalcio", url: "https://www.fantacalcio.it/probabili-formazioni-serie-a", fn: X.fantacalcio },
-  { key: "sky", hub: "https://sport.sky.it/calcio/serie-a", link: /sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/probabili-formazioni-serie-a[^"#?\s]*/, fn: X.lineFormat,
+  { key: "sky", hub: ["https://sport.sky.it/calcio/serie-a/probabili-formazioni", "https://sport.sky.it/calcio/serie-a"], link: /sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/probabili-formazioni-serie-a[^"#?\s]*/, fn: X.lineFormat,
     // nei turni infrasettimanali Sky pubblica un articolo per partita
     perMatch: { hubs: ["https://sport.sky.it/calcio/serie-a/probabili-formazioni", "https://sport.sky.it/calcio/serie-a"], link: /sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/[a-z0-9-]+-probabili-formazioni-\d+-giornata/, fn: X.skyMatch } },
   { key: "gazzetta", url: "https://www.gazzetta.it/Calcio/prob_form/", fn: X.gazzetta },
@@ -50,7 +50,7 @@ async function evalSafe(page, fn) {
 async function allLinks(page, re) {
   const a = await links(page, re);
   const html = await page.content();
-  const b = [...html.matchAll(new RegExp(re.source, "g"))].map(m => m[0].startsWith("http") ? m[0] : "https://www." + m[0]);
+  const b = [...html.matchAll(new RegExp(re.source, "g"))].map(m => m[0].startsWith("http") ? m[0] : (m[0].split("/")[0].split(".").length >= 3 ? "https://" : "https://www.") + m[0]);
   const host = new URL(page.url()).origin;
   const c = [...html.matchAll(/"(\/[^"\s]+?story\.shtml)"/g)].map(m => host + m[1]).filter(u => re.test(u));
   return [...new Set([...a, ...b, ...c])];
@@ -82,7 +82,8 @@ async function readSource(page, s) {
     }
     throw new Error("articolo della giornata non trovato");
   }
-  await open(page, s.hub);
+  const hubs = [].concat(s.hub);
+  await open(page, hubs[0]);
   if (s.multi) {
     const seen = new Set(await allLinks(page, s.multi));
     if (s.summary) { // pagina riassuntiva della giornata: contiene i link a tutte le partite
@@ -94,9 +95,10 @@ async function readSource(page, s) {
       const next = [...seen].find(u => !done.has(u)); if (!next) break; done.add(next);
       try { await open(page, next); const r = await evalSafe(page, s.fn); Object.assign(all.teams, r.teams); all.giornata = all.giornata ?? r.giornata; (await allLinks(page, s.multi)).forEach(u => seen.add(u)); } catch (e) {}
     }
-    return { ...all, url: s.hub };
+    return { ...all, url: hubs[0] };
   }
-  const found = await links(page, s.link);
+  let found = await allLinks(page, s.link);
+  for (const h of hubs.slice(1)) { if (found.length) break; await open(page, h); found = await allLinks(page, s.link); }
   if (!found.length && s.perMatch) return readPerMatch(page, s);
   if (!found.length) throw new Error("articolo della giornata non trovato");
   // l'articolo con il numero di giornata più alto
