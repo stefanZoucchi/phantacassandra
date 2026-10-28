@@ -709,15 +709,52 @@ async function startUpdate(){
       "Non sono riuscito ad avviare l'aggiornamento. Riprova tra qualche minuto.";
   }finally{b.disabled=false}
 }
+/* ---------- aggiornamento con un tocco (GitHub) ---------- */
+const GH=(()=>{const h=location.hostname.match(/^([^.]+)\.github\.io$/), repo=location.pathname.split("/").filter(Boolean)[0];return h&&repo?{user:h[1],repo}:null})();
+const ghTok=()=>{try{return localStorage.getItem("ghToken")||""}catch(e){return ""}};
+const ghApi=(path,opt={})=>fetch(`https://api.github.com/repos/${GH.user}/${GH.repo}${path}`,{...opt,headers:{Accept:"application/vnd.github+json",...(ghTok()?{Authorization:"Bearer "+ghTok()}:{}),...(opt.headers||{})}});
+async function freshData(){ // dati appena salvati, senza aspettare la pubblicazione della pagina
+  const r=await ghApi(`/contents/docs/data.json?t=${Date.now()}`,{headers:{Accept:"application/vnd.github.raw+json"},cache:"no-store"});
+  return r.ok?r.json():null;
+}
+function showTokenForm(msg){
+  const u=`https://github.com/settings/personal-access-tokens/new`;
+  $("refreshNote").innerHTML=`${msg?`<b>${msg}</b><br>`:""}Per aggiornare con un tocco serve una chiave di GitHub (una volta sola su ogni dispositivo). Creala <a href="${u}" target="_blank" rel="noopener">qui</a>: <i>Repository access</i> → Only select repositories → <b>${GH.repo}</b>; <i>Permissions</i> → <b>Actions: Read and write</b>. Poi incollala qui sotto.
+  <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><input id="ghTokIn" type="password" placeholder="github_pat_…" style="flex:1;min-width:200px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;font:inherit"><button class="primary" id="ghTokSave" type="button">Salva e aggiorna</button></div>
+  <div style="margin-top:6px;font-size:12px;opacity:.75">La chiave resta solo in questo browser. In alternativa <a href="https://github.com/${GH.user}/${GH.repo}/actions/workflows/aggiorna.yml" target="_blank" rel="noopener">avvia a mano da GitHub</a>.</div>`;
+  $("ghTokSave").onclick=()=>{const v=$("ghTokIn").value.trim();if(!v)return;try{localStorage.setItem("ghToken",v)}catch(e){}ghUpdate()};
+}
+let ghTimer=null;
+async function ghUpdate(){
+  const note=$("refreshNote"), b=$("btnRefresh");
+  $("refreshPanel").hidden=false; $("progress").innerHTML=""; $("refreshPanel").querySelector("h2").textContent="Aggiornamento dai siti";
+  if(!ghTok()) return showTokenForm();
+  b.disabled=true; note.textContent="Avvio dell'aggiornamento…";
+  const before=DATA?.generated, t0=Date.now();
+  try{
+    const r=await ghApi("/actions/workflows/aggiorna.yml/dispatches",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ref:"main",inputs:{modo:"manuale"}})});
+    if(r.status===401||r.status===403||r.status===404){try{localStorage.removeItem("ghToken")}catch(e){} b.disabled=false; return showTokenForm("La chiave non funziona (scaduta o senza permesso Actions).");}
+    if(!r.ok) throw new Error(r.status);
+  }catch(e){b.disabled=false; note.textContent="Non sono riuscito ad avviare l'aggiornamento. Riprova tra poco."; return}
+  const tick=()=>{const m=Math.floor((Date.now()-t0)/1000);note.textContent=`Aggiornamento in corso (${Math.floor(m/60)}:${String(m%60).padStart(2,"0")}). GitHub legge i 9 siti in circa 3 minuti: la pagina si aggiorna da sola.`};
+  tick(); clearInterval(ghTimer);
+  ghTimer=setInterval(async()=>{
+    tick();
+    if(Date.now()-t0<60000) return;
+    try{
+      const d=await freshData();
+      if(d&&d.generated!==before){clearInterval(ghTimer);DATA=d;b.disabled=false;route();$("refreshPanel").hidden=false;note.textContent=`Fatto: dati aggiornati alle ${d.generated}.`;return}
+      const runs=await ghApi("/actions/workflows/aggiorna.yml/runs?per_page=1").then(r=>r.json());
+      const run=runs.workflow_runs?.[0];
+      if(run&&run.status==="completed"&&new Date(run.created_at).getTime()>t0-60000&&run.conclusion!=="success"){clearInterval(ghTimer);b.disabled=false;note.innerHTML=`L'aggiornamento non è andato a buon fine. <a href="${run.html_url}" target="_blank" rel="noopener">Vedi il dettaglio su GitHub</a>.`}
+    }catch(e){}
+    if(Date.now()-t0>15*60000){clearInterval(ghTimer);b.disabled=false;note.textContent="L'aggiornamento ci sta mettendo troppo: ricarica la pagina tra qualche minuto."}
+  },15000);
+}
 $("btnRefresh").onclick=()=>{
-  const h=location.hostname.match(/^([^.]+)\.github\.io$/), repo=location.pathname.split("/").filter(Boolean)[0];
+  if(GH) return ghUpdate();
   $("refreshPanel").hidden=false; $("progress").innerHTML="";
-  $("refreshPanel").querySelector("h2").textContent="Aggiornamento dai siti";
-  if(h&&repo){
-    const u=`https://github.com/${h[1]}/${repo}/actions/workflows/aggiorna.yml`;
-    window.open(u,"_blank","noopener");
-    $("refreshNote").innerHTML=`Si apre GitHub: premi <b>Run workflow</b> e poi di nuovo <b>Run workflow</b>. Dopo 5-10 minuti ricarica questa pagina. <a href="${u}" target="_blank" rel="noopener">Apri GitHub</a>`;
-  }else $("refreshNote").textContent="L'aggiornamento parte da GitHub (vedi le istruzioni nel file LEGGIMI).";
+  $("refreshNote").textContent="L'aggiornamento parte da GitHub (vedi le istruzioni nel file LEGGIMI).";
 };
 
 /* ---------- boot & routing ---------- */
@@ -736,6 +773,7 @@ function route(){
 async function boot(){
   try{DATA=await fetch("data.json",{cache:"no-store"}).then(r=>r.ok?r.json():null)}catch(e){}
   if(!DATA){try{DATA=JSON.parse(document.getElementById("seed")?.textContent||"null")}catch(e){}}
+  if(GH){try{const d=await Promise.race([freshData(),new Promise(r=>setTimeout(()=>r(null),4000))]);if(d&&d.generated&&d.generated!==DATA?.generated)DATA=d}catch(e){}}
   // rose: quella del browser oppure il file caricato su GitHub (rose-phantacassandra.json o rose.json), vince la più recente
   let saved=null, local=null, remote=null;
   try{local=JSON.parse(localStorage.getItem("rose")||"null")}catch(e){}
