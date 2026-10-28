@@ -333,7 +333,7 @@ function renderHeader(){
   $("logo").innerHTML=logoHTML(ROSA);
   if(DATA) $("sub").textContent=`Serie A · ${DATA.giornata}ª giornata · aggiornato ${DATA.generated} · ${ROSA.players.length} giocatori`;
 }
-const isOut=x=>(x.o&&(x.o.k==="inf"||x.o.k==="squal"))?1:0;
+const isOut=x=>!x.o?0:(x.o.k==="inf"||x.o.k==="squal")?2:x.o.k==="dubbio"?1:0; // in fondo: prima gli in dubbio, poi infortunati e squalificati
 function rowsFor(SQ){
   const srcs=DATA.sources;
   return SQ.players.map(p=>{
