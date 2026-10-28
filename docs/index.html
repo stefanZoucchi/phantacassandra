@@ -78,9 +78,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .watch{font-size:13px;color:var(--muted)}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);align-items:center}
 .dot{width:14px;height:14px;border-radius:50%;display:inline-block;flex:none}
-.d-ok{background:var(--ok)} .d-bench{background:var(--bench)} .d-out{background:var(--out)} .d-na{background:var(--na)}
+.d-ok{background:var(--ok)} .d-bench,.d-dubbio{background:var(--bench)} .d-out{background:var(--out)} .d-na{background:var(--na)}
 .dot.ball{display:inline-flex;align-items:center;justify-content:center;font:800 9px/1 system-ui,sans-serif;color:#fff}
 .dot.d-bench.ball{color:#1b1400}
+/* lettere al posto dei pallini */
+.lt{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;font:800 11px/1 system-ui,sans-serif;color:#fff;vertical-align:middle}
+.lt-T{background:var(--ok)} .lt-P{background:var(--bench);color:#1b1400} .lt-Bv{background:var(--ok)} .lt-Bg{background:var(--bench);color:#1b1400}
+.lt-D{background:#ee7d1a} .lt-I,.lt-S{background:var(--out)} .lt-na{background:transparent;color:var(--na);font-weight:700}
 .legend span{display:inline-flex;gap:6px;align-items:center}
 
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -171,11 +175,14 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
   </header>
 
   <div class="legend">
-    <span><i class="dot d-ok"></i>Titolare</span>
-    <span><i class="dot d-bench"></i>Panchina</span>
-    <span><i class="dot d-out"></i>Infortunato o squalificato</span>
-    <span><i class="dot d-na"></i>Non ancora pubblicato</span>
-    <span><i class="dot d-ok ball">B</i><i class="dot d-bench ball" style="margin-left:3px">B</i>In ballottaggio: in vantaggio / in svantaggio</span>
+    <span><i class="lt lt-T">T</i>Titolare</span>
+    <span><i class="lt lt-P">P</i>Panchina</span>
+    <span><i class="lt lt-Bv">B</i>Ballottaggio, in vantaggio</span>
+    <span><i class="lt lt-Bg">B</i>Ballottaggio, in svantaggio</span>
+    <span><i class="lt lt-D">D</i>In dubbio / da valutare</span>
+    <span><i class="lt lt-I">I</i>Infortunato</span>
+    <span><i class="lt lt-S">S</i>Squalificato</span>
+    <span><i class="lt lt-na">–</i>Non ancora pubblicato</span>
     <span>% impiego = fonti che lo danno titolare ÷ fonti che hanno pubblicato · sotto ogni fonte: data e ora del suo ultimo aggiornamento</span>
   </div>
 
@@ -318,14 +325,17 @@ function outInfo(p){const T=DATA.teams[p.team];return (T?.out||[]).find(o=>o.n==
 function offCell(p){
   const O=DATA.teams[p.team]?.official; if(!O) return null;
   if(O.xi.includes(p.canon)) return "ok";
-  const o=outInfo(p); if(o&&(o.k==="inf"||o.k==="squal")) return "out";
+  const o=outInfo(p); if(o&&(o.k==="inf"||o.k==="squal")) return o.k;
   return "bench";
 }
 function cellFor(p,src){
   const T=DATA.teams[p.team]; const L=T?.lineups?.[src.key];
   if(!src.ok||!L) return "na";
+  // stato secondo questa fonte (se pubblica le sue liste): rosso se fuori, giallo se in dubbio / da valutare
+  const st=L.st?.[p.canon];
+  if(st==="inf"||st==="squal"||st==="dubbio") return st;
   if(L.xi.includes(p.canon)) return "ok";
-  const o=outInfo(p); if(o&&(o.k==="inf"||o.k==="squal")) return "out";
+  if(!L.st){const o=outInfo(p); if(o&&(o.k==="inf"||o.k==="squal")) return o.k;}
   return "bench";
 }
 function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
@@ -418,31 +428,27 @@ function render(){
   const order=["P","D","C","A",null];
   const names={P:"Portieri",D:"Difensori",C:"Centrocampisti",A:"Attaccanti",null:"Senza ruolo"};
   let html=`<table><thead><tr><th class="name" style="position:sticky;left:0;z-index:2">Giocatore</th><th>%</th>`+
-    srcs.map(s=>`<th class="src"><a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.name)}${s.note?": "+esc(s.note):""}">${ABBR[s.key]||s.key}</a><small>${esc(s.updated||"—")}</small></th>`).join("")+`<th class="src uff" title="Formazione ufficiale: quando esce sostituisce i pronostici">UFF<small>ufficiale</small></th><th>Stato</th></tr></thead><tbody>`;
+    srcs.map(s=>`<th class="src"><a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.name)}${s.note?": "+esc(s.note):""}">${ABBR[s.key]||s.key}</a><small>${esc(s.updated||"—")}</small></th>`).join("")+`<th class="src uff" title="Formazione ufficiale: quando esce sostituisce i pronostici">UFF<small>ufficiale</small></th></tr></thead><tbody>`;
   for(const ro of order){
     const g=rows.filter(x=>(x.p.ruolo||null)===ro).sort((a,b)=>(isOut(a)-isOut(b))||((b.pct??-1)-(a.pct??-1))||((DATA.teams[b.p.team]?.pct?.[b.p.canon]||0)-(DATA.teams[a.p.team]?.pct?.[a.p.canon]||0)));
     if(!g.length) continue;
-    html+=`<tr class="role"><td colspan="${srcs.length+4}">${names[ro]}</td></tr>`;
+    html+=`<tr class="role"><td colspan="${srcs.length+3}">${names[ro]}</td></tr>`;
     for(const x of g){
       const T=x.p.team?DATA.teams[x.p.team]:null;
       const meta=T?`<b class="tm">${esc(x.p.team).toUpperCase()}</b> ${T.home?"vs":"@"} <b class="tm">${esc(T.opp).toUpperCase()}</b> · ${esc(T.when)}`:"";
-      let badge="";
-      if(!x.p.canon) badge=`<span class="badge b-nf">Non trovato</span>`;
-      else if(x.o?.k==="inf") badge=`<span class="badge b-inf">Infortunato</span>`;
-      else if(x.o?.k==="squal") badge=`<span class="badge b-squal">Squalificato</span>`;
-      else if(x.o?.k==="dubbio") badge=`<span class="badge b-dubbio">In dubbio</span>`;
-      const label={ok:"titolare",bench:"panchina",out:"infortunato/squalificato",na:"non pubblicato"};
+      const label={ok:"titolare",bench:"panchina",dubbio:"in dubbio / da valutare",inf:"infortunato / indisponibile",squal:"squalificato",na:"non pubblicato"};
+      const chip=(c,b,title)=>{const L=c==="ok"?(b?["Bv","B"]:["T","T"]):c==="bench"?(b?["Bg","B"]:["P","P"]):c==="dubbio"?["D","D"]:c==="inf"?["I","I"]:c==="squal"?["S","S"]:["na","–"];
+        return `<i class="lt lt-${L[0]}" title="${esc(title)}: ${label[c]||label.na}${b?(c==="ok"?", ballottaggio in vantaggio":", ballottaggio in svantaggio"):""}">${L[1]}</i>`};
       html+=`<tr><td class="name"><div class="pname">${x.p.ruolo?`<span class="role-tag r-${x.p.ruolo}">${x.p.ruolo}</span>`:""}${esc(String(x.p.nome).toUpperCase())}</div><div class="pmeta">${meta||"Controlla nome e squadra nella rosa"}</div></td>`+
         `<td><div class="pct">${x.pct==null?"—":x.pct+"%"}</div>${x.off?'<div class="pmeta">ufficiale</div>':""}</td>`+
-        x.cells.map((c,i)=>{const b=x.balls?.[i];return `<td class="dc"><i class="dot d-${c}${b?" ball":""}" title="${esc(srcs[i].name)}: ${label[c]}${b?(c==="ok"?", in ballottaggio (in vantaggio)":", in ballottaggio (in svantaggio)"):""}">${b?"B":""}</i></td>`}).join("")+
-        `<td class="dc uffc"><i class="dot d-${x.off||"na"}" title="Formazione ufficiale: ${x.off?label[x.off]:"non ancora uscita"}"></i></td>`+
-        `<td>${badge}</td></tr>`;
+        x.cells.map((c,i)=>`<td class="dc">${chip(c,x.balls?.[i],srcs[i].name)}</td>`).join("")+
+        `<td class="dc uffc">${x.off?chip(x.off,false,"Formazione ufficiale"):chip("na",false,"Formazione ufficiale")}</td></tr>`;
     }
   }
   wrap.innerHTML=html+"</tbody></table>";
   const nf=rows.filter(x=>!x.p.canon).length;
   $("foot").textContent=(nf?`${nf} giocatori non abbinati: aprili in Modifica rosa per correggere il nome o la squadra. `:"")+
-    "CDS = Corriere dello Sport e Tuttosport (stessi dati, contati una volta). Le fonti non ancora uscite per questa giornata restano grigie e non pesano sulla percentuale.";
+    "CDS = Corriere dello Sport e Tuttosport (stessi dati, contati una volta). Le fonti non ancora uscite per questa giornata restano con il trattino e non pesano sulla percentuale.";
 }
 
 /* ---------- editor ---------- */
