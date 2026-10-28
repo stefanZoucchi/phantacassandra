@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1d6b45"><link rel="manifest" href="manifest.webmanifest"><style>[hidden]{display:none!important}body{margin:0}:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}</style></head><body>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1d6b45"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon.png"><style>[hidden]{display:none!important}body{margin:0}:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}</style></head><body>
 <title>PhantaCassandra</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,6 +80,7 @@ td.dc{text-align:center}
 td.name{position:sticky;left:0;background:var(--surface);min-width:150px;max-width:230px;z-index:1}
 .pname{font-weight:700}
 .pmeta{font-size:12px;color:var(--muted);white-space:nowrap}
+.pmeta b.tm{color:var(--fg);font-weight:700;letter-spacing:.02em}
 tr.role td{background:var(--chip);font:700 14px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;position:static}
 .role-tag{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font:700 13px var(--display);color:#fff;margin-right:8px;vertical-align:middle}
 .r-P{background:#c98a00}.r-D{background:#2f7d4a}.r-C{background:#2d64b3}.r-A{background:#b5352a}.r-X{background:#6b756f}
@@ -93,7 +94,10 @@ th.uff{color:var(--accent);font:700 13px var(--display);letter-spacing:.04em}
 th.uff small{display:block;font:400 10px var(--body);color:var(--muted)}
 .lastupd{font-size:12px;color:var(--muted);text-align:right;margin-top:4px}
 .rank td,.rank th{white-space:nowrap}
-.rank .pos{font:700 20px var(--display);width:28px}
+.rank .pos{font:700 20px var(--display);width:34px}
+.rank tr.podio td.pos{color:var(--accent)}
+.rank tr.p1 td{background:color-mix(in srgb,var(--ok) 12%,var(--surface))}
+.rank tr.p1 td.pos::after{content:" 🏆";font-size:15px}
 .rank td.pct{text-align:right}
 .rank td{padding:5px 10px}
 .empty{padding:28px;text-align:center;color:var(--muted)}
@@ -172,9 +176,9 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
       <input type="file" id="inXlsx" accept=".xlsx,.xls,.csv" hidden>
       <button class="primary" type="button" id="btnSave">Salva rosa</button>
       <button type="button" id="btnCancel">Chiudi</button>
-      <button type="button" id="btnExport">Esporta rose</button>
-      <label class="btn" for="inImport">Importa rose</label><input type="file" id="inImport" accept=".json" hidden>
       <button type="button" id="btnDel">Elimina squadra</button>
+      <button type="button" id="btnExport">Esporta rose</button>
+      <label class="btn" for="inImport">Importa rose</label><input type="file" id="inImport" accept=".json,application/json" hidden>
       <span class="note" id="saveNote"></span>
     </div>
     <div class="unres" id="unres"></div>
@@ -189,7 +193,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
 <script>
 (() => {
 const $ = id => document.getElementById(id);
-const ABBR = {fantacalcio:"FC",sky:"SKY",gazzetta:"GDS",corriere:"CDS",tmw:"TMW",sosfanta:"SOS",eurosport:"EUR",goal:"GOAL"};
+const ABBR = {fantacalcio:"FC",sky:"SKY",gazzetta:"GDS",corriere:"CDS",tmw:"TMW",sosfanta:"SOS",eurosport:"EUR",goal:"GOAL",calciomercato:"CM"};
 const SOURCES = [
   {key:"fantacalcio",name:"Fantacalcio.it",mode:"direct",url:"https://www.fantacalcio.it/probabili-formazioni-serie-a",primary:true},
   {key:"sky",name:"Sky Sport",mode:"find",hub:"https://sport.sky.it/calcio/serie-a",query:"probabili formazioni",hrefRe:/https:\/\/sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/probabili-formazioni[^"\s]*/},
@@ -198,7 +202,8 @@ const SOURCES = [
   {key:"tmw",name:"TuttoMercatoWeb",note:"Stesse formazioni di Sportitalia (stesso gruppo): contate una volta sola",mode:"find",hub:"https://www.tuttomercatoweb.com/probabili-formazioni/",query:"Probabili formazioni Serie A, le ultime",hrefRe:/https:\/\/www\.tuttomercatoweb\.com\/probabili-formazioni\/probabili-formazioni-serie-a[^"\s]*/},
   {key:"sosfanta",name:"SOS Fanta",mode:"direct",url:"https://www.sosfanta.com/lista-formazioni/probabili-formazioni-serie-a/"},
   {key:"eurosport",name:"Eurosport",mode:"multi",hub:"https://www.eurosport.it/calcio/serie-a/",query:"probabili formazioni e statistiche",hrefRe:/https:\/\/www\.eurosport\.it\/calcio\/serie-a\/[^"\s]*probabili-formazioni-statistiche[^"\s]*/g},
-  {key:"goal",name:"Goal.com",mode:"find",hub:"https://www.goal.com/it/notizie",query:"Probabili formazioni Serie A",hrefRe:/https:\/\/www\.goal\.com\/it\/liste\/probabili-formazioni-serie-a[^"\s]*/}
+  {key:"goal",name:"Goal.com",mode:"find",hub:"https://www.goal.com/it/notizie",query:"Probabili formazioni Serie A",hrefRe:/https:\/\/www\.goal\.com\/it\/liste\/probabili-formazioni-serie-a[^"\s]*/},
+  {key:"calciomercato",name:"Calciomercato.com",note:"Stesso gruppo editoriale di Goal.com",mode:"pages",hub:"https://www.calciomercato.com/notizie/",query:"probabili formazioni",hrefRe:/https:\/\/www\.calciomercato\.com\/liste\/serie-a-probabili-formazioni-[a-z]+-giornata[^"\s]*/}
 ];
 const TEAM_ALIASES = {juve:"Juventus",inter:"Inter",milan:"Milan",roma:"Roma",lazio:"Lazio",napoli:"Napoli",atalanta:"Atalanta",dea:"Atalanta",viola:"Fiorentina",toro:"Torino",granata:"Torino"};
 
@@ -212,7 +217,7 @@ let mcp = null, sample = null, artifact = null;
 function norm(s){return String(s||"").replace(/[øØ]/g,"o").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[’']/g,"").replace(/[^a-z ]/g," ").split(/\s+/).filter(Boolean)}
 function base(c){let t=norm(c);while(t.length>1&&t[t.length-1].length<=2)t=t.slice(0,-1);return t}
 function inits(c){const t=norm(c);const b=base(c);return t.slice(b.length)}
-const ALIAS={"nuno tavares":"Tavares N.","diogo leite":"Leite","rodrigo mora":"Mora","lucas perri":"Perri","yan couto":"Couto","nico paz":"Paz N.","goncalo ramos":"Ramos G.","cisse":"Cissè A.","estupinian":"Estupinan","hutchison":"Hutchinson","kike perez":"Perez K.","josep martinez":"Martinez Jo.","anguissa":"Zambo Anguissa","rafa marin":"Marin R.","valde":"Valdepenas","pote":"Goncalves P.","goncalves":"Goncalves P.","dodo":"Dodò","junior messias":"Messias","floriani":"Floriani Mussolini","sebastiano esposito":"Esposito Se.","pio esposito":"Esposito F.P.","lautaro":"Martinez L.","lautaro martinez":"Martinez L.","danilo veiga":"Veiga D.","petar sucic":"Sucic P.","daniel braganca":"Braganca","ricardo mangas":"Mangas","dany mota":"Mota","gustavo varela":"Varela G."};
+const ALIAS={"nuno tavares":"Tavares N.","diogo leite":"Leite","rodrigo mora":"Mora","lucas perri":"Perri","yan couto":"Couto","nico paz":"Paz N.","goncalo ramos":"Ramos G.","cisse":"Cissè A.","estupinian":"Estupinan","hutchison":"Hutchinson","kike perez":"Perez K.","josep martinez":"Martinez Jo.","anguissa":"Zambo Anguissa","rafa marin":"Marin R.","valde":"Valdepenas","pote":"Goncalves P.","goncalves":"Goncalves P.","dodo":"Dodò","junior messias":"Messias","floriani":"Floriani Mussolini","sebastiano esposito":"Esposito Se.","pio esposito":"Esposito F.P.","lautaro":"Martinez L.","lautaro martinez":"Martinez L.","danilo veiga":"Veiga D.","petar sucic":"Sucic P.","daniel braganca":"Braganca","ricardo mangas":"Mangas","dany mota":"Mota","gustavo varela":"Varela G.","schmidt":"Schmid"};
 function matchName(name, cands){
   const n=norm(name), key=n.join(" ");
   if(!n.length) return null;
@@ -295,7 +300,6 @@ function offCell(p){
 }
 function cellFor(p,src){
   const T=DATA.teams[p.team]; const L=T?.lineups?.[src.key];
-  if(T?.official) return "na";
   if(!src.ok||!L) return "na";
   if(L.xi.includes(p.canon)) return "ok";
   const o=outInfo(p); if(o&&(o.k==="inf"||o.k==="squal")) return "out";
@@ -365,10 +369,11 @@ function renderFonti(){
   const rows=srcs.map(s=>({s,t:tot[s.key],c:cur[s.key]})).sort((a,b)=>((b.t?b.t.hits/b.t.total:-1)-(a.t?a.t.hits/a.t.total:-1)));
   const nOff=Object.values(DATA.teams).filter(T=>T.official).length;
   const pctS=v=>v&&v.total?Math.round(v.hits/v.total*1000)/10+"%":"—";
-  let pos=0;
+  let pos=0, n=0, lastV=null;
+  const rankOf=x=>{if(!x.t) return null; n++; const v=x.t.hits/x.t.total; if(v!==lastV){pos=n;lastV=v} return pos};
   el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Attendibilità delle fonti</h2>
    <div class="tablewrap"><table class="rank"><thead><tr><th>#</th><th>Fonte</th><th>Totale</th><th>Indovinati</th><th>${DATA.giornata}ª g.</th><th>Giornate</th></tr></thead><tbody>`+
-   rows.map(x=>`<tr><td class="pos">${x.t?++pos:"–"}</td><td><a href="${esc(x.s.url)}" target="_blank" rel="noopener">${esc(x.s.name)}</a>${x.s.key==="corriere"?' <span class="pmeta">= Tuttosport</span>':x.s.key==="tmw"?' <span class="pmeta">= Sportitalia</span>':""}</td><td class="pct">${pctS(x.t)}</td><td>${x.t?x.t.hits+"/"+x.t.total:"—"}</td><td>${pctS(x.c)}</td><td>${x.t?x.t.g:0}</td></tr>`).join("")+
+   rows.map(x=>{const r=rankOf(x);return `<tr class="${r&&r<=3?"podio p"+r:""}"><td class="pos">${r?r+"°":"–"}</td><td><a href="${esc(x.s.url)}" target="_blank" rel="noopener">${esc(x.s.name)}</a>${x.s.key==="corriere"?' <span class="pmeta">= Tuttosport</span>':x.s.key==="tmw"?' <span class="pmeta">= Sportitalia</span>':""}</td><td class="pct">${pctS(x.t)}</td><td>${x.t?x.t.hits+"/"+x.t.total:"—"}</td><td>${pctS(x.c)}</td><td>${x.t?x.t.g:0}</td></tr>`}).join("")+
    `</tbody></table></div><div class="note">Titolari previsti che poi compaiono nella formazione ufficiale. ${nOff?`Giornata in corso: ${nOff} squadre su ${Object.keys(DATA.teams).length} con l'ufficiale.`:"La classifica parte con le prime formazioni ufficiali, circa un'ora prima di ogni partita."}</div>`;
 }
 function render(){
@@ -396,7 +401,7 @@ function render(){
     html+=`<tr class="role"><td colspan="${srcs.length+4}">${names[ro]}</td></tr>`;
     for(const x of g){
       const T=x.p.team?DATA.teams[x.p.team]:null;
-      const meta=T?`${esc(x.p.team)} ${T.home?"vs":"@"} ${esc(T.opp)} · ${esc(T.when)}`:"";
+      const meta=T?`<b class="tm">${esc(x.p.team).toUpperCase()}</b> ${T.home?"vs":"@"} <b class="tm">${esc(T.opp).toUpperCase()}</b> · ${esc(T.when)}`:"";
       let badge="";
       if(!x.p.canon) badge=`<span class="badge b-nf">Non trovato</span>`;
       else if(x.o?.k==="inf") badge=`<span class="badge b-inf">Infortunato</span>`;
@@ -467,9 +472,31 @@ $("btnDel").onclick=async()=>{
   STORE.squads.splice(CUR,1);try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(e){}
   location.hash="#home"; await saveFiles({"rose.json":JSON.stringify(STORE)});
 };
-$("btnExport").onclick=()=>{const b=new Blob([JSON.stringify(STORE)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="rose.json";document.body.append(a);a.click();a.remove()};
-$("inImport").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!Array.isArray(j.squads)||!j.squads.length)throw 0;STORE.squads=j.squads.map((q,i)=>({name:q.name||"Squadra "+(i+1),logo:q.logo||null,players:(q.players||[]).map(p=>resolve(p))}));try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(_){}
-route();$("saveNote").textContent="Rose importate."}catch(_){$("saveNote").textContent="File non valido: usa un rose.json esportato da PhantaCassandra."}e.target.value=""});
+$("btnExport").onclick=async()=>{
+  const json=JSON.stringify({app:"PhantaCassandra",version:1,squads:STORE.squads},null,1);
+  const dl=window.claude?await claude.use("downloads").catch(()=>null):null;
+  if(dl){
+    try{await dl.save({filename:"rose-phantacassandra.json",data:new Blob([json],{type:"application/json"})});$("saveNote").textContent="Rose esportate.";}
+    catch(e){$("saveNote").textContent=e?.code==="declined"?"Esportazione annullata.":"Esportazione non disponibile qui."}
+    return;
+  }
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([json],{type:"application/json"}));a.download="rose-phantacassandra.json";document.body.append(a);a.click();a.remove();
+  $("saveNote").textContent="Rose esportate nel file rose-phantacassandra.json (cartella Download).";
+};
+$("inImport").addEventListener("change",async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{
+    const j=JSON.parse(await f.text());
+    if(!Array.isArray(j.squads)||!j.squads.length) throw 0;
+    STORE.squads=j.squads.map((q,i)=>({name:q.name||("Squadra "+(i+1)),logo:typeof q.logo==="string"&&q.logo.startsWith("data:image/")?q.logo:null,
+      players:(Array.isArray(q.players)?q.players:[]).map(p=>resolve({nome:String(p.nome||""),ruolo:p.ruolo||null,club:p.club||p.team||null})).filter(p=>p.nome)}));
+    try{localStorage.setItem("rose",JSON.stringify(STORE))}catch(_){}
+    location.hash="#home"; route();
+    const r=await saveFiles({"rose.json":JSON.stringify(STORE)});
+    $("saveNote").textContent=r===true?`Importate ${STORE.squads.length} squadre e salvate.`:r;
+  }catch(_){$("saveNote").textContent="File non valido: usa il file esportato da PhantaCassandra."}
+  e.target.value="";
+});
 $("btnNoLogo").onclick=()=>{ROSA.logo=null;renderHeader()};
 $("btnEdit").onclick=()=>showEditor($("editor").hidden);
 $("btnCancel").onclick=()=>showEditor(false);
@@ -501,6 +528,14 @@ async function pageText(url){await tool("navigate",{url});await sleep(2500);retu
 function findHits(out){return out.split("\n").map(l=>({line:l,ref:(l.match(/\[(ref_\d+)\]/)||[])[1],href:(l.match(/href="([^"]+)"/)||[])[1]})).filter(h=>h.ref)}
 async function fetchSource(s){
   if(s.mode==="direct") return {url:s.url,text:await pageText(s.url)};
+  if(s.mode==="pages"){ // l'articolo della giornata si trova scorrendo le pagine delle notizie
+    for(let i=1;i<=6;i++){
+      await tool("navigate",{url:s.hub+i}); await sleep(2000);
+      const h=findHits(await tool("find",{query:s.query})).find(h=>h.href&&s.hrefRe.test(h.href));
+      if(h) return {url:h.href,text:await pageText(h.href)};
+    }
+    throw new Error("Articolo non trovato");
+  }
   await tool("navigate",{url:s.hub}); await sleep(2500);
   const hits=findHits(await tool("find",{query:s.query}));
   if(s.mode==="multi"){
@@ -632,14 +667,36 @@ async function refresh(){
 }
 // candsOf variant usable on a teams map under construction
 const _candsOf=candsOf; candsOf=function(t,map){const T=(map||DATA.teams)[t];return [...new Set([...(T.roster||[]),...(T.out||[]).map(o=>o.n)])]};
+// Il pulsante avvia l'aggiornamento programmato di Claude (stesso lavoro delle 9:36 e 15:36), che legge i siti e ripubblica la pagina.
+const TRIGGER_ID="trig_01GgAK9xyuqLVwfVKRqY6M2j";
+function lastStart(){try{return Number(sessionStorage.getItem("updStart")||0)}catch(e){return 0}}
+async function startUpdate(){
+  const panel=$("refreshPanel"), note=$("refreshNote"); panel.hidden=false; $("progress").innerHTML="";
+  $("refreshPanel").querySelector("h2").textContent="Aggiornamento dai siti";
+  if(!mcp){note.textContent="L'aggiornamento si avvia solo dalla versione di PhantaCassandra dentro Claude. Questo file mostra i dati dell'ultima volta.";return}
+  const since=Date.now()-lastStart();
+  if(since<12*60*1000){note.textContent=`Aggiornamento già avviato ${Math.max(1,Math.round(since/60000))} minuti fa. Quando è pronto la pagina si ricarica da sola.`;return}
+  const b=$("btnRefresh"); b.disabled=true; note.textContent="Avvio dell'aggiornamento…";
+  try{
+    await mcp.callTool("Claude Code Remote","fire_trigger",{trigger_id:TRIGGER_ID,text:'Aggiornamento richiesto a mano dal pulsante della pagina: in data.json scrivi "mode":"manuale" invece di "automatico".'});
+    try{sessionStorage.setItem("updStart",String(Date.now()))}catch(e){}
+    const t=new Date(); note.textContent=`Aggiornamento avviato alle ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}. Claude legge i 9 siti in 3-10 minuti: quando ha finito la pagina si ricarica da sola con i dati nuovi. Puoi anche chiuderla. Serve il computer acceso con l'app Claude aperta.`;
+  }catch(e){
+    const c=e?.code;
+    note.textContent=c==="server_not_connected"||c==="not_in_manifest"?"Per avviare l'aggiornamento la pagina deve poter usare Claude Code Remote: consentilo quando te lo chiede, oppure dal menu Autorizzazioni della pagina.":
+      c==="approval_required"?"Serve la tua conferma per avviare l'aggiornamento: premi di nuovo e approva la richiesta.":
+      c==="needs_reauth"?"Ricollega Claude Code Remote nelle impostazioni dei connettori di claude.ai, poi riprova.":
+      "Non sono riuscito ad avviare l'aggiornamento. Riprova tra qualche minuto.";
+  }finally{b.disabled=false}
+}
 $("btnRefresh").onclick=()=>{
   const h=location.hostname.match(/^([^.]+)\.github\.io$/), repo=location.pathname.split("/").filter(Boolean)[0];
-  if(window.claude){refresh();return}
   $("refreshPanel").hidden=false; $("progress").innerHTML="";
+  $("refreshPanel").querySelector("h2").textContent="Aggiornamento dai siti";
   if(h&&repo){
     const u=`https://github.com/${h[1]}/${repo}/actions/workflows/aggiorna.yml`;
     window.open(u,"_blank","noopener");
-    $("refreshNote").innerHTML=`Si apre GitHub: premi <b>Run workflow</b> e poi di nuovo <b>Run workflow</b>. Dopo 3-5 minuti ricarica questa pagina. <a href="${u}" target="_blank" rel="noopener">Apri GitHub</a>`;
+    $("refreshNote").innerHTML=`Si apre GitHub: premi <b>Run workflow</b> e poi di nuovo <b>Run workflow</b>. Dopo 5-10 minuti ricarica questa pagina. <a href="${u}" target="_blank" rel="noopener">Apri GitHub</a>`;
   }else $("refreshNote").textContent="L'aggiornamento parte da GitHub (vedi le istruzioni nel file LEGGIMI).";
 };
 
