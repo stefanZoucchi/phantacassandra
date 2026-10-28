@@ -1,0 +1,20 @@
+letto corriere: giornata 9, 14 squadre (3s)
+errore sky: articolo della giornata non trovato
+letto fantacalcio: giornata 9, 20 squadre (6s)
+letto sosfanta: giornata ?, 14 squadre (3s)
+letto gazzetta: giornata 9, 14 squadre (20s)
+letto calciomercato: giornata ?, 20 squadre (22s)
+letto tmw: giornata 9, 18 squadre (29s)
+letto goal: giornata 9, 20 squadre (15s)
+letto eurosport: giornata 9, 14 squadre (51s)
+Siti letti in 58s
+- Sky Sport: articolo della giornata non trovato
++ Gazzetta: 14 squadre
++ Corriere dello Sport: 14 squadre
+  TuttoMercatoWeb Como: 12 titolari, scartata
++ TuttoMercatoWeb: 17 squadre
++ SOS Fanta: 14 squadre
++ Eurosport: 14 squadre
++ Goal.com: 20 squadre
++ Calciomercato.com: 20 squadre
+OK: 9ª giornata, 9 fonti, 6 formazioni ufficiali, 70 indisponibili. Salvato 28/10/2026 11:44.
