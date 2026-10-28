@@ -227,7 +227,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
 <script>
 (() => {
 const $ = id => document.getElementById(id);
-const ABBR = {spm:"SPM",fantacalcio:"FC",sky:"SKY",gazzetta:"GDS",corriere:"CDS",tmw:"TMW",sosfanta:"SOS",eurosport:"EUR",goal:"GOAL",calciomercato:"CM"};
+const ABBR = {spm:"SPM",fantacalcio:"FC",sky:"SKY",gazzetta:"GDS",corriere:"CDS",tmw:"TMW",sosfanta:"SOS",eurosport:"EUR",goal:"GOAL"};
 const SOURCES = [
   {key:"fantacalcio",name:"Fantacalcio.it",mode:"direct",url:"https://www.fantacalcio.it/probabili-formazioni-serie-a",primary:true},
   {key:"sky",name:"Sky Sport",mode:"find",hub:"https://sport.sky.it/calcio/serie-a",query:"probabili formazioni",hrefRe:/https:\/\/sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/probabili-formazioni[^"\s]*/},
@@ -236,8 +236,7 @@ const SOURCES = [
   {key:"tmw",name:"TuttoMercatoWeb",note:"Stesse formazioni di Sportitalia (stesso gruppo): contate una volta sola",mode:"find",hub:"https://www.tuttomercatoweb.com/probabili-formazioni/",query:"Probabili formazioni Serie A, le ultime",hrefRe:/https:\/\/www\.tuttomercatoweb\.com\/probabili-formazioni\/probabili-formazioni-serie-a[^"\s]*/},
   {key:"sosfanta",name:"SOS Fanta",mode:"direct",url:"https://www.sosfanta.com/lista-formazioni/probabili-formazioni-serie-a/"},
   {key:"eurosport",name:"Eurosport",mode:"multi",hub:"https://www.eurosport.it/calcio/serie-a/",query:"probabili formazioni e statistiche",hrefRe:/https:\/\/www\.eurosport\.it\/calcio\/serie-a\/[^"\s]*probabili-formazioni-statistiche[^"\s]*/g},
-  {key:"goal",name:"Goal.com",mode:"find",hub:"https://www.goal.com/it/notizie",query:"Probabili formazioni Serie A",hrefRe:/https:\/\/www\.goal\.com\/it\/liste\/probabili-formazioni-serie-a[^"\s]*/},
-  {key:"calciomercato",name:"Calciomercato.com",note:"Stesso gruppo editoriale di Goal.com",mode:"pages",hub:"https://www.calciomercato.com/notizie/",query:"probabili formazioni",hrefRe:/https:\/\/www\.calciomercato\.com\/liste\/serie-a-probabili-formazioni-[a-z]+-giornata[^"\s]*/}
+  {key:"goal",name:"Goal.com",mode:"find",hub:"https://www.goal.com/it/notizie",query:"Probabili formazioni Serie A",hrefRe:/https:\/\/www\.goal\.com\/it\/liste\/probabili-formazioni-serie-a[^"\s]*/}
 ];
 const TEAM_ALIASES = {juve:"Juventus",inter:"Inter",milan:"Milan",roma:"Roma",lazio:"Lazio",napoli:"Napoli",atalanta:"Atalanta",dea:"Atalanta",viola:"Fiorentina",toro:"Torino",granata:"Torino"};
 
@@ -403,17 +402,34 @@ function renderFonti(){
   const cur=accuracy(DATA);
   const rounds=[...(DATA.history||[]).filter(h=>h.giornata!=DATA.giornata),{giornata:DATA.giornata,stats:cur,live:true}];
   const tot={};
-  for(const r of rounds) for(const [k,v] of Object.entries(r.stats||{})){tot[k]=tot[k]||{hits:0,total:0,g:0};tot[k].hits+=v.hits;tot[k].total+=v.total;tot[k].g++}
+  for(const r of rounds) for(const [k,v] of Object.entries(r.stats||{})){
+    tot[k]=tot[k]||{hits:0,total:0,teams:0,g:0};
+    tot[k].hits+=v.hits; tot[k].total+=v.total; tot[k].teams+=(v.teams||0); tot[k].g++;
+  }
+  const MIN_TEAMS=6; // sotto questa soglia il campione è troppo piccolo per un podio affidabile
   const srcs=DATA.sources;
-  const rows=srcs.map(s=>({s,t:tot[s.key],c:cur[s.key]})).sort((a,b)=>((b.t?b.t.hits/b.t.total:-1)-(a.t?a.t.hits/a.t.total:-1)));
+  const rows=srcs.map(s=>({s,t:tot[s.key],c:cur[s.key]})).sort((a,b)=>{
+    const ta=a.t&&a.t.total?a.t.hits/a.t.total:-1, tb=b.t&&b.t.total?b.t.hits/b.t.total:-1;
+    return tb-ta;
+  });
   const nOff=Object.values(DATA.teams).filter(T=>T.official).length;
   const pctS=v=>v&&v.total?Math.round(v.hits/v.total*1000)/10+"%":"—";
   let pos=0, n=0, lastV=null;
-  const rankOf=x=>{if(!x.t) return null; n++; const v=x.t.hits/x.t.total; if(v!==lastV){pos=n;lastV=v} return pos};
+  const rankOf=x=>{
+    if(!x.t||!x.t.total) return null;
+    if((x.t.teams||0)<MIN_TEAMS) return null; // n.c. se campione piccolo
+    n++; const v=x.t.hits/x.t.total; if(v!==lastV){pos=n;lastV=v} return pos;
+  };
   el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Attendibilità delle fonti</h2>
-   <div class="tablewrap"><table class="rank"><thead><tr><th>#</th><th>Fonte</th><th>Totale</th><th>Indovinati</th><th>${DATA.giornata}ª g.</th><th>Giornate</th></tr></thead><tbody>`+
-   rows.map(x=>{const r=rankOf(x);return `<tr class="${r&&r<=3?"podio p"+r:""}"><td class="pos">${r?r+"°":"–"}</td><td><a href="${esc(x.s.url)}" target="_blank" rel="noopener">${esc(x.s.name)}</a>${x.s.key==="corriere"?' <span class="pmeta">= Tuttosport</span>':x.s.key==="tmw"?' <span class="pmeta">= Sportitalia</span>':""}</td><td class="pct">${pctS(x.t)}</td><td>${x.t?x.t.hits+"/"+x.t.total:"—"}</td><td>${pctS(x.c)}</td><td>${x.t?x.t.g:0}</td></tr>`}).join("")+
-   `</tbody></table></div><div class="note">Titolari previsti che poi compaiono nella formazione ufficiale. ${nOff?`Giornata in corso: ${nOff} squadre su ${Object.keys(DATA.teams).length} con l'ufficiale.`:"La classifica parte con le prime formazioni ufficiali, circa un'ora prima di ogni partita."}</div>`;
+   <div class="tablewrap"><table class="rank"><thead><tr><th>#</th><th>Fonte</th><th>Totale</th><th>Indovinati</th><th>Partite</th><th>${DATA.giornata}ª g.</th><th>Giornate</th></tr></thead><tbody>`+
+   rows.map(x=>{
+     const r=rankOf(x);
+     const small=x.t&&(x.t.teams||0)>0&&(x.t.teams||0)<MIN_TEAMS;
+     const meta=x.s.key==="corriere"?' <span class="pmeta">= Tuttosport</span>':x.s.key==="tmw"?' <span class="pmeta">= Sportitalia</span>':"";
+     const badge=small?' <span class="pmeta" title="Campione ancora piccolo: la % può oscillare molto">campione piccolo</span>':"";
+     return `<tr class="${r&&r<=3?"podio p"+r:""}"><td class="pos">${r?r+"°":(x.t?"n.c.":"–")}</td><td><a href="${esc(x.s.url)}" target="_blank" rel="noopener">${esc(x.s.name)}</a>${meta}${badge}</td><td class="pct">${pctS(x.t)}</td><td>${x.t?x.t.hits+"/"+x.t.total:"—"}</td><td>${x.t&&x.t.teams?x.t.teams:"—"}</td><td>${pctS(x.c)}${x.c&&x.c.teams?` <span class="pmeta">(${x.c.teams})</span>`:""}</td><td>${x.t?x.t.g:0}</td></tr>`;
+   }).join("")+
+   `</tbody></table></div><div class="note">Titolari previsti che poi compaiono nella formazione ufficiale (tutte le partite di Serie A, non solo le tue rose). La % è hits/total; con poche partite il margine di errore è alto — sotto ${MIN_TEAMS} squadre ufficiali confrontate la fonte resta fuori classifica (n.c.). ${nOff?`Giornata in corso: ${nOff} squadre su ${Object.keys(DATA.teams).length} con l'ufficiale.`:"La classifica parte con le prime formazioni ufficiali, circa un'ora prima di ogni partita."}</div>`;
 }
 function render(){
   $("lastUpd").textContent=DATA?`Ultimo aggiornamento: ${DATA.generated} · ${DATA.mode||"manuale"}`:"";
