@@ -116,16 +116,23 @@ function build(raw, prev, mode = "automatico", log = console.log) {
       const R = raw[k]; if (!R || (!results[k] && k !== "fantacalcio") || !R.out) return null;
       const tn = Object.keys(R.out).find(x => sameTeam(x, t)); if (!tn) return null;
       // liste con le due squadre mescolate: tengo solo i giocatori della rosa di questa squadra
-      return R.mixed ? R.out[tn].filter(o => matchName(o.n, T.roster, t)) : R.out[tn];
-    }).filter(L => L && L.length);
+      const L = R.mixed ? R.out[tn].filter(o => matchName(o.n, T.roster, t)) : R.out[tn];
+      return L.length ? { k, L } : null;
+    }).filter(Boolean);
     if (!lists.length) { const PT = prev && prev.giornata == P.giornata && prev.teams?.[t]; if (PT?.out?.length) T.out = PT.out; continue; } // nessuna lista nuova: tengo quella di prima
     const canon = n => matchName(n, T.roster, t) || n;
     const all = [];
-    lists.forEach(L => L.forEach(o => {
-      const c = canon(o.n); const ex = all.find(a => a.n === c || matchName(o.n, [a.n], t));
-      const k = o.k; // se una fonte lo dà fuori e un'altra in dubbio, vince "fuori"
-      if (ex) { if (RANK[k] > RANK[ex.k]) ex.k = k; } else all.push({ n: c, k });
-    }));
+    for (const { k: src, L } of lists) {
+      const st = {};
+      for (const o of L) {
+        const c = canon(o.n); const ex = all.find(a => a.n === c || matchName(o.n, [a.n], t));
+        const k = o.k; // se una fonte lo dà fuori e un'altra in dubbio, vince "fuori"
+        if (ex) { if (RANK[k] > RANK[ex.k]) ex.k = k; } else all.push({ n: c, k });
+        st[ex ? ex.n : c] = k;
+      }
+      // stato secondo questa fonte: serve per il colore del suo pallino
+      if (T.lineups[src]) T.lineups[src].st = st;
+    }
     T.out = all;
   }
 
