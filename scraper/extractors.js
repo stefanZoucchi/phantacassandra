@@ -162,4 +162,14 @@ const skyMatch = function () {
   return { giornata: g ? +g[1] : null, teams, out: {}, updated: d ? `${d[3]}/${d[2]}` : "" };
 };
 
-module.exports = { skyMatch, lineFormat, fantacalcio, gazzetta, corriere, sosfanta };
+// Lega Serie A, pagina della partita: "Sassuolo\n4-3-3\nPosizione\n14th\nLazio\n4-3-3\n1st\nPosizione\n80\nTurati\n26\n..." fino ad "Allenatori"
+const lega = function () {
+  const t = document.body.innerText;
+  const m = t.match(/\n([^\n]+)\n(\d(?:-\d){2,3})\nPosizione\n[^\n]*\n([^\n]+)\n(\d(?:-\d){2,3})\n[^\n]*\nPosizione\n([\s\S]*?)\nAllenatori/);
+  if (!m) return { teams: {} };
+  const names = m[5].split("\n").map(x => x.trim()).filter(x => x && !/^\d{1,2}$/.test(x));
+  if (names.length < 22) return { teams: {} };
+  return { teams: { [m[1].trim()]: { mod: m[2], xi: names.slice(0, 11) }, [m[3].trim()]: { mod: m[4], xi: names.slice(11, 22) } } };
+};
+
+module.exports = { lega, skyMatch, lineFormat, fantacalcio, gazzetta, corriere, sosfanta };

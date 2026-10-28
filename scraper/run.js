@@ -20,6 +20,8 @@ const PLAN = [
   { key: "sosfanta", url: "https://www.sosfanta.com/lista-formazioni/probabili-formazioni-serie-a/", fn: X.sosfanta },
   { key: "eurosport", hub: "https://www.eurosport.it/calcio/serie-a/", summary: /eurosport\.it\/calcio\/serie-a\/[^"#?\s]*probabili-formazioni-\d+a-giornata[^"#?\s]*story\.shtml/, multi: /eurosport\.it\/calcio\/serie-a\/[^"#?\s]*-probabili-formazioni-statistiche[^"#?\s]*story\.shtml/, fn: X.lineFormat },
   { key: "calciomercato", pages: "https://www.calciomercato.com/notizie/", link: /calciomercato\.com\/liste\/serie-a-probabili-formazioni-[a-z]+-giornata[^"#?\s]*/, fn: X.lineFormat },
+  // formazioni ufficiali dalla Lega Serie A (una pagina per partita)
+  { key: "lega", legaHub: "https://www.legaseriea.it/it/serie-a", link: /legaseriea\.it\/(?:it\/)?serie-a\/match\/[0-9a-f]{32}\/[a-z0-9-]+-vs-[a-z0-9-]+/, fn: X.lega },
   { key: "goal", hub: "https://www.goal.com/it/notizie", link: /goal\.com\/it\/liste\/probabili-formazioni-serie-a-giornata-\d+[^"#?\s]*/, fn: X.lineFormat },
 ];
 
@@ -72,7 +74,19 @@ async function readPerMatch(page, s) {
   return { ...res, url: P.hubs[0] };
 }
 
+async function readLega(page, s) {
+  await open(page, s.legaHub);
+  const byId = {};
+  for (const u of await allLinks(page, s.link)) { const id = (u.match(/match\/([0-9a-f]{32})/) || [])[1]; if (id && !byId[id]) byId[id] = u.replace(/[?#].*$/, ""); }
+  const urls = Object.values(byId).slice(0, 10);
+  if (!urls.length) throw new Error("partite non trovate");
+  const res = { teams: {} };
+  for (const u of urls) { try { await open(page, u); const r = await evalSafe(page, s.fn); Object.assign(res.teams, r.teams); } catch (e) {} }
+  return { ...res, url: s.legaHub };
+}
+
 async function readSource(page, s) {
+  if (s.legaHub) return readLega(page, s);
   if (s.url) { await open(page, s.url); return { ...(await evalSafe(page, s.fn)), url: s.url }; }
   if (s.pages) { // l'articolo della giornata si trova scorrendo le pagine delle notizie
     for (let i = 1; i <= 8; i++) {
@@ -139,7 +153,7 @@ function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di R
   async function worker() {
     for (let s; (s = queue.shift());) {
       const page = await ctx.newPage(), t0 = Date.now();
-      try { raw[s.key] = await withTimeout(readSource(page, s), (s.multi || s.perMatch) ? 240000 : 120000, s.key); console.log(`letto ${s.key}: giornata ${raw[s.key].giornata ?? "?"}, ${Object.keys(raw[s.key].teams || {}).length} squadre (${Math.round((Date.now() - t0) / 1000)}s)`); }
+      try { raw[s.key] = await withTimeout(readSource(page, s), (s.multi || s.perMatch || s.legaHub) ? 240000 : 120000, s.key); console.log(`letto ${s.key}: giornata ${raw[s.key].giornata ?? "?"}, ${Object.keys(raw[s.key].teams || {}).length} squadre (${Math.round((Date.now() - t0) / 1000)}s)`); }
       catch (e) { raw[s.key] = { error: String(e.message || e).slice(0, 120) }; console.log(`errore ${s.key}: ${raw[s.key].error}`); }
       await page.close().catch(() => {});
     }

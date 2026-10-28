@@ -66,10 +66,28 @@ function build(raw, prev, mode = "automatico", log = console.log) {
     const t = m[side], T = P.teams[t];
     teams[t] = { match: m.home + "-" + m.away, home: side === "home", opp: m[opp], when: m.when, roster: [...T.xi, ...(T.bench || [])], pct: T.pct || {},
       lineups: T.official ? {} : { fantacalcio: { mod: T.mod, xi: T.xi } }, out: [] };
-    if (T.official) teams[t].official = { xi: T.xi, src: "Fantacalcio.it" };
+    if (T.official) teams[t].official = { xi: T.xi, src: "Fantacalcio.it", bench: T.bench || [] };
     else { const bn = ballOf(P, t, t, teams[t].roster); if (bn.length) teams[t].lineups.fantacalcio.b = bn; }
   }
   const teamKey = n => Object.keys(teams).find(k => sameTeam(k, n));
+  // Formazioni ufficiali della Lega Serie A: valgono solo da 60 minuti prima del calcio d'inizio
+  // (prima la pagina della partita potrebbe mostrare altro)
+  const minsTo = when => { const m = String(when || "").match(/(\d{2})\/(\d{2}) (\d{1,2}):(\d{2})/); if (!m) return null;
+    const n = now.full.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
+    let y = +n[3]; if (+m[2] < +n[2] - 6) y++;
+    return (Date.UTC(y, +m[2] - 1, +m[1], +m[3], +m[4]) - Date.UTC(+n[3], +n[2] - 1, +n[1], +n[4], +n[5])) / 60000; };
+  const LG = raw.lega;
+  if (LG && !LG.error) {
+    let n = 0;
+    for (const [tn, L] of Object.entries(LG.teams || {})) {
+      const t = teamKey(tn); if (!t) continue;
+      const mt = minsTo(teams[t].when); if (mt == null || mt > 60) continue;
+      const xi = [...new Set(L.xi.map(p => matchName(p, teams[t].roster, t) || p))];
+      if (xi.length !== 11 || xi.filter(p => teams[t].roster.includes(p)).length < 9) { log(`  Lega ${t}: nomi non abbinati, scartata`); continue; }
+      teams[t].official = { xi, src: "Lega Serie A", bench: teams[t].official?.bench || [] }; n++;
+    }
+    log(`+ Lega Serie A: ${n} formazioni ufficiali`);
+  } else if (LG) log(`- Lega Serie A: ${LG.error}`);
   const pairsOk = R => { // the source must describe the same fixtures
     let ok = 0, tot = 0;
     for (const n of Object.keys(R.teams || {})) { const t = teamKey(n); if (!t) continue; tot++; if (Object.keys(R.teams).some(o => sameTeam(o, teams[t].opp))) ok++; }
@@ -141,7 +159,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   if (same) {
     for (const [t, T] of Object.entries(teams)) {
       const PT = prev.teams?.[t]; if (!PT) continue;
-      if (PT.official) { T.official = PT.official; T.lineups = PT.lineups; T.pct = PT.pct; }
+      if (PT.official) { T.official = { ...PT.official, bench: PT.official.bench?.length ? PT.official.bench : (T.official?.bench || []) }; T.lineups = PT.lineups; T.pct = PT.pct; if (PT.out) T.out = PT.out; }
       else if (T.official) { // ufficiale appena uscita: i pronostici restano quelli letti prima
         T.lineups = { ...T.lineups, ...PT.lineups };
         if (PT.pct && Object.keys(PT.pct).length) T.pct = PT.pct;
@@ -150,6 +168,11 @@ function build(raw, prev, mode = "automatico", log = console.log) {
     }
   } else if (prev) {
     history = history.filter(h => h.giornata != prev.giornata).concat([{ giornata: prev.giornata, stats: accuracy(prev) }]);
+  }
+  // partita con formazione ufficiale: chi era titolare o in panchina non è indisponibile per quella partita
+  for (const T of Object.values(teams)) if (T.official) {
+    const ok = new Set([...(T.official.xi || []), ...(T.official.bench || [])]);
+    T.out = (T.out || []).filter(o => !ok.has(o.n));
   }
   const prevSrc = Object.fromEntries((same ? prev.sources : []).map(x => [x.key, x]));
   const srcFC = { url: raw.fantacalcio.url, updated: shortDate(P.updated) || now.day };
