@@ -82,9 +82,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .dot.ball{display:inline-flex;align-items:center;justify-content:center;font:800 9px/1 system-ui,sans-serif;color:#fff}
 .dot.d-bench.ball{color:#1b1400}
 /* lettere al posto dei pallini */
-.lt{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;font:800 11px/1 system-ui,sans-serif;color:#fff;vertical-align:middle}
-.lt-T{background:var(--ok)} .lt-P{background:var(--bench);color:#1b1400} .lt-Bv{background:var(--ok)} .lt-Bg{background:var(--bench);color:#1b1400}
+.lt{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;font:800 11px/1 system-ui,sans-serif;color:#111;vertical-align:middle}
+.lt-T{background:var(--ok)} .lt-P{background:var(--bench)} .lt-Bv{background:var(--ok)} .lt-Bg{background:var(--bench)}
 .lt-D{background:#ee7d1a} .lt-I,.lt-S{background:var(--out)} .lt-na{background:transparent;color:var(--na);font-weight:700}
+.lt:not(.lt-na){color:#111}
 .legend span{display:inline-flex;gap:6px;align-items:center}
 
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
