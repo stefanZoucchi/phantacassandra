@@ -129,12 +129,31 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   // Squalificato se lo dice almeno uno; infortunato se almeno uno lo dà fuori senza dubbi; altrimenti in dubbio.
   const RANK = { dubbio: 1, inf: 2, squal: 3 };
   const outKeys = ["fantacalcio", "gazzetta", "sky", "tmw", "goal", "calciomercato", "eurosport"];
+  // nomi conosciuti per squadra: rosa di Fantacalcio.it + indisponibili segnalati dalle altre fonti
+  const known = t => { const c = new Set(teams[t].roster);
+    for (const k of outKeys.slice(1)) { const R = raw[k]; if (!R?.out) continue; const tn = Object.keys(R.out).find(x => sameTeam(x, t)); (tn ? R.out[tn] : []).forEach(o => c.add(o.n)); }
+    return [...c]; };
+  // liste con le due squadre mescolate (Fantacalcio.it: prima la colonna di casa, poi quella in trasferta, sezione per sezione):
+  // chi è riconosciuto decide la colonna, gli altri seguono il precedente della stessa sezione
+  const sideOf = (L, t) => {
+    const o = teams[t].opp, ct = known(t), co = known(o), res = [];
+    let cur = "home", sec = null;
+    const homeT = teams[t].home ? t : o, awayT = teams[t].home ? o : t;
+    for (const x of L) {
+      if (x.k !== sec) { sec = x.k; cur = homeT; }
+      if (x.n === "-") { if (cur === homeT) cur = awayT; continue; } // colonna di casa vuota: da qui in poi è la trasferta
+      const inT = !!matchName(x.n, ct, t), inO = !!matchName(x.n, co, o);
+      if (inT !== inO) cur = inT ? t : o;
+      if (cur === t) res.push(x);
+    }
+    return res;
+  };
   for (const [t, T] of Object.entries(teams)) {
     const lists = outKeys.map(k => {
       const R = raw[k]; if (!R || (!results[k] && k !== "fantacalcio") || !R.out) return null;
       const tn = Object.keys(R.out).find(x => sameTeam(x, t)); if (!tn) return null;
       // liste con le due squadre mescolate: tengo solo i giocatori della rosa di questa squadra
-      const L = R.mixed ? R.out[tn].filter(o => matchName(o.n, T.roster, t)) : R.out[tn];
+      const L = R.mixed ? sideOf(R.out[tn], t) : R.out[tn];
       return L.length ? { k, L } : null;
     }).filter(Boolean);
     if (!lists.length) { const PT = prev && prev.giornata == P.giornata && prev.teams?.[t]; if (PT?.out?.length) T.out = PT.out; continue; } // nessuna lista nuova: tengo quella di prima
@@ -169,11 +188,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   } else if (prev) {
     history = history.filter(h => h.giornata != prev.giornata).concat([{ giornata: prev.giornata, stats: accuracy(prev) }]);
   }
-  // partita con formazione ufficiale: chi era titolare o in panchina non è indisponibile per quella partita
-  for (const T of Object.values(teams)) if (T.official) {
-    const ok = new Set([...(T.official.xi || []), ...(T.official.bench || [])]);
-    T.out = (T.out || []).filter(o => !ok.has(o.n));
-  }
+  // gli indisponibili di una partita con l'ufficiale restano quelli di prima del via: servono per vedere chi ha sbagliato
   const prevSrc = Object.fromEntries((same ? prev.sources : []).map(x => [x.key, x]));
   const srcFC = { url: raw.fantacalcio.url, updated: shortDate(P.updated) || now.day };
   const sources = SOURCES.map(s => {

@@ -45,7 +45,8 @@ const fantacalcio = function () {
     const bl = sec("Ballottaggi", "Squalificati").split("\n").map(x => x.trim()).filter(x => x && !/^\d{1,3}%$/.test(x) && !/^Nessun/i.test(x));
     const pairs = []; for (let k = 0; k + 1 < bl.length; k += 2) pairs.push(bl[k] + " - " + bl[k + 1]);
     const names = txt => txt.split(/\n\s*\n/).map(x => x.trim()).filter(Boolean).flatMap(x => x.split("\n")).map(x => x.trim())
-      .filter(x => x && !/^Nessun/i.test(x) && x.length <= 30 && !/\s(di|del|della|al|alla|contro|da|in|out|e)\s/i.test(" " + x + " ") && /^[A-ZÀ-Ý]/.test(x));
+      .map(x => /^Nessun/i.test(x) ? "-" : x) // "Nessun calciatore" = colonna vuota: lo tengo come separatore tra casa e trasferta
+      .filter(x => x === "-" || (x && x.length <= 30 && !/\s(di|del|della|al|alla|contro|da|in|out|e)\s/i.test(" " + x + " ") && /^[A-ZÀ-Ý]/.test(x)));
     const outs = [...names(sec("Squalificati", "Diffidati")).map(n => ({ n, k: "squal" })), ...names(sec("Infortunati", "In dubbio")).map(n => ({ n, k: "inf" })), ...names(sec("In dubbio", "Presentazione squadre|Dettaglio calciatori")).map(n => ({ n, k: "dubbio" }))];
     const L = body.split("\n").map(s => s.trim()).filter(s => s && !/connection is too slow/i.test(s));
     const tIdx = L.map((s, k) => (isMod(L[k + 1] || "") ? k : -1)).filter(k => k >= 0);
