@@ -19,7 +19,6 @@ const PLAN = [
   { key: "tmw", hub: "https://www.tuttomercatoweb.com/probabili-formazioni/", link: /tuttomercatoweb\.com\/probabili-formazioni\/probabili-formazioni-serie-a-ultime-\d+a-giornata[^"#?\s]*/, fn: X.lineFormat },
   { key: "sosfanta", url: "https://www.sosfanta.com/lista-formazioni/probabili-formazioni-serie-a/", fn: X.sosfanta },
   { key: "eurosport", hub: "https://www.eurosport.it/calcio/serie-a/", summary: /eurosport\.it\/calcio\/serie-a\/[^"#?\s]*probabili-formazioni-\d+a-giornata[^"#?\s]*story\.shtml/, multi: /eurosport\.it\/calcio\/serie-a\/[^"#?\s]*-probabili-formazioni-statistiche[^"#?\s]*story\.shtml/, fn: X.lineFormat },
-  { key: "calciomercato", pages: "https://www.calciomercato.com/notizie/", link: /calciomercato\.com\/liste\/serie-a-probabili-formazioni-[a-z]+-giornata[^"#?\s]*/, fn: X.lineFormat },
   // formazioni ufficiali dalla Lega Serie A (una pagina per partita)
   { key: "lega", legaHub: "https://www.legaseriea.it/it/serie-a", link: /legaseriea\.it\/(?:it\/)?serie-a\/match\/[0-9a-f]{32}\/[a-z0-9-]+-vs-[a-z0-9-]+/, fn: X.lega },
   { key: "goal", hub: "https://www.goal.com/it/notizie", link: /goal\.com\/it\/liste\/probabili-formazioni-serie-a-giornata-\d+[^"#?\s]*/, fn: X.lineFormat },
