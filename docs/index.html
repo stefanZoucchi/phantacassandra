@@ -171,6 +171,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
       <div class="sub" id="sub">Caricamento dati…</div>
     </div>
     <div class="actions">
+      <button id="btnSpm" type="button" title="Aggiungi a mano le probabili di Sportmediaset">Sportmediaset</button>
       <button id="btnEdit" type="button">Modifica rosa</button>
     </div>
   </header>
@@ -187,6 +188,17 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
     <span>% impiego = fonti che lo danno titolare ÷ fonti che hanno pubblicato · sotto ogni fonte: data e ora del suo ultimo aggiornamento</span>
   </div>
 
+
+  <section class="panel" id="spmPanel" hidden>
+    <h2>Sportmediaset</h2>
+    <div class="note">Sportmediaset non permette la lettura automatica, quindi la colonna <b>SPM</b> la riempi tu, una partita alla volta:
+      <b>1.</b> <a href="https://www.sportmediaset.mediaset.it/probabili-formazioni/serie-a/" target="_blank" rel="noopener">apri le probabili di Sportmediaset</a> e scegli la partita;
+      <b>2.</b> seleziona tutto e copia (computer: Ctrl+A e Ctrl+C · telefono: tieni premuto, «Seleziona tutto», «Copia»);
+      <b>3.</b> torna qui e incolla nel riquadro. I dati restano solo in questo browser.</div>
+    <textarea id="spmIn" rows="4" placeholder="Incolla qui la pagina della partita copiata da Sportmediaset"></textarea>
+    <div class="note" id="spmMsg"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" id="spmRead" type="button">Leggi</button><button id="spmClear" type="button">Cancella i dati Sportmediaset</button><button id="spmClose" type="button">Chiudi</button></div>
+  </section>
 
   <section class="panel" id="editor" hidden>
     <h2>Rosa</h2>
@@ -224,7 +236,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
 <script>
 (() => {
 const $ = id => document.getElementById(id);
-const ABBR = {fantacalcio:"FC",sky:"SKY",gazzetta:"GDS",corriere:"CDS",tmw:"TMW",sosfanta:"SOS",eurosport:"EUR",goal:"GOAL",calciomercato:"CM"};
+const ABBR = {spm:"SPM",fantacalcio:"FC",sky:"SKY",gazzetta:"GDS",corriere:"CDS",tmw:"TMW",sosfanta:"SOS",eurosport:"EUR",goal:"GOAL",calciomercato:"CM"};
 const SOURCES = [
   {key:"fantacalcio",name:"Fantacalcio.it",mode:"direct",url:"https://www.fantacalcio.it/probabili-formazioni-serie-a",primary:true},
   {key:"sky",name:"Sky Sport",mode:"find",hub:"https://sport.sky.it/calcio/serie-a",query:"probabili formazioni",hrefRe:/https:\/\/sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/probabili-formazioni[^"\s]*/},
@@ -754,7 +766,7 @@ async function ghUpdate(){
     if(Date.now()-t0<60000) return;
     try{
       const d=await freshData();
-      if(d&&d.generated!==before){clearInterval(ghTimer);DATA=d;b.disabled=false;route();$("refreshPanel").hidden=false;note.textContent=`Fatto: dati aggiornati alle ${d.generated}.`;return}
+      if(d&&d.generated!==before){clearInterval(ghTimer);DATA=d;applySPM();b.disabled=false;route();$("refreshPanel").hidden=false;note.textContent=`Fatto: dati aggiornati alle ${d.generated}.`;return}
       const runs=await ghApi("/actions/workflows/aggiorna.yml/runs?per_page=1").then(r=>r.json());
       const run=runs.workflow_runs?.[0];
       if(run&&run.status==="completed"&&new Date(run.created_at).getTime()>t0-60000&&run.conclusion!=="success"){clearInterval(ghTimer);b.disabled=false;note.innerHTML=`L'aggiornamento non è andato a buon fine. <a href="${run.html_url}" target="_blank" rel="noopener">Vedi il dettaglio su GitHub</a>.`}
@@ -767,6 +779,64 @@ $("btnRefresh").onclick=()=>{
   $("refreshPanel").hidden=false; $("progress").innerHTML="";
   $("refreshNote").textContent="L'aggiornamento parte da GitHub (vedi le istruzioni nel file LEGGIMI).";
 };
+
+/* ---------- Sportmediaset incollato a mano (solo in questo browser) ---------- */
+const SPM_URL="https://www.sportmediaset.mediaset.it/probabili-formazioni/serie-a/";
+function spmLoad(){try{return JSON.parse(localStorage.getItem("spm")||"null")||{}}catch(e){return {}}}
+function spmSave(v){try{localStorage.setItem("spm",JSON.stringify(v))}catch(e){}}
+function applySPM(){
+  if(!DATA) return;
+  const S=spmLoad(), ok=S.giornata==DATA.giornata&&S.matches&&Object.keys(S.matches).length;
+  DATA.sources=(DATA.sources||[]).filter(x=>x.key!=="spm");
+  for(const T of Object.values(DATA.teams)) if(T.lineups) delete T.lineups.spm;
+  if(!ok) return;
+  let last="";
+  for(const M of Object.values(S.matches)){ if(M.at>last) last=M.at; for(const [t,L] of Object.entries(M.teams)) if(DATA.teams[t]) DATA.teams[t].lineups={...DATA.teams[t].lineups,spm:L}; }
+  DATA.sources.push({key:"spm",name:"Sportmediaset",url:SPM_URL,updated:last,ok:true,note:"Incollato a mano: resta solo in questo browser"});
+}
+// testo copiato dalla pagina di una partita: "MILAN\n4-2-3-1\n28/10/2026\n18:30\nBOLOGNA\n3-4-2-1\nALLENATORE\nAmorim\n(11 nomi)\nALLENATORE\n..."
+function parseSPM(text){
+  const L=String(text||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const isMod=x=>/^\d(-\d){2,3}$/.test(x), out=[];
+  for(let i=0;i+6<L.length;i++){
+    if(!(isMod(L[i+1])&&/^\d{2}\/\d{2}\/\d{4}$/.test(L[i+2])&&/^\d{1,2}:\d{2}$/.test(L[i+3])&&isMod(L[i+5])&&/^ALLENATORE$/i.test(L[i+6]))) continue;
+    const h=teamFor(L[i]), a=teamFor(L[i+4]); if(!h||!a) continue;
+    const a2=L.findIndex((x,k)=>k>i+6&&/^ALLENATORE$/i.test(x));
+    const hx=L.slice(i+8,a2), ax=L.slice(a2+2,a2+13);
+    if(a2<0||hx.length!==11||ax.length!==11) continue;
+    const sec=(lab,ends)=>{const k=L.findIndex((x,j)=>j>a2&&x.toUpperCase()===lab);if(k<0)return [];const r=[];for(let j=k+1;j<L.length&&!ends.includes(L[j].toUpperCase());j++)r.push(L[j]);return r.join(",").split(/\s*,\s*/).filter(Boolean)};
+    const ind=sec("INDISPONIBILI",["SQUALIFICATI","LE ULTIME","PANCHINA"]), sq=sec("SQUALIFICATI",["LE ULTIME","INDISPONIBILI","PANCHINA"]);
+    const teams={};
+    for(const [t,xi,mod] of [[h,hx,L[i+1]],[a,ax,L[i+5]]]){
+      const c=candsOf(t), st={};
+      for(const n of ind){const m=matchName(n,c); if(m) st[m]="inf";}
+      for(const n of sq){const m=matchName(n,c); if(m) st[m]="squal";}
+      teams[t]={mod,xi:[...new Set(xi.map(n=>matchName(n,c)||n))],st};
+    }
+    out.push({key:h+"-"+a,teams});
+    i=a2+12;
+  }
+  return out;
+}
+function spmRender(msg){
+  const S=spmLoad(), have=S.giornata==DATA?.giornata?Object.keys(S.matches||{}):[];
+  const all=DATA?[...new Set(Object.values(DATA.teams).map(T=>T.match))]:[];
+  $("spmMsg").innerHTML=(msg?`<b>${esc(msg)}</b><br>`:"")+(all.length?`Partite inserite: ${have.length} di ${all.length}`+(have.length?` (${have.map(esc).join(", ")})`:""):"");
+}
+function spmRead(){
+  const r=parseSPM($("spmIn").value);
+  if(!r.length){spmRender("Non ho trovato una formazione nel testo incollato: copia tutta la pagina della partita.");return}
+  const S=spmLoad(); if(S.giornata!=DATA.giornata){S.giornata=DATA.giornata;S.matches={}}
+  const d=new Date(), at=`${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+  for(const m of r) S.matches[m.key]={at,teams:m.teams};
+  spmSave(S); applySPM(); $("spmIn").value=""; render(); $("spmPanel").hidden=false;
+  spmRender(`Aggiunta: ${r.map(m=>m.key).join(", ")}`);
+}
+$("btnSpm").onclick=()=>{const P=$("spmPanel");P.hidden=!P.hidden;if(!P.hidden){spmRender();$("spmIn").focus()}};
+$("spmClose").onclick=()=>{$("spmPanel").hidden=true};
+$("spmRead").onclick=spmRead;
+$("spmIn").addEventListener("paste",()=>setTimeout(spmRead,50));
+$("spmClear").onclick=()=>{if(!confirm("Cancello i dati di Sportmediaset incollati in questo browser?"))return;try{localStorage.removeItem("spm")}catch(e){};applySPM();render();spmRender("Dati Sportmediaset cancellati.")};
 
 /* ---------- boot & routing ---------- */
 function route(){
@@ -785,6 +855,7 @@ async function boot(){
   try{DATA=await fetch("data.json",{cache:"no-store"}).then(r=>r.ok?r.json():null)}catch(e){}
   if(!DATA){try{DATA=JSON.parse(document.getElementById("seed")?.textContent||"null")}catch(e){}}
   if(GH){try{const d=await Promise.race([freshData(),new Promise(r=>setTimeout(()=>r(null),4000))]);if(d&&d.generated&&d.generated!==DATA?.generated)DATA=d}catch(e){}}
+  applySPM();
   // rose: quella del browser oppure il file caricato su GitHub (rose-phantacassandra.json o rose.json), vince la più recente
   let saved=null, local=null, remote=null;
   try{local=JSON.parse(localStorage.getItem("rose")||"null")}catch(e){}
