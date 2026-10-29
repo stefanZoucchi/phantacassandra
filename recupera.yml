@@ -1,0 +1,40 @@
+name: Recupera previsioni perse
+
+# Da avviare a mano: Actions → Recupera previsioni perse → Run workflow.
+# Rimette in docs/data.json le previsioni della giornata in corso che erano state salvate
+# in un aggiornamento precedente e poi sono sparite (es. SportMediaset del 27 e 28 ottobre).
+on:
+  workflow_dispatch:
+    inputs:
+      fonti:
+        description: "Fonti da recuperare (es. spm). Vuoto = tutte"
+        required: false
+        default: "spm"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aggiorna
+  cancel-in-progress: false
+
+jobs:
+  recupera:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Recupera dalla cronologia
+        env:
+          FONTI: ${{ inputs.fonti }}
+        run: node scraper/recupera.js
+      - name: Salva
+        run: |
+          git config user.name "PhantaCassandra"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/data.json
+          git diff --cached --quiet || git commit -m "Previsioni recuperate dalla cronologia"
+          git pull --rebase -q || true
+          git push

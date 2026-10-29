@@ -1,0 +1,51 @@
+name: Storico giocatori (tabellini Gazzetta)
+
+# Giro notturno: legge i tabellini delle partite finite sulla Gazzetta e aggiorna docs/history-players.json.
+# Il primo giro recupera da solo tutte le giornate già giocate. Per rileggere delle giornate:
+# Actions → Storico giocatori → Run workflow → giornate "1-9" (oppure "8,9").
+on:
+  schedule:
+    # 00:15 a Roma tutto l'anno: la prima riga vale con l'ora solare, la seconda con l'ora legale
+    # (scraper/storico.js salta quella che non cade dopo la mezzanotte italiana)
+    - cron: "15 23 * * *"
+    - cron: "15 22 * * *"
+  workflow_dispatch:
+    inputs:
+      giornate:
+        description: "Giornate da rileggere (es. 1-9 oppure 8,9). Vuoto = solo quelle mancanti"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: storico
+  cancel-in-progress: false
+
+jobs:
+  storico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container: mcr.microsoft.com/playwright:v1.48.2-jammy
+    steps:
+      - name: Prepara git
+        run: command -v git >/dev/null || (apt-get update -qq && apt-get install -y -qq git >/dev/null)
+      - uses: actions/checkout@v4
+      - name: Prepara il lettore
+        run: npm install --no-save --no-audit --no-fund playwright@1.48.2
+      - name: Leggi i tabellini e aggiorna lo storico
+        env:
+          HOME: /root
+          EVENT: ${{ github.event_name }}
+          HIST_GIORNATE: ${{ github.event_name == 'workflow_dispatch' && inputs.giornate || '' }}
+        run: node scraper/storico.js
+      - name: Salva
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "PhantaCassandra"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/history-players*.json docs/ultimo-storico.txt 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Storico giocatori $(TZ=Europe/Rome date '+%d/%m %H:%M')"
+          git pull --rebase -q || true
+          git push
