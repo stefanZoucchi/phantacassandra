@@ -13,8 +13,14 @@ const SOURCES = [
   { key: "spm", name: "SportMediaset" },
 ];
 
+// La classifica delle fonti conta solo da questa giornata in poi: la 9ª ha dati incompleti
+// (SportMediaset mancante su 16 squadre) e falserebbe il confronto.
+const STATS_FROM = 10;
+const statsFrom = D => +(D?.statsFrom ?? STATS_FROM);
+
 function accuracy(D) {
   const st = {};
+  if (+D.giornata < statsFrom(D)) return st;
   for (const T of Object.values(D.teams || {})) {
     if (!T.official) continue;
     const off = new Set(T.official.xi);
@@ -214,8 +220,11 @@ function build(raw, prev, mode = "automatico", log = console.log) {
     // chiude la giornata precedente: salva sempre le stats (anche se poche ufficiali)
     try {
       const st = accuracy(prev);
-      history = history.filter(h => h.giornata != prev.giornata).concat([{ giornata: prev.giornata, stats: st }]);
-      log(`History: salvate stats giornata ${prev.giornata}ª (${Object.keys(st).length} fonti)`);
+      history = history.filter(h => h.giornata != prev.giornata);
+      if (Object.keys(st).length) {
+        history = history.concat([{ giornata: prev.giornata, stats: st }]);
+        log(`History: salvate stats giornata ${prev.giornata}ª (${Object.keys(st).length} fonti)`);
+      } else log(`History: giornata ${prev.giornata}ª esclusa dalla classifica delle fonti`);
     } catch (e) { log(`History: impossibile salvare stats giornata ${prev.giornata}: ${e.message}`); }
   }
   // gli indisponibili di una partita con l'ufficiale restano quelli di prima del via: servono per vedere chi ha sbagliato
@@ -234,7 +243,8 @@ function build(raw, prev, mode = "automatico", log = console.log) {
       ...(s.note ? { note: s.note } : {}),
     };
   });
-  return { giornata: P.giornata, generated: now.full, mode, history, sources, teams };
+  history = history.filter(h => +h.giornata >= statsFrom(prev));
+  return { giornata: P.giornata, generated: now.full, mode, statsFrom: statsFrom(prev), history, sources, teams };
 }
 
 module.exports = { build, accuracy, SOURCES, nowRome };

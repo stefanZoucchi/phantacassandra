@@ -3,7 +3,8 @@
 // legge il tabellino di ogni partita FINITA e archivia in docs/history-players.json:
 // T = titolare, ↓ = titolare sostituito (minuto), ↑ = entrato (minuto), P = in panchina,
 // I / S = indisponibile / squalificato (dagli indisponibili raccolti prima della partita).
-// Le partite già archiviate non vengono rilette: il primo giro recupera tutta la stagione.
+// Le partite già archiviate non vengono rilette. Lo storico parte dalla giornata in corso al primo giro
+// (H.from): le giornate precedenti non hanno i dati su infortuni e squalifiche e non vengono archiviate.
 //
 // Variabili facoltative:
 //   HIST_GIORNATE="1-9" oppure "8,9"  → rilegge queste giornate (anche se già archiviate)
@@ -83,9 +84,17 @@ function nameMapper(cands, team) {
   H.outs[gCur] = H.outs[gCur] || {};
   for (const [t, T] of Object.entries(data.teams)) if (T.out?.length) H.outs[gCur][t] = T.out;
 
-  const forced = parseList(process.env.HIST_GIORNATE);
+  // lo storico parte dalla giornata in cui abbiamo iniziato a salvare gli indisponibili (prima non sapremmo dire chi era infortunato o squalificato)
+  // (= la prima giornata con gli indisponibili salvati, altrimenti quella in corso)
+  H.from = +H.from || Math.min(+data.giornata, ...Object.keys(H.outs).filter(g => Object.keys(H.outs[g] || {}).length).map(Number));
+  H.giornate = H.giornate.filter(g => +g >= H.from);
+  for (const P of Object.values(H.players)) for (const g of Object.keys(P.g || {})) if (+g < H.from) delete P.g[g];
+  for (const g of Object.keys(H.matches)) if (+g < H.from) delete H.matches[g];
+  for (const [n, P] of Object.entries(H.players)) if (!Object.keys(P.g || {}).length) delete H.players[n];
+
+  const forced = parseList(process.env.HIST_GIORNATE).filter(g => g >= H.from);
   let todo = forced.length ? forced
-    : Array.from({ length: +data.giornata }, (_, i) => i + 1).filter(g => Object.keys(H.matches[g] || {}).length < 10);
+    : Array.from({ length: +data.giornata - H.from + 1 }, (_, i) => H.from + i).filter(g => Object.keys(H.matches[g] || {}).length < 10);
   todo = todo.slice(-MAX_GIORNATE);
   if (!todo.length) { log("Storico già completo fino alla " + data.giornata + "ª giornata"); save(H); fs.writeFileSync(LOGF, LOG.join("\n") + "\n"); return; }
   log("Giornate da controllare: " + todo.join(", "));
