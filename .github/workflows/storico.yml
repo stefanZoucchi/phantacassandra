@@ -5,8 +5,10 @@ name: Storico giocatori (tabellini Gazzetta)
 # Actions → Storico giocatori → Run workflow → giornate "1-9" (oppure "8,9").
 on:
   schedule:
-    # 00:15 a Roma con l'ora solare (01:15 con l'ora legale)
+    # 00:15 a Roma tutto l'anno: la prima riga vale con l'ora solare, la seconda con l'ora legale
+    # (scraper/storico.js salta quella che non cade dopo la mezzanotte italiana)
     - cron: "15 23 * * *"
+    - cron: "15 22 * * *"
   workflow_dispatch:
     inputs:
       giornate:
@@ -35,6 +37,7 @@ jobs:
       - name: Leggi i tabellini e aggiorna lo storico
         env:
           HOME: /root
+          EVENT: ${{ github.event_name }}
           HIST_GIORNATE: ${{ github.event_name == 'workflow_dispatch' && inputs.giornate || '' }}
         run: node scraper/storico.js
       - name: Salva
@@ -42,7 +45,7 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "PhantaCassandra"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/history-players.json docs/ultimo-storico.txt 2>/dev/null || true
+          git add docs/history-players*.json docs/ultimo-storico.txt 2>/dev/null || true
           git diff --cached --quiet || git commit -m "Storico giocatori $(TZ=Europe/Rome date '+%d/%m %H:%M')"
           git pull --rebase -q || true
           git push
