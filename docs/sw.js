@@ -1,5 +1,5 @@
 // Service worker: installabilità PWA + data.json network-first (fallback cache).
-const CACHE = "pc-v2";
+const CACHE = "pc-v3";
 self.addEventListener("install", e => {
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(["./", "./index.html", "./data.json"]).catch(() => {})));
