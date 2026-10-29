@@ -166,11 +166,58 @@ const skyMatch = function () {
 // Lega Serie A, pagina della partita: "Sassuolo\n4-3-3\nPosizione\n14th\nLazio\n4-3-3\n1st\nPosizione\n80\nTurati\n26\n..." fino ad "Allenatori"
 const lega = function () {
   const t = document.body.innerText;
-  const m = t.match(/\n([^\n]+)\n(\d(?:-\d){2,3})\nPosizione\n[^\n]*\n([^\n]+)\n(\d(?:-\d){2,3})\n[^\n]*\nPosizione\n([\s\S]*?)\nAllenatori/);
+  // Team\nmod\nPosizione\nrank\nTeam\nmod\nPosizione\nrank\nXI...\nAllenatori
+  let m = t.match(/\n([A-ZÀ-Ü][^\n]{1,40})\n(\d(?:-\d){2,3})\nPosizione\n[^\n]*\n([A-ZÀ-Ü][^\n]{1,40})\n(\d(?:-\d){2,3})\nPosizione\n[^\n]*\n([\s\S]*?)\nAllenatori/i);
+  if (!m) m = t.match(/\n([A-ZÀ-Ü][^\n]{1,40})\n(\d(?:-\d){2,3})\nPosizione[^\n]*\n([A-ZÀ-Ü][^\n]{1,40})\n(\d(?:-\d){2,3})\nPosizione[^\n]*\n([\s\S]*?)\nAllenatori/i);
   if (!m) return { teams: {} };
   const names = m[5].split("\n").map(x => x.trim()).filter(x => x && !/^\d{1,2}$/.test(x));
   if (names.length < 22) return { teams: {} };
-  return { teams: { [m[1].trim()]: { mod: m[2], xi: names.slice(0, 11) }, [m[3].trim()]: { mod: m[4], xi: names.slice(11, 22) } } };
+  const home = m[1].trim(), away = m[3].trim();
+  const teams = {
+    [home]: { mod: m[2], xi: names.slice(0, 11) },
+    [away]: { mod: m[4], xi: names.slice(11, 22) },
+  };
+  // Post-gara (tab /lineups): sezione PANCHINA con eventuali minuti di ingresso "(74')"
+  // Pattern tipico: Nome\nRuolo\n(74') oppure Nome\nRuolo senza minuto
+  const pan = t.split(/\nPANCHINA\n/i)[1] || t.split(/\nPanchina\n/i)[1] || "";
+  if (pan) {
+    const chunk = pan.split(/\n(?:TESTA A TESTA|Statistiche|CLASSIFICA|Allenatori)/i)[0] || pan;
+    const lines = chunk.split("\n").map(s => s.trim()).filter(Boolean);
+    // Rimuove prefissi numero maglia "20 Demba Thiam" → "Demba Thiam"
+    const stripNum = s => s.replace(/^\d{1,2}\s+/, "").trim();
+    const isRole = s => /^(Portiere|Difensore|Centrocampista|Attaccante|Allenatore)/i.test(s);
+    const isMin = s => /^\(\d{1,3}(?:\+\d{1,2})?'\)$/.test(s);
+    const benches = { [home]: [], [away]: [] };
+    let side = home, i = 0;
+    // euristica: prima metà panchina casa, dopo un secondo blocco o dopo ~9-15 nomi → trasferta
+    // meglio: conta i nomi fino a ripetizione di struttura; split a metà se due team
+    const entries = [];
+    while (i < lines.length) {
+      let name = lines[i];
+      if (/^Allenatori$/i.test(name)) break;
+      if (isMin(name) || isRole(name) || /^\d+$/.test(name)) { i++; continue; }
+      name = stripNum(name);
+      if (!name || name.length < 2 || name.length > 40) { i++; continue; }
+      let min = null, j = i + 1;
+      if (j < lines.length && isRole(lines[j])) j++;
+      if (j < lines.length && isMin(lines[j])) { min = parseInt(lines[j].replace(/\D/g, ""), 10); j++; }
+      // secondo minuto (uscita) opzionale
+      if (j < lines.length && isMin(lines[j])) j++;
+      entries.push({ n: name, min });
+      i = j > i + 1 ? j : i + 1;
+    }
+    if (entries.length >= 4) {
+      // split casa/trasferta: tipicamente ~7-12 per lato
+      const mid = Math.ceil(entries.length / 2);
+      benches[home] = entries.slice(0, mid);
+      benches[away] = entries.slice(mid);
+      for (const side of [home, away]) {
+        teams[side].bench = benches[side].map(e => e.n);
+        teams[side].subs = benches[side].filter(e => e.min != null).map(e => ({ n: e.n, min: e.min }));
+      }
+    }
+  }
+  return { teams };
 };
 
 // SportMediaset: una pagina per partita (?match=id1:id2). Testo tipico:

@@ -78,11 +78,23 @@ async function readPerMatch(page, s) {
 async function readLega(page, s) {
   await open(page, s.legaHub);
   const byId = {};
-  for (const u of await allLinks(page, s.link)) { const id = (u.match(/match\/([0-9a-f]{32})/) || [])[1]; if (id && !byId[id]) byId[id] = u.replace(/[?#].*$/, ""); }
+  for (const u of await allLinks(page, s.link)) {
+    const id = (u.match(/match\/([0-9a-f]{32})/) || [])[1];
+    if (id && !byId[id]) byId[id] = u.replace(/[?#].*$/, "").replace(/\/lineups\/?$/, "");
+  }
   const urls = Object.values(byId).slice(0, 10);
   if (!urls.length) throw new Error("partite non trovate");
   const res = { teams: {} };
-  for (const u of urls) { try { await open(page, u); const r = await evalSafe(page, s.fn); Object.assign(res.teams, r.teams); } catch (e) {} }
+  for (const u of urls) {
+    try {
+      // preferisci /lineups (post-gara: panchina + minuti ingresso); fallback pagina match
+      let r = null;
+      try { await open(page, u.replace(/\/?$/, "") + "/lineups"); r = await evalSafe(page, s.fn); }
+      catch (e) { r = null; }
+      if (!r || !Object.keys(r.teams || {}).length) { await open(page, u); r = await evalSafe(page, s.fn); }
+      Object.assign(res.teams, r.teams || {});
+    } catch (e) {}
+  }
   return { ...res, url: s.legaHub };
 }
 
@@ -123,7 +135,7 @@ async function readSource(page, s) {
 }
 
 // legge piu' siti insieme (ognuno nella sua scheda): il giro dura 2-3 minuti invece di 8
-const PARALLEL = 4;
+const PARALLEL = 5;
 // tutto quello che viene scritto nel registro finisce anche in docs/ultimo-giro.txt (utile per capire cosa non va)
 const LOG = [];
 for (const k of ["log", "error"]) { const o = console[k].bind(console); console[k] = (...a) => { LOG.push(a.join(" ")); o(...a); }; }
@@ -164,7 +176,29 @@ function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di R
   await browser.close();
   try {
     const data = build(raw, prev, MODE, console.log);
+    for (const T of Object.values(data.teams || {})) delete T._legaPost;
     fs.writeFileSync(OUT, JSON.stringify(data));
+    try {
+      const { mergeHistory } = require("./history");
+      const { matchName, sameTeam } = require("./names");
+      const LG = raw.lega;
+      if (LG && !LG.error && data.giornata) {
+        const payload = {}, outMap = {};
+        for (const [tn, L] of Object.entries(LG.teams || {})) {
+          const t = Object.keys(data.teams).find(x => sameTeam(x, tn));
+          if (!t || !L.xi) continue;
+          const roster = data.teams[t].roster || [];
+          const cands = [...roster, ...(L.bench || []), ...(L.xi || [])];
+          payload[t] = {
+            xi: L.xi.map(p => matchName(p, roster, t) || p),
+            bench: (L.bench || []).map(p => matchName(p, cands, t) || p),
+            subs: (L.subs || []).map(s => ({ n: matchName(s.n, cands, t) || s.n, min: s.min })),
+          };
+          if (data.teams[t].out?.length) outMap[t] = data.teams[t].out;
+        }
+        if (Object.keys(payload).length) mergeHistory(data.giornata, payload, outMap, console.log);
+      }
+    } catch (e) { console.log("History giocatori: " + e.message); }
     const off = Object.values(data.teams).filter(t => t.official).length;
     const nOut = Object.values(data.teams).reduce((a, t) => a + t.out.length, 0);
     console.log(`OK: ${data.giornata}ª giornata, ${data.sources.filter(s => s.ok).length} fonti, ${off} formazioni ufficiali, ${nOut} indisponibili. Salvato ${data.generated}.`);

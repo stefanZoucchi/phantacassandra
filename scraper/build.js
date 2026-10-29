@@ -81,10 +81,19 @@ function build(raw, prev, mode = "automatico", log = console.log) {
     let n = 0;
     for (const [tn, L] of Object.entries(LG.teams || {})) {
       const t = teamKey(tn); if (!t) continue;
-      const mt = minsTo(teams[t].when); if (mt == null || mt > 60) continue;
-      const xi = [...new Set(L.xi.map(p => matchName(p, teams[t].roster, t) || p))];
-      if (xi.length !== 11 || xi.filter(p => teams[t].roster.includes(p)).length < 9) { log(`  Lega ${t}: nomi non abbinati, scartata`); continue; }
-      teams[t].official = { xi, src: "Lega Serie A", bench: teams[t].official?.bench || [] }; n++;
+      const cands = [...teams[t].roster, ...(L.bench || []), ...(L.xi || [])];
+      const xi = [...new Set((L.xi || []).map(p => matchName(p, teams[t].roster, t) || p))];
+      const bench = [...new Set((L.bench || []).map(p => matchName(p, cands, t) || p))];
+      const subs = (L.subs || []).map(s => ({ n: matchName(s.n, cands, t) || s.n, min: s.min })).filter(s => s.n);
+      // ufficiale "live" solo vicino al calcio d'inizio; bench/subs servono anche post-gara per lo storico
+      const mt = minsTo(teams[t].when);
+      if (xi.length === 11 && xi.filter(p => teams[t].roster.includes(p)).length >= 9 && mt != null && mt <= 60) {
+        teams[t].official = { xi, src: "Lega Serie A", bench: bench.length ? bench : (teams[t].official?.bench || []), subs };
+        n++;
+      } else if (xi.length === 11 && (bench.length || subs.length)) {
+        // post-gara: conserva per history anche se fuori finestra ufficiale
+        teams[t]._legaPost = { xi, bench, subs };
+      }
     }
     log(`+ Lega Serie A: ${n} formazioni ufficiali`);
   } else if (LG) log(`- Lega Serie A: ${LG.error}`);
@@ -99,7 +108,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
     if (!R || R.error) { log(`- ${s.name}: ${R?.error || "non letto"}`); continue; }
     if (R.giornata != null && R.giornata != P.giornata) { log(`- ${s.name}: è ancora alla ${R.giornata}ª giornata`); continue; }
     if (R.giornata == null && !pairsOk(R)) { log(`- ${s.name}: le partite non corrispondono alla ${P.giornata}ª giornata`); continue; }
-    let n = 0;
+    let n = 0, unmatched = [];
     for (const [tn, L] of Object.entries(R.teams || {})) {
       const t = teamKey(tn); if (!t) continue;
       const cands = [...teams[t].roster];
@@ -109,6 +118,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
         const split = L.xi.length === 10 && parts.length === 2 ? parts.map(x => matchName(x, cands, t)) : [];
         if (split.length === 2 && split.every(Boolean) && split[0] !== split[1]) { xi.push(...split); continue; }
         const c = matchName(p, cands, t);
+        if (!c) unmatched.push(`${t}:${p}`);
         xi.push(c || p);
       }
       xi = [...new Set(xi)];
@@ -121,7 +131,11 @@ function build(raw, prev, mode = "automatico", log = console.log) {
       }
       n++;
     }
-    if (n) { results[s.key] = { url: R.url, updated: shortDate(R.updated) || now.day }; log(`+ ${s.name}: ${n} squadre`); }
+    if (unmatched.length) {
+      const sample = [...new Set(unmatched)].slice(0, 12);
+      log(`  ${s.name}: nomi non abbinati (${sample.length}${unmatched.length > sample.length ? "+" : ""}): ${sample.join(", ")}`);
+    }
+    if (n) { results[s.key] = { url: R.url, updated: shortDate(R.updated) || now.day, teams: n }; log(`+ ${s.name}: ${n} squadre`); }
     else log(`- ${s.name}: nessuna squadra utilizzabile`);
   }
 
@@ -173,7 +187,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
     T.out = all;
   }
 
-  let history = prev?.history || [];
+  let history = Array.isArray(prev?.history) ? prev.history : [];
   const same = prev && prev.giornata == P.giornata;
   if (same) {
     for (const [t, T] of Object.entries(teams)) {
@@ -185,15 +199,29 @@ function build(raw, prev, mode = "automatico", log = console.log) {
       }
       else for (const [k, L] of Object.entries(PT.lineups || {})) if (!T.lineups[k] && !results[k]) T.lineups[k] = L;
     }
-  } else if (prev) {
-    history = history.filter(h => h.giornata != prev.giornata).concat([{ giornata: prev.giornata, stats: accuracy(prev) }]);
+  } else if (prev && prev.giornata != null) {
+    // chiude la giornata precedente: salva sempre le stats (anche se poche ufficiali)
+    try {
+      const st = accuracy(prev);
+      history = history.filter(h => h.giornata != prev.giornata).concat([{ giornata: prev.giornata, stats: st }]);
+      log(`History: salvate stats giornata ${prev.giornata}ª (${Object.keys(st).length} fonti)`);
+    } catch (e) { log(`History: impossibile salvare stats giornata ${prev.giornata}: ${e.message}`); }
   }
   // gli indisponibili di una partita con l'ufficiale restano quelli di prima del via: servono per vedere chi ha sbagliato
   const prevSrc = Object.fromEntries((same ? prev.sources : []).map(x => [x.key, x]));
-  const srcFC = { url: raw.fantacalcio.url, updated: shortDate(P.updated) || now.day };
+  const nFC = Object.keys(P.teams || {}).length;
+  const srcFC = { url: raw.fantacalcio.url, updated: shortDate(P.updated) || now.day, teams: nFC };
   const sources = SOURCES.map(s => {
     const r = s.key === "fantacalcio" ? srcFC : results[s.key], ps = prevSrc[s.key];
-    return { key: s.key, name: s.name, url: r?.url || ps?.url || "", updated: r?.updated || ps?.updated || "", ok: !!r || !!ps?.ok, ...(s.note ? { note: s.note } : {}) };
+    const teamsN = r?.teams ?? ps?.teams;
+    return {
+      key: s.key, name: s.name,
+      url: r?.url || ps?.url || "",
+      updated: r?.updated || ps?.updated || "",
+      ok: !!r || !!ps?.ok,
+      ...(teamsN != null ? { teams: teamsN } : {}),
+      ...(s.note ? { note: s.note } : {}),
+    };
   });
   return { giornata: P.giornata, generated: now.full, mode, history, sources, teams };
 }
