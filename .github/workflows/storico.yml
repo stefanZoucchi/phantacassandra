@@ -1,0 +1,42 @@
+name: Storico giocatori (Lega post-gara)
+
+# Pacchetto pluto: giro notturno per archiviare T/P/E/I/S dalle lineups Lega
+on:
+  schedule:
+    # 00:15 Europe/Rome ≈ 23:15 UTC (solare) / 22:15 UTC (legale) — usiamo 23:15 UTC
+    - cron: "15 23 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: storico
+  cancel-in-progress: false
+
+jobs:
+  storico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container: mcr.microsoft.com/playwright:v1.48.2-jammy
+    steps:
+      - name: Prepara git
+        run: command -v git >/dev/null || (apt-get update -qq && apt-get install -y -qq git >/dev/null)
+      - uses: actions/checkout@v4
+      - name: Prepara il lettore
+        run: npm install --no-save --no-audit --no-fund playwright@1.48.2
+      - name: Leggi Lega + aggiorna storico
+        env:
+          EVENT: ${{ github.event_name }}
+          MODE: automatico
+          HOME: /root
+        run: node scraper/run.js
+      - name: Salva
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "PhantaCassandra"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/data.json docs/history-players.json docs/ultimo-giro.txt 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Storico/formazioni $(TZ=Europe/Rome date '+%d/%m %H:%M')"
+          git pull --rebase -q || true
+          git push
