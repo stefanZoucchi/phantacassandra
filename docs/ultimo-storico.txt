@@ -1,0 +1,91 @@
+Giornate da controllare: 1, 2, 3, 4, 5, 6, 7, 8, 9
+1ª giornata: calendario non letto (page.$$eval: Execution context was destroyed, most likely because of a navigatio)
+  + Atalanta-Bologna
+  + Cagliari-Inter (titolari non in rosa: Lautaro Martínez)
+  + Fiorentina-Frosinone (titolari non in rosa: Albert Gudmundsson)
+  + Juventus-Parma (titolari non in rosa: Jonathan David)
+  + Lazio-Genoa (titolari non in rosa: Boulaye Dia, Brooke Norton-Cuffy)
+  + Lecce-Roma
+  + Milan-Venezia
+  + Monza-Udinese
+  + Napoli-Como
+  + Sassuolo-Torino
+2ª giornata: 10 partite archiviate (10/10 in totale)
+  + Bologna-Sassuolo
+  + Cagliari-Lecce
+  + Fiorentina-Torino
+  + Frosinone-Venezia
+  + Genoa-Como
+  + Inter-Napoli (titolari non in rosa: Lautaro Martínez)
+  + Juventus-Milan
+  + Parma-Monza
+  + Roma-Atalanta
+  + Udinese-Lazio
+3ª giornata: 10 partite archiviate (10/10 in totale)
+  + Atalanta-Cagliari
+  + Como-Parma
+  + Genoa-Frosinone
+  + Inter-Udinese
+  + Lazio-Milan
+  + Lecce-Monza
+  + Napoli-Bologna
+  + Sassuolo-Juventus
+  + Torino-Roma
+  + Venezia-Fiorentina
+4ª giornata: 10 partite archiviate (10/10 in totale)
+  + Bologna-Torino
+  + Fiorentina-Napoli
+  + Frosinone-Como
+  + Juventus-Atalanta
+  + Milan-Lecce
+  + Monza-Sassuolo
+  + Parma-Genoa
+  + Roma-Inter (titolari non in rosa: Lautaro Martínez)
+  + Udinese-Cagliari
+  + Venezia-Lazio
+5ª giornata: 10 partite archiviate (10/10 in totale)
+  + Atalanta-Venezia
+  + Cagliari-Juventus
+  + Como-Roma
+  + Genoa-Fiorentina (titolari non in rosa: Hamed Traoré)
+  + Inter-Parma
+  + Lazio-Monza
+  + Lecce-Bologna
+  + Napoli-Frosinone
+  + Sassuolo-Milan
+  + Torino-Udinese
+6ª giornata: 10 partite archiviate (10/10 in totale)
+  + Bologna-Inter
+  + Fiorentina-Como
+  + Frosinone-Sassuolo
+  + Juventus-Lazio
+  + Milan-Atalanta
+  + Monza-Cagliari
+  parma-torino: non ancora finita
+  + Roma-Genoa
+  + Udinese-Lecce
+  + Venezia-Napoli
+7ª giornata: 9 partite archiviate (9/10 in totale)
+  + Atalanta-Frosinone
+  + Cagliari-Bologna
+  + Como-Sassuolo
+  + Genoa-Venezia (titolari non in rosa: Hamed Traoré)
+  + Inter-Fiorentina
+  + Lazio-Parma
+  + Lecce-Juventus
+  + Napoli-Roma
+  + Torino-Monza
+  + Udinese-Milan
+8ª giornata: 10 partite archiviate (10/10 in totale)
+  fiorentina-atalanta: non ancora finita
+  frosinone-lecce: non ancora finita
+  + Genoa-Juventus
+  + Milan-Bologna
+  + Monza-Napoli
+  + Parma-Udinese
+  + Roma-Cagliari
+  + Sassuolo-Lazio
+  + Torino-Como
+  + Venezia-Inter
+9ª giornata: 8 partite archiviate (8/10 in totale)
+Storico: 77 partite nuove, 627 giocatori, giornate 2,3,4,5,6,7,8,9
