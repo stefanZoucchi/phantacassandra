@@ -141,18 +141,29 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
 .progress li{font-size:13px;display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;background:var(--chip)}
 .unres{font-size:13px}
 @media (prefers-reduced-motion:no-preference){.spin{animation:pulse 1s ease-in-out infinite}@keyframes pulse{50%{opacity:.35}}}
+
+.hist-grid{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.hist-cell{width:22px;height:22px;border-radius:4px;display:inline-grid;place-items:center;font:700 11px var(--display);color:#111}
+.hist-T{background:var(--ok);color:#fff}
+.hist-P{background:var(--bench);color:#111}
+.hist-E{background:#3b82f6;color:#fff}
+.hist-I,.hist-S{background:var(--out);color:#fff}
+.hist-empty{background:var(--chip);color:var(--na)}
+.hist-table td.name{position:sticky;left:0;background:var(--surface);z-index:1}
+.hist-head{font-size:11px;color:var(--muted);text-align:center;min-width:22px}
 </style>
 
 <div class="wrap">
   <nav class="topbar">
     <div class="brand disp">PhantaCassandra</div>
     <div class="seg" role="tablist">
-      <a href="#home">Home</a><span id="sqTabs" style="display:contents"></span><a href="#fonti">Fonti</a>
+      <a href="#home">Home</a><span id="sqTabs" style="display:contents"></span><a href="#fonti">Fonti</a><a href="#storico">Storico</a>
     </div>
     <div class="right"><button class="primary" id="btnRefresh" type="button">Aggiorna dai siti</button><div class="lastupd" id="lastUpd"></div></div>
   </nav>
   <div class="rotate-hint" id="rotateHint">Le tabelle sono larghe: gira il telefono oppure installa PhantaCassandra come app (menu ⋮ → Installa app), che si apre sempre in orizzontale.</div>
   <section id="fontiView" class="home" hidden></section>
+  <section id="storicoView" class="home" hidden></section>
 
   <section class="panel" id="refreshPanel" hidden>
     <h2>Lettura dei siti</h2>
@@ -363,7 +374,7 @@ function srcWeight(key){
   return Math.round((0.75+0.5*p)*100)/100; // ~0.75 se pessima, ~1.25 se ottima
 }
 function rowsFor(SQ){
-  const srcs=DATA.sources;
+  const srcs=typeof sourcesOrderedByRank==="function"?sourcesOrderedByRank():DATA.sources;
   const wts=srcs.map(s=>srcWeight(s.key));
   return SQ.players.map(p=>{
     const r=p.canon?p:resolve(p);
@@ -409,6 +420,41 @@ function accuracy(D){
   }
   return st;
 }
+
+function sourcesOrderedByRank(){
+  if(!DATA||!DATA.sources) return [];
+  const cur=accuracy(DATA);
+  const tot={};
+  for(const r of (DATA.history||[])) for(const [k,v] of Object.entries(r.stats||{})){
+    tot[k]=tot[k]||{hits:0,total:0,teams:0}; tot[k].hits+=v.hits; tot[k].total+=v.total; tot[k].teams+=(v.teams||0);
+  }
+  for(const [k,v] of Object.entries(cur)){ tot[k]=tot[k]||{hits:0,total:0,teams:0}; tot[k].hits+=v.hits; tot[k].total+=v.total; tot[k].teams+=(v.teams||0); }
+  const MIN=6;
+  return [...DATA.sources].sort((a,b)=>{
+    const ta=tot[a.key], tb=tot[b.key];
+    const ra=ta&&ta.total&&(ta.teams||0)>=MIN?ta.hits/ta.total:-1;
+    const rb=tb&&tb.total&&(tb.teams||0)>=MIN?tb.hits/tb.total:-1;
+    if(rb!==ra) return rb-ra;
+    return (tb?.teams||0)-(ta?.teams||0);
+  });
+}
+function accuracyCommon(D){
+  // ranking solo sulle squadre dove TUTTE le fonti ok hanno una formazione
+  const srcs=(D.sources||[]).filter(s=>s.ok).map(s=>s.key);
+  if(srcs.length<2) return accuracy(D);
+  const st={}; const common=[];
+  for(const [tn,T] of Object.entries(D.teams||{})){
+    if(!T.official) continue;
+    if(!srcs.every(k=>T.lineups&&T.lineups[k]&&T.lineups[k].xi)) continue;
+    common.push(tn);
+    const off=new Set(T.official.xi);
+    for(const k of srcs){
+      const h=(T.lineups[k].xi||[]).filter(n=>off.has(n)).length;
+      st[k]=st[k]||{hits:0,total:0,teams:0}; st[k].hits+=h; st[k].total+=off.size; st[k].teams++;
+    }
+  }
+  return st;
+}
 function renderFonti(){
   const el=$("fontiView");
   if(!DATA){el.innerHTML="";return}
@@ -433,8 +479,16 @@ function renderFonti(){
     if((x.t.teams||0)<MIN_TEAMS) return null; // n.c. se campione piccolo
     n++; const v=x.t.hits/x.t.total; if(v!==lastV){pos=n;lastV=v} return pos;
   };
+  const common=accuracyCommon(DATA);
+  const commonKeys=Object.keys(common);
+  let commonNote="";
+  if(commonKeys.length){
+    const ranked=commonKeys.map(k=>({k,p:common[k].hits/common[k].total,n:common[k].teams})).sort((a,b)=>b.p-a.p);
+    const nC=ranked[0]?.n||0;
+    commonNote=` · Base comune (solo squadre coperte da tutte le fonti ok, ${nC} sq): `+ranked.slice(0,5).map(x=>`${ABBR[x.k]||x.k} ${Math.round(x.p*1000)/10}%`).join(", ")+".";
+  }
   el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Attendibilità delle fonti</h2>
-   <div class="tablewrap"><table class="rank"><thead><tr><th>#</th><th>Fonte</th><th>Totale</th><th>Indovinati</th><th>Partite</th><th>${DATA.giornata}ª g.</th><th>Giornate</th></tr></thead><tbody>`+
+   <div class="tablewrap"><table class="rank"><thead><tr><th>#</th><th>Fonte</th><th>Totale</th><th>Indovinati</th><th>Squadre</th><th>${DATA.giornata}ª g.</th><th>Giornate</th></tr></thead><tbody>`+
    rows.map(x=>{
      const r=rankOf(x);
      const small=x.t&&(x.t.teams||0)>0&&(x.t.teams||0)<MIN_TEAMS;
@@ -442,7 +496,60 @@ function renderFonti(){
      const badge=small?' <span class="pmeta" title="Campione ancora piccolo: la % può oscillare molto">campione piccolo</span>':"";
      return `<tr class="${r&&r<=3?"podio p"+r:""}"><td class="pos">${r?r+"°":(x.t?"n.c.":"–")}</td><td><a href="${esc(x.s.url)}" target="_blank" rel="noopener">${esc(x.s.name)}</a>${meta}${badge}</td><td class="pct">${pctS(x.t)}</td><td>${x.t?x.t.hits+"/"+x.t.total:"—"}</td><td>${x.t&&x.t.teams?x.t.teams:"—"}</td><td>${pctS(x.c)}${x.c&&x.c.teams?` <span class="pmeta">(${x.c.teams})</span>`:""}</td><td>${x.t?x.t.g:0}</td></tr>`;
    }).join("")+
-   `</tbody></table></div><div class="note">Titolari previsti che poi compaiono nella formazione ufficiale (tutte le partite di Serie A, non solo le tue rose). La % è hits/total; con poche partite il margine di errore è alto — sotto ${MIN_TEAMS} squadre ufficiali confrontate la fonte resta fuori classifica (n.c.). ${nOff?`Giornata in corso: ${nOff} squadre su ${Object.keys(DATA.teams).length} con l'ufficiale.`:"La classifica parte con le prime formazioni ufficiali, circa un'ora prima di ogni partita."}</div>`;
+   `</tbody></table></div><div class="note">Titolari previsti che poi compaiono nella formazione ufficiale (tutte le partite di Serie A, non solo le tue rose). Colonna <b>Squadre</b> = n. squadre con ufficiale confrontate. La % è hits/total; sotto ${MIN_TEAMS} squadre la fonte è n.c. ${nOff?`Giornata in corso: ${nOff} squadre su ${Object.keys(DATA.teams).length} con l'ufficiale.`:"La classifica parte con le prime formazioni ufficiali, circa un'ora prima di ogni partita."} ${commonNote}</div>`;
+}
+
+let HIST=null;
+async function loadHist(){
+  if(HIST) return HIST;
+  try{HIST=await fetch("history-players.json",{cache:"no-store"}).then(r=>r.ok?r.json():null)}catch(e){HIST=null}
+  return HIST;
+}
+function renderStorico(){
+  const el=$("storicoView");
+  if(!el) return;
+  el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico giocatori</h2><div class="note">Caricamento…</div>`;
+  loadHist().then(H=>{
+    if(!H||!H.giornate||!H.giornate.length){
+      el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico giocatori</h2>
+        <div class="note">Nessun dato archiviato. Lo storico si popola dopo le partite, dal giro notturno Lega (T titolare, P panchina, E entrato, I infortunato, S squalificato).</div>`;
+      return;
+    }
+    const gs=H.giornate;
+    // filtra: se c'è una rosa, solo quei giocatori; altrimenti top per n. giornate
+    let names;
+    if(ROSA&&ROSA.players&&ROSA.players.length){
+      names=ROSA.players.map(p=>p.canon||p.nome).filter(n=>H.players[n]);
+      // anche matchName-ish: cerca per ogni player
+      for(const p of ROSA.players){
+        if(p.canon&&H.players[p.canon]) continue;
+        const hit=Object.keys(H.players).find(k=>k===p.nome||k===p.canon);
+        if(hit&&!names.includes(hit)) names.push(hit);
+      }
+    } else {
+      names=Object.keys(H.players).sort((a,b)=>Object.keys(H.players[b].g).length-Object.keys(H.players[a].g).length).slice(0,40);
+    }
+    const cell=(st,min)=>{
+      if(!st) return `<span class="hist-cell hist-empty" title="n.d.">–</span>`;
+      const tip=st.s==="E"&&st.min!=null?`E ${st.min}'`:st.s;
+      return `<span class="hist-cell hist-${st.s}" title="${tip}">${st.s}</span>`;
+    };
+    el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico giocatori</h2>
+      <div class="legend">
+        <span><i class="hist-cell hist-T">T</i>Titolare</span>
+        <span><i class="hist-cell hist-P">P</i>Panchina</span>
+        <span><i class="hist-cell hist-E">E</i>Entrato (hover = minuto)</span>
+        <span><i class="hist-cell hist-I">I</i>Infortunato</span>
+        <span><i class="hist-cell hist-S">S</i>Squalificato</span>
+      </div>
+      <div class="tablewrap"><table class="hist-table"><thead><tr><th class="name">Giocatore</th><th>Squadra</th>${gs.map(g=>`<th class="hist-head">${g}</th>`).join("")}</tr></thead><tbody>`+
+      names.map(n=>{
+        const P=H.players[n];
+        return `<tr><td class="name"><b>${esc(n)}</b></td><td class="pmeta">${esc(P.team||"")}</td>${gs.map(g=>`<td>${cell(P.g[g])}</td>`).join("")}</tr>`;
+      }).join("")+
+      `</tbody></table></div>
+      <div class="note">Dati da Lega Serie A (lineups post-gara). Aggiornamento notturno. ${H.updated?`Ultimo archivio: ${esc(H.updated)}`:""}</div>`;
+  });
 }
 function nextGiroHint(){
   // orari di riserva IT (solare): 11:55 14:25 17:25 17:55 20:10 — indicativi
@@ -458,6 +565,7 @@ function render(){
   $("lastUpd").textContent=DATA?`Ultimo aggiornamento: ${DATA.generated} · ${DATA.mode||"manuale"} · ${nextGiroHint()}`:"";
   renderTabs();
   if(CUR==="fonti"){renderFonti();return}
+  if(CUR==="storico"){renderStorico();return}
   renderTabs();
   if(CUR===null){renderHome();return}
   renderHeader();
@@ -467,7 +575,7 @@ function render(){
     wrap.innerHTML=`<div class="empty"><div class="disp">Nessun giocatore in rosa</div>Premi <b>Modifica rosa</b> e incolla i tuoi giocatori o importa il file Excel.</div>`;
     return;
   }
-  const srcs=DATA.sources;
+  const srcs=sourcesOrderedByRank();
   const rows=rowsFor(ROSA);
   const order=["P","D","C","A",null];
   const names={P:"Portieri",D:"Difensori",C:"Centrocampisti",A:"Attaccanti",null:"Senza ruolo"};
@@ -818,11 +926,12 @@ $("btnRefresh").onclick=()=>{
 /* ---------- boot & routing ---------- */
 function route(){
   const m=location.hash.match(/^#squadra-(\d+)$/);
-  CUR=location.hash==="#fonti"?"fonti":(m&&STORE.squads[Number(m[1])-1])?Number(m[1])-1:null;
+  CUR=location.hash==="#fonti"?"fonti":location.hash==="#storico"?"storico":(m&&STORE.squads[Number(m[1])-1])?Number(m[1])-1:null;
   const isSq=typeof CUR==="number";
   if(isSq) ROSA=STORE.squads[CUR];
   $("homeView").hidden=CUR!==null; $("squadView").hidden=!isSq; $("fontiView").hidden=CUR!=="fonti";
-  const here=CUR===null?"#home":CUR==="fonti"?"#fonti":"#squadra-"+(CUR+1);
+  if($("storicoView")) $("storicoView").hidden=CUR!=="storico";
+  const here=CUR===null?"#home":CUR==="fonti"?"#fonti":CUR==="storico"?"#storico":"#squadra-"+(CUR+1);
   document.querySelectorAll(".seg a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")===here?"page":"false"));
   showEditor(false);
   render();
