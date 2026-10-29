@@ -177,14 +177,14 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
     <div class="right"><button class="primary" id="btnRefresh" type="button">Aggiorna dai siti</button><div class="lastupd" id="lastUpd"></div></div>
   </nav>
   <div class="rotate-hint" id="rotateHint">Le tabelle sono larghe: gira il telefono oppure installa PhantaCassandra come app (menu ⋮ → Installa app), che si apre sempre in orizzontale.</div>
-  <section id="fontiView" class="home" hidden></section>
-  <section id="storicoView" class="home" hidden></section>
 
   <section class="panel" id="refreshPanel" hidden>
     <h2>Lettura dei siti</h2>
     <div class="note" id="refreshNote">Il browser dell'app apre le pagine una alla volta, poi Claude ne estrae le formazioni. Ci vogliono alcuni minuti.</div>
     <ul class="progress" id="progress"></ul>
   </section>
+  <section id="fontiView" class="home" hidden></section>
+  <section id="storicoView" class="home" hidden></section>
 
   <section id="homeView" class="home">
     <div class="sub" id="homeSub"></div>
@@ -530,8 +530,9 @@ function renderStorico(){
   loadHist().then(H=>{
     if(!H||!H.giornate||!H.giornate.length){
       el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico · ${esc(SQ&&SQ.name||"Rosa")}</h2>
-        <div class="note">Nessun dato archiviato. Si popola dopo le partite con i tabellini della Gazzetta (giro notturno; dalla pagina Actions di GitHub puoi avviarlo a mano: «Storico giocatori» → Run workflow).</div>
-        <p><a href="#${typeof CUR==="number"?"squadra-"+(CUR+1):"home"}">← Torna</a></p>`;
+        <div class="note">Nessun dato archiviato. Si popola dopo le partite con i tabellini della Gazzetta (ogni notte in automatico, oppure subito con il pulsante qui sotto).</div>
+        <div class="row">${storicoBtnHTML()}<a class="btn" href="#squadra-${(typeof LAST_SQ==="number"?LAST_SQ:0)+1}">← Rosa</a></div>`;
+      bindStoricoBtn();
       return;
     }
     const gs=H.giornate;
@@ -567,7 +568,7 @@ function renderStorico(){
     el.innerHTML=`<div class="band" style="margin-bottom:8px">
         <div class="title"><h1 style="font-size:28px">Storico</h1>
           <div class="sub">${esc(SQ&&SQ.name||"")} · ${gs.length} giornate</div></div>
-        <div class="actions"><a class="btn" href="${back}">← Rosa</a></div>
+        <div class="actions">${storicoBtnHTML()}<a class="btn" href="${back}">← Rosa</a></div>
       </div>
       <div class="legend">
         <span><i class="hist-cell hist-T">T</i>Titolare</span>
@@ -590,7 +591,8 @@ function renderStorico(){
           ${gs.map(g=>`<td class="dc">${cell(Ph&&Ph.g[g])}</td>`).join("")}</tr>`;
       }).join(""):`<tr><td colspan="${gs.length+1}" class="empty">Nessun giocatore della rosa presente nello storico.</td></tr>`)+
       `</tbody></table></div>
-      <div class="note">Dati dai tabellini della Gazzetta dello Sport, a partita finita. Se le giornate superano lo schermo la tabella scorre in orizzontale — i nomi restano fissi a sinistra. ${H.updated?`Ultimo archivio: ${esc(new Date(H.updated).toLocaleString("it-IT",{timeZone:"Europe/Rome",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}))}`:""}</div>`;
+      <div class="note">Dati dai tabellini della Gazzetta dello Sport, a partita finita. Si aggiorna da solo ogni notte; «Aggiorna storico» lo fa subito. Se le giornate superano lo schermo la tabella scorre in orizzontale — i nomi restano fissi a sinistra. ${H.updated?`Ultimo archivio: ${esc(new Date(H.updated).toLocaleString("it-IT",{timeZone:"Europe/Rome",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}))}`:""}</div>`;
+    bindStoricoBtn();
   });
 }
 function nextGiroHint(){
@@ -929,12 +931,12 @@ async function freshData(){ // dati appena salvati, senza aspettare la pubblicaz
   const r=await ghApi(`/contents/docs/data.json?t=${Date.now()}`,{headers:{Accept:"application/vnd.github.raw+json"},cache:"no-store"});
   return r.ok?r.json():null;
 }
-function showTokenForm(msg){
+function showTokenForm(msg,after=ghUpdate,wf="aggiorna.yml"){
   const u=`https://github.com/settings/personal-access-tokens/new`;
   $("refreshNote").innerHTML=`${msg?`<b>${msg}</b><br>`:""}Per aggiornare con un tocco serve una chiave di GitHub (una volta sola su ogni dispositivo). Creala <a href="${u}" target="_blank" rel="noopener">qui</a>: <i>Repository access</i> → Only select repositories → <b>${GH.repo}</b>; <i>Permissions</i> → <b>Actions: Read and write</b>. Poi incollala qui sotto.
   <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><input id="ghTokIn" type="password" placeholder="github_pat_…" style="flex:1;min-width:200px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;font:inherit"><button class="primary" id="ghTokSave" type="button">Salva e aggiorna</button></div>
-  <div style="margin-top:6px;font-size:12px;opacity:.75">La chiave resta solo in questo browser. In alternativa <a href="https://github.com/${GH.user}/${GH.repo}/actions/workflows/aggiorna.yml" target="_blank" rel="noopener">avvia a mano da GitHub</a>.</div>`;
-  $("ghTokSave").onclick=()=>{const v=$("ghTokIn").value.trim();if(!v)return;try{localStorage.setItem("ghToken",v)}catch(e){}ghUpdate()};
+  <div style="margin-top:6px;font-size:12px;opacity:.75">La chiave resta solo in questo browser. In alternativa <a href="https://github.com/${GH.user}/${GH.repo}/actions/workflows/${wf}" target="_blank" rel="noopener">avvia a mano da GitHub</a>.</div>`;
+  $("ghTokSave").onclick=()=>{const v=$("ghTokIn").value.trim();if(!v)return;try{localStorage.setItem("ghToken",v)}catch(e){}after()};
 }
 let ghTimer=null;
 async function ghUpdate(){
@@ -962,6 +964,49 @@ async function ghUpdate(){
     }catch(e){}
     if(Date.now()-t0>15*60000){clearInterval(ghTimer);b.disabled=false;note.textContent="L'aggiornamento ci sta mettendo troppo: ricarica la pagina tra qualche minuto."}
   },15000);
+}
+/* ---------- storico: avvio del workflow "Storico giocatori" dalla pagina ---------- */
+function storicoBtnHTML(){return `<button class="primary" id="btnStoricoUpd" type="button"${stTimer?" disabled":""}>${stTimer?"Storico in aggiornamento…":"Aggiorna storico"}</button>`}
+function bindStoricoBtn(){const b=$("btnStoricoUpd"); if(b) b.onclick=ghStorico;}
+let stTimer=null;
+async function ghStorico(){
+  const panel=$("refreshPanel"), note=$("refreshNote");
+  panel.hidden=false; $("progress").innerHTML=""; panel.querySelector("h2").textContent="Aggiornamento dello storico";
+  if(!GH){note.textContent="Il pulsante funziona dalla pagina pubblicata su GitHub (…github.io). Da qui avvia «Storico giocatori» dalla pagina Actions del repository.";return}
+  if(!ghTok()) return showTokenForm("",ghStorico,"storico.yml");
+  const last=(()=>{try{return Number(sessionStorage.getItem("stStart")||0)}catch(e){return 0}})();
+  if(Date.now()-last<8*60000&&!stTimer){note.textContent=`Aggiornamento dello storico già avviato ${Math.max(1,Math.round((Date.now()-last)/60000))} minuti fa: attendi qualche minuto e ricarica la pagina.`;return}
+  const setBtn=on=>{const b=$("btnStoricoUpd"); if(b){b.disabled=on;b.textContent=on?"Storico in aggiornamento…":"Aggiorna storico"}};
+  setBtn(true); note.textContent="Avvio dell'aggiornamento dello storico…";
+  const before=HIST?.updated||null, t0=Date.now();
+  try{
+    const r=await ghApi("/actions/workflows/storico.yml/dispatches",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ref:"main",inputs:{giornate:""}})});
+    if(r.status===401||r.status===403||r.status===404){try{localStorage.removeItem("ghToken")}catch(e){} setBtn(false); return showTokenForm("La chiave non funziona (scaduta o senza permesso Actions).",ghStorico,"storico.yml");}
+    if(!r.ok) throw new Error(r.status);
+    try{sessionStorage.setItem("stStart",String(t0))}catch(e){}
+  }catch(e){setBtn(false); note.textContent="Non sono riuscito ad avviare l'aggiornamento dello storico. Riprova tra poco."; return}
+  const tick=()=>{const m=Math.floor((Date.now()-t0)/1000);note.textContent=`Storico in aggiornamento (${Math.floor(m/60)}:${String(m%60).padStart(2,"0")}). GitHub legge i tabellini della Gazzetta: di solito 2-4 minuti, la prima volta (tutta la stagione) anche 10. La tabella si aggiorna da sola.`};
+  tick(); clearInterval(stTimer);
+  const stop=msg=>{clearInterval(stTimer);stTimer=null;setBtn(false);if(msg!=null)note.innerHTML=msg};
+  stTimer=setInterval(async()=>{
+    tick();
+    if(Date.now()-t0<60000) return;
+    try{
+      const res=await ghApi(`/contents/docs/history-players.json?t=${Date.now()}`,{headers:{Accept:"application/vnd.github.raw+json"},cache:"no-store"});
+      const h=res.ok?await res.json():null;
+      if(h&&h.updated&&h.updated!==before&&new Date(h.updated).getTime()>t0-60000){
+        HIST=h; stop(`Fatto: storico aggiornato, ${h.giornate?.length||0} giornate archiviate.`);
+        if(CUR==="storico") renderStorico(); return;
+      }
+      const runs=await ghApi("/actions/workflows/storico.yml/runs?per_page=1").then(r=>r.json());
+      const run=runs.workflow_runs?.[0];
+      if(run&&run.status==="completed"&&new Date(run.created_at).getTime()>t0-60000){
+        if(run.conclusion!=="success") return stop(`L'aggiornamento dello storico non è andato a buon fine. <a href="${run.html_url}" target="_blank" rel="noopener">Vedi il dettaglio su GitHub</a>.`);
+        if(Date.now()-new Date(run.updated_at).getTime()>90000) return stop("Fatto: nessuna partita nuova da archiviare.");
+      }
+    }catch(e){}
+    if(Date.now()-t0>25*60000) stop("L'aggiornamento ci sta mettendo troppo: ricarica la pagina tra qualche minuto.");
+  },20000);
 }
 $("btnRefresh").onclick=()=>{
   if(GH) return ghUpdate();
