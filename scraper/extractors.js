@@ -217,8 +217,43 @@ const lega = function () {
       }
     }
   }
+  parseLegaEvents(t, teams, home, away);
   return { teams };
 };
+
+// EVENTI Lega: "Entra X - esce Y ( Team )" / "X (in) - Y (out) ( Team )" + minuto sulla riga sopra
+function parseLegaEvents(t, teams, home, away) {
+  const evBlock = (t.split(/\n(?:EVENTS|EVENTI|Eventi)\n/i)[1] || t).split(/\n(?:Statistiche|Statistics|CLASSIFICA|Standings)\n/i)[0] || t;
+  const lines = evBlock.split("\n").map(s => s.trim()).filter(Boolean);
+  const parseMin = s => {
+    const m = String(s).match(/^(\d{1,3})(?:\+(\d{1,2}))?'?$/);
+    return m ? (+m[1] + (m[2] ? +m[2] : 0)) : null;
+  };
+  const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, "");
+  const teamOf = label => {
+    const L = norm(label.replace(/[()]/g, ""));
+    if (!L) return null;
+    if (home && (L === norm(home) || L.startsWith(norm(home).slice(0, 4)) || norm(home).startsWith(L.slice(0, 4)))) return home;
+    if (away && (L === norm(away) || L.startsWith(norm(away).slice(0, 4)) || norm(away).startsWith(L.slice(0, 4)))) return away;
+    // pagina /events senza XI: usa il nome come chiave squadra
+    return label.replace(/[()]/g, "").trim() || null;
+  };
+  let lastMin = null;
+  for (const line of lines) {
+    const pm = parseMin(line);
+    if (pm != null) { lastMin = pm; continue; }
+    let mm = line.match(/^Entra\s+(.+?)\s*[-–]\s*esce\s+(.+?)\s*\(\s*([^)]+)\s*\)\s*$/i);
+    if (!mm) mm = line.match(/^(.+?)\s*\(in\)\s*[-–]\s*(.+?)\s*\(out\)\s*\(\s*([^)]+)\s*\)\s*$/i);
+    if (!mm) continue;
+    const inn = mm[1].trim(), outn = mm[2].trim(), side = teamOf(mm[3]);
+    if (!side) continue;
+    if (!teams[side]) teams[side] = { xi: [], bench: [], subs: [], exits: [] };
+    teams[side].subs = teams[side].subs || [];
+    teams[side].exits = teams[side].exits || [];
+    if (!teams[side].subs.some(s => s.n === inn)) teams[side].subs.push({ n: inn, min: lastMin });
+    if (!teams[side].exits.some(s => s.n === outn)) teams[side].exits.push({ n: outn, min: lastMin });
+  }
+}
 
 // SportMediaset: una pagina per partita (?match=id1:id2). Testo tipico:
 // TEAM1\nMOD1\nDATA\nORA\nTEAM2\nMOD2\nALLENATORE\nCoach1\n11 giocatori\nALLENATORE\nCoach2\n11 giocatori

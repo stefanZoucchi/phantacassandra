@@ -136,6 +136,53 @@ Attaccante
   if (allSubs.length) assert(allSubs.some(s => s.min > 0), "lega sub con minuto");
 }
 
+
+// --- Lega eventi sostituzioni ---
+{
+  const sample = `
+Milan
+3-5-1-1
+Posizione
+2nd
+Bologna
+4-2-3-1
+Posizione
+10th
+Maignan
+Estupinan
+Pavlovic
+Gabbia
+Tomori
+Fofana
+Modric
+Rabiot
+Pulisic
+Leao
+Gimenez
+Skorupski
+Miranda
+Casale
+Heggem
+Zortea
+Ferguson
+Freuler
+Rowe
+Odgaard
+Orsolini
+Castro
+Allenatori
+EVENTS
+85'
+Entra Christopher Nkunku - esce Santiago Giménez ( Milan )
+72'
+Entra Niclas Füllkrug - esce Rafael Leão ( Milan )
+Statistiche della partita
+`;
+  const r = withText(sample, X.lega);
+  assert(r.teams.Milan?.subs?.some(s => s.n.includes("Nkunku") && s.min === 85), "lega entra Nkunku 85");
+  assert(r.teams.Milan?.exits?.some(s => s.n.includes("Gim") && s.min === 85), "lega esce Gimenez 85");
+}
+
 // --- History merge ---
 {
   const { mergeHistory, load } = require("./history");

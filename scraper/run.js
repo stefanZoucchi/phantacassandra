@@ -87,11 +87,28 @@ async function readLega(page, s) {
   const res = { teams: {} };
   for (const u of urls) {
     try {
-      // preferisci /lineups (post-gara: panchina + minuti ingresso); fallback pagina match
+      const base = u.replace(/\/?$/, "").replace(/\/(lineups|events)\/?$/, "");
+      // 1) lineups: XI + panchina; 2) events: sostituzioni entra/esce; 3) fallback match
       let r = null;
-      try { await open(page, u.replace(/\/?$/, "") + "/lineups"); r = await evalSafe(page, s.fn); }
+      try { await open(page, base + "/lineups"); r = await evalSafe(page, s.fn); }
       catch (e) { r = null; }
-      if (!r || !Object.keys(r.teams || {}).length) { await open(page, u); r = await evalSafe(page, s.fn); }
+      if (!r || !Object.keys(r.teams || {}).length) {
+        try { await open(page, base); r = await evalSafe(page, s.fn); } catch (e) { r = { teams: {} }; }
+      }
+      // arricchisci con eventi (sostituzioni) se la pagina match/events li ha
+      try {
+        await open(page, base + "/events");
+        const ev = await evalSafe(page, s.fn);
+        for (const [tn, L] of Object.entries(ev.teams || {})) {
+          if (!r.teams[tn]) r.teams[tn] = L;
+          else {
+            if (L.subs?.length) r.teams[tn].subs = L.subs;
+            if (L.exits?.length) r.teams[tn].exits = L.exits;
+            if (L.bench?.length && !r.teams[tn].bench?.length) r.teams[tn].bench = L.bench;
+          }
+        }
+      } catch (e) {}
+      // se events non ha XI, prova a parsare eventi dalla pagina match già letta
       Object.assign(res.teams, r.teams || {});
     } catch (e) {}
   }
@@ -193,6 +210,7 @@ function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di R
             xi: L.xi.map(p => matchName(p, roster, t) || p),
             bench: (L.bench || []).map(p => matchName(p, cands, t) || p),
             subs: (L.subs || []).map(s => ({ n: matchName(s.n, cands, t) || s.n, min: s.min })),
+            exits: (L.exits || []).map(s => ({ n: matchName(s.n, cands, t) || s.n, min: s.min })),
           };
           if (data.teams[t].out?.length) outMap[t] = data.teams[t].out;
         }

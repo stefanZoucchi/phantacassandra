@@ -27,20 +27,24 @@ function mergeHistory(giornata, teamsPayload, outMap, log = () => {}) {
     if (!L?.xi?.length) continue;
     const xi = new Set(L.xi);
     const subMin = Object.fromEntries((L.subs || []).map(s => [s.n, s.min]));
+    // uscite da eventi Lega: titolare sostituito → ↓
+    const exitMin = Object.fromEntries((L.exits || []).map(s => [s.n, s.min]));
     const bench = new Set(L.bench || []);
-    // tutti i nominati
-    const all = new Set([...xi, ...bench, ...Object.keys(subMin)]);
+    const all = new Set([...xi, ...bench, ...Object.keys(subMin), ...Object.keys(exitMin)]);
     for (const n of all) {
-      const key = n;
-      if (!H.players[key]) H.players[key] = { team, g: {} };
-      H.players[key].team = team;
+      if (!H.players[n]) H.players[n] = { team, g: {} };
+      H.players[n].team = team;
       let st = "P";
       if (xi.has(n)) st = "T";
       else if (subMin[n] != null) st = "E";
       else if (bench.has(n)) st = "P";
-      H.players[key].g[g] = subMin[n] != null ? { s: st, min: subMin[n] } : { s: st };
+      const cell = { s: st };
+      if (subMin[n] != null) { cell.s = "E"; cell.min = subMin[n]; }
+      if (exitMin[n] != null) { cell.s = "T"; cell.out = exitMin[n]; } // titolare uscito: ↓
+      // se era in panchina e ha subMin, resta E (↑) anche se per caso in exitMin
+      if (subMin[n] != null && !xi.has(n)) { cell.s = "E"; cell.min = subMin[n]; delete cell.out; }
+      H.players[n].g[g] = cell;
     }
-    // I / S da liste indisponibili se il giocatore non è in lista gara
     const outs = outMap?.[team] || [];
     for (const o of outs) {
       const n = o.n;
