@@ -82,7 +82,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .dot.ball{display:inline-flex;align-items:center;justify-content:center;font:800 9px/1 system-ui,sans-serif;color:#fff}
 .dot.d-bench.ball{color:#1b1400}
 /* lettere al posto dei pallini */
-.lt{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;font:800 11px/1 system-ui,sans-serif;color:#111;vertical-align:middle}
+.lt{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;font:800 13px/1 system-ui,sans-serif;color:#111;vertical-align:middle}
 .lt-T{background:var(--ok)} .lt-P{background:var(--bench)}
 .lt-Bv{background:transparent;color:var(--ok);border:1.5px solid var(--ok)}
 .lt-Bg{background:transparent;color:var(--bench);border:1.5px solid var(--bench)}
@@ -98,17 +98,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
 table{border-collapse:collapse;width:auto;font-variant-numeric:tabular-nums}
 .tablewrap{width:fit-content;max-width:100%}
-th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
-thead th{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--surface);position:sticky;top:0}
-th.src{text-align:center;width:38px;padding:5px 1px}
-th.src a{display:block;color:var(--fg);text-decoration:none;font:700 13px var(--display);letter-spacing:.04em}
+th,td{padding:6px 5px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+thead th{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--surface);position:sticky;top:0;z-index:3}
+th.src{text-align:center;width:32px;min-width:32px;max-width:36px;padding:6px 2px}
+th.src a{display:block;color:var(--fg);text-decoration:none;font:700 12px var(--display);letter-spacing:.03em}
 th.src a:hover{color:var(--accent);text-decoration:underline}
-th.src small{display:block;font:400 10px var(--body);color:var(--muted);text-transform:none;letter-spacing:0}
-td.dc{text-align:center}
-td.name{position:sticky;left:0;background:var(--surface);min-width:150px;max-width:230px;z-index:1}
-.pname{font-weight:700}
-.pmeta{font-size:12px;color:var(--muted);white-space:nowrap}
+th.src small{display:block;font:400 9px var(--body);color:var(--muted);text-transform:none;letter-spacing:0;line-height:1.2}
+td.dc{text-align:center;padding:6px 2px}
+td.name{position:sticky;left:0;background:var(--surface);min-width:140px;max-width:200px;z-index:2}
+.pname{font-weight:700;line-height:1.2}
+.pmeta{font-size:12px;color:var(--muted);line-height:1.25}
 .pmeta b.tm{color:var(--fg);font-weight:700;letter-spacing:.02em}
+.pwhen{font-size:11px;color:var(--muted);line-height:1.2;margin-top:1px}
 tr.role td{background:var(--chip);font:700 14px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;position:static}
 .role-tag{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font:700 13px var(--display);color:#fff;margin-right:8px;vertical-align:middle}
 .r-P{background:#c98a00}.r-D{background:#2f7d4a}.r-C{background:#2d64b3}.r-A{background:#b5352a}.r-X{background:#6b756f}
@@ -142,22 +143,29 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
 .unres{font-size:13px}
 @media (prefers-reduced-motion:no-preference){.spin{animation:pulse 1s ease-in-out infinite}@keyframes pulse{50%{opacity:.35}}}
 
-.hist-grid{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
-.hist-cell{width:22px;height:22px;border-radius:4px;display:inline-grid;place-items:center;font:700 11px var(--display);color:#111}
-.hist-T{background:var(--ok);color:#fff}
+.hist-cell{width:26px;height:26px;border-radius:7px;display:inline-grid;place-items:center;font:800 13px/1 system-ui,sans-serif;color:#111;vertical-align:middle}
+.hist-T{background:var(--ok);color:#111}
 .hist-P{background:var(--bench);color:#111}
-.hist-E{background:#3b82f6;color:#fff}
 .hist-I,.hist-S{background:var(--out);color:#fff}
-.hist-empty{background:var(--chip);color:var(--na)}
-.hist-table td.name{position:sticky;left:0;background:var(--surface);z-index:1}
-.hist-head{font-size:11px;color:var(--muted);text-align:center;min-width:22px}
+.hist-empty{background:transparent;color:var(--na);font-weight:700}
+/* subentrato: freccia su, sfondo e bordo giallo, freccia nera */
+.hist-in{background:#111;color:var(--bench);border:1.5px solid var(--bench)}
+/* titolare uscito: freccia giù, sfondo verde, freccia nera */
+.hist-out{background:var(--ok);color:#111;border:1.5px solid var(--ok)}
+.hist-table{border-collapse:collapse}
+.hist-table thead th{position:sticky;top:0;z-index:3;background:var(--surface)}
+.hist-table td.name,.hist-table th.name{position:sticky;left:0;background:var(--surface);z-index:2;min-width:140px;max-width:200px}
+.hist-table thead th.name{z-index:4}
+.hist-head{font-size:11px;color:var(--muted);text-align:center;min-width:28px;padding:6px 2px}
+.hist-table td.dc{text-align:center;padding:6px 2px}
+.tablewrap.scroll-y{max-height:min(70vh,640px);overflow:auto}
 </style>
 
 <div class="wrap">
   <nav class="topbar">
     <div class="brand disp">PhantaCassandra</div>
     <div class="seg" role="tablist">
-      <a href="#home">Home</a><span id="sqTabs" style="display:contents"></span><a href="#fonti">Fonti</a><a href="#storico">Storico</a>
+      <a href="#home">Home</a><span id="sqTabs" style="display:contents"></span><a href="#fonti">Fonti</a>
     </div>
     <div class="right"><button class="primary" id="btnRefresh" type="button">Aggiorna dai siti</button><div class="lastupd" id="lastUpd"></div></div>
   </nav>
@@ -184,6 +192,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
       <div class="sub" id="sub">Caricamento dati…</div>
     </div>
     <div class="actions">
+      <button id="btnStorico" type="button">Storico</button>
       <button id="btnEdit" type="button">Modifica rosa</button>
     </div>
   </header>
@@ -508,47 +517,73 @@ async function loadHist(){
 function renderStorico(){
   const el=$("storicoView");
   if(!el) return;
-  el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico giocatori</h2><div class="note">Caricamento…</div>`;
+  // storico legato alla rosa corrente (o prima squadra)
+  const SQ = STORE.squads[typeof LAST_SQ==="number"?LAST_SQ:0] || STORE.squads[0];
+  el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico · ${esc(SQ&&SQ.name||"Rosa")}</h2><div class="note">Caricamento…</div>`;
   loadHist().then(H=>{
     if(!H||!H.giornate||!H.giornate.length){
-      el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico giocatori</h2>
-        <div class="note">Nessun dato archiviato. Lo storico si popola dopo le partite, dal giro notturno Lega (T titolare, P panchina, E entrato, I infortunato, S squalificato).</div>`;
+      el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico · ${esc(SQ&&SQ.name||"Rosa")}</h2>
+        <div class="note">Nessun dato archiviato. Si popola dopo le partite (giro notturno Lega).</div>
+        <p><a href="#${typeof CUR==="number"?"squadra-"+(CUR+1):"home"}">← Torna</a></p>`;
       return;
     }
     const gs=H.giornate;
-    // filtra: se c'è una rosa, solo quei giocatori; altrimenti top per n. giornate
-    let names;
-    if(ROSA&&ROSA.players&&ROSA.players.length){
-      names=ROSA.players.map(p=>p.canon||p.nome).filter(n=>H.players[n]);
-      // anche matchName-ish: cerca per ogni player
-      for(const p of ROSA.players){
-        if(p.canon&&H.players[p.canon]) continue;
-        const hit=Object.keys(H.players).find(k=>k===p.nome||k===p.canon);
-        if(hit&&!names.includes(hit)) names.push(hit);
-      }
-    } else {
-      names=Object.keys(H.players).sort((a,b)=>Object.keys(H.players[b].g).length-Object.keys(H.players[a].g).length).slice(0,40);
+    const players=SQ&&SQ.players||[];
+    let rows=[];
+    for(const p of players){
+      const canon=p.canon||p.nome;
+      let key=null;
+      if(canon&&H.players[canon]) key=canon;
+      else if(p.nome&&H.players[p.nome]) key=p.nome;
+      else key=Object.keys(H.players).find(k=>k===canon||k===p.nome)||null;
+      rows.push({p, key, H: key?H.players[key]:null});
     }
-    const cell=(st,min)=>{
+    const cell=st=>{
       if(!st) return `<span class="hist-cell hist-empty" title="n.d.">–</span>`;
-      const tip=st.s==="E"&&st.min!=null?`E ${st.min}'`:st.s;
-      return `<span class="hist-cell hist-${st.s}" title="${tip}">${st.s}</span>`;
+      // subentrato dalla panchina
+      if(st.s==="E"){
+        const tip=st.min!=null?`Entrato al ${st.min}'`:"Entrato dalla panchina";
+        return `<span class="hist-cell hist-in" title="${tip}">↑</span>`;
+      }
+      // titolare sostituito (minuto uscita)
+      if(st.out!=null || st.s==="X"){
+        const tip=st.out!=null?`Uscito al ${st.out}'`:(st.min!=null?`Uscito al ${st.min}'`:"Sostituito");
+        return `<span class="hist-cell hist-out" title="${tip}">↓</span>`;
+      }
+      if(st.s==="T") return `<span class="hist-cell hist-T" title="Titolare">T</span>`;
+      if(st.s==="P") return `<span class="hist-cell hist-P" title="Panchina">P</span>`;
+      if(st.s==="I") return `<span class="hist-cell hist-I" title="Infortunato">I</span>`;
+      if(st.s==="S") return `<span class="hist-cell hist-S" title="Squalificato">S</span>`;
+      return `<span class="hist-cell hist-empty">–</span>`;
     };
-    el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico giocatori</h2>
+    const back=`#squadra-${(typeof LAST_SQ==="number"?LAST_SQ:0)+1}`;
+    el.innerHTML=`<div class="band" style="margin-bottom:8px">
+        <div class="title"><h1 style="font-size:28px">Storico</h1>
+          <div class="sub">${esc(SQ&&SQ.name||"")} · ${gs.length} giornate</div></div>
+        <div class="actions"><a class="btn" href="${back}">← Rosa</a></div>
+      </div>
       <div class="legend">
         <span><i class="hist-cell hist-T">T</i>Titolare</span>
         <span><i class="hist-cell hist-P">P</i>Panchina</span>
-        <span><i class="hist-cell hist-E">E</i>Entrato (hover = minuto)</span>
+        <span><i class="hist-cell hist-in">↑</i>Subentrato (hover = minuto)</span>
+        <span><i class="hist-cell hist-out">↓</i>Sostituito (hover = minuto)</span>
         <span><i class="hist-cell hist-I">I</i>Infortunato</span>
         <span><i class="hist-cell hist-S">S</i>Squalificato</span>
       </div>
-      <div class="tablewrap"><table class="hist-table"><thead><tr><th class="name">Giocatore</th><th>Squadra</th>${gs.map(g=>`<th class="hist-head">${g}</th>`).join("")}</tr></thead><tbody>`+
-      names.map(n=>{
-        const P=H.players[n];
-        return `<tr><td class="name"><b>${esc(n)}</b></td><td class="pmeta">${esc(P.team||"")}</td>${gs.map(g=>`<td>${cell(P.g[g])}</td>`).join("")}</tr>`;
-      }).join("")+
+      <div class="tablewrap scroll-y"><table class="hist-table"><thead><tr>
+        <th class="name">Giocatore</th>
+        ${gs.map(g=>`<th class="hist-head">${g}</th>`).join("")}
+      </tr></thead><tbody>`+
+      (rows.length?rows.map(({p,H:Ph})=>{
+        const team=p.team||(Ph&&Ph.team)||"";
+        const T=team&&DATA&&DATA.teams[team];
+        const meta=T?`<b class="tm">${esc(team).toUpperCase()}</b> ${T.home?"vs":"@"} <b class="tm">${esc(T.opp).toUpperCase()}</b>`:(team?`<b class="tm">${esc(team).toUpperCase()}</b>`:"");
+        return `<tr><td class="name"><div class="pname">${esc(String(p.nome).toUpperCase())}</div>
+          <div class="pmeta">${meta||"&nbsp;"}</div></td>
+          ${gs.map(g=>`<td class="dc">${cell(Ph&&Ph.g[g])}</td>`).join("")}</tr>`;
+      }).join(""):`<tr><td colspan="${gs.length+1}" class="empty">Nessun giocatore della rosa presente nello storico.</td></tr>`)+
       `</tbody></table></div>
-      <div class="note">Dati da Lega Serie A (lineups post-gara). Aggiornamento notturno. ${H.updated?`Ultimo archivio: ${esc(H.updated)}`:""}</div>`;
+      <div class="note">Dati Lega Serie A post-gara. Scroll orizzontale se le giornate superano lo schermo — i nomi restano fissi a sinistra. ${H.updated?`Ultimo archivio: ${esc(H.updated)}`:""}</div>`;
   });
 }
 function nextGiroHint(){
@@ -591,16 +626,18 @@ function render(){
     html+=`<tr class="role"><td colspan="${srcs.length+3}">${names[ro]}</td></tr>`;
     for(const x of g){
       const T=x.p.team?DATA.teams[x.p.team]:null;
-      const meta=T?`<b class="tm">${esc(x.p.team).toUpperCase()}</b> ${T.home?"vs":"@"} <b class="tm">${esc(T.opp).toUpperCase()}</b> · ${esc(T.when)}`:"";
+      const meta=T?`<b class="tm">${esc(x.p.team).toUpperCase()}</b> ${T.home?"vs":"@"} <b class="tm">${esc(T.opp).toUpperCase()}</b>`:"";
+      const when=T&&T.when?esc(T.when):"";
       const label={ok:"titolare",bench:"panchina",dubbio:"in dubbio / da valutare",inf:"infortunato / indisponibile",squal:"squalificato",na:"non pubblicato"};
       const chip=(c,b,title)=>{const L=c==="ok"?(b?["Bv","B"]:["T","T"]):c==="bench"?(b?["Bg","B"]:["P","P"]):c==="dubbio"?["D","D"]:c==="inf"?["I","I"]:c==="squal"?["S","S"]:["na","–"];
         return `<i class="lt lt-${L[0]}" title="${esc(title)}: ${label[c]||label.na}${b?(c==="ok"?", ballottaggio in vantaggio":", ballottaggio in svantaggio"):""}">${L[1]}</i>`};
-      html+=`<tr><td class="name"><div class="pname">${x.p.ruolo?`<span class="role-tag r-${x.p.ruolo}">${x.p.ruolo}</span>`:""}${esc(String(x.p.nome).toUpperCase())}</div><div class="pmeta">${meta||"Controlla nome e squadra nella rosa"}</div></td>`+
+      html+=`<tr><td class="name"><div class="pname">${esc(String(x.p.nome).toUpperCase())}</div><div class="pmeta">${meta||"Controlla nome e squadra nella rosa"}</div>${when?`<div class="pwhen">${when}</div>`:""}</td>`+
         `<td><div class="pct">${x.pct==null?"—":x.pct+"%"}</div>${x.off?'<div class="pmeta">ufficiale</div>':""}</td>`+
         x.cells.map((c,i)=>`<td class="dc">${chip(c,x.balls?.[i],srcs[i].name)}</td>`).join("")+
         `<td class="dc uffc">${x.off?chip(x.off,false,"Formazione ufficiale"):chip("na",false,"Formazione ufficiale")}</td></tr>`;
     }
   }
+  wrap.classList.add("scroll-y");
   wrap.innerHTML=html+"</tbody></table>";
   const nf=rows.filter(x=>!x.p.canon).length;
   $("foot").textContent=(nf?`${nf} giocatori non abbinati: aprili in Modifica rosa per correggere il nome o la squadra. `:"")+
@@ -924,11 +961,14 @@ $("btnRefresh").onclick=()=>{
 };
 
 /* ---------- boot & routing ---------- */
+let LAST_SQ=0;
 function route(){
   const m=location.hash.match(/^#squadra-(\d+)$/);
+  if(m&&STORE.squads[Number(m[1])-1]) LAST_SQ=Number(m[1])-1;
   CUR=location.hash==="#fonti"?"fonti":location.hash==="#storico"?"storico":(m&&STORE.squads[Number(m[1])-1])?Number(m[1])-1:null;
   const isSq=typeof CUR==="number";
   if(isSq) ROSA=STORE.squads[CUR];
+  else if(CUR==="storico") ROSA=STORE.squads[LAST_SQ]||STORE.squads[0];
   $("homeView").hidden=CUR!==null; $("squadView").hidden=!isSq; $("fontiView").hidden=CUR!=="fonti";
   if($("storicoView")) $("storicoView").hidden=CUR!=="storico";
   const here=CUR===null?"#home":CUR==="fonti"?"#fonti":CUR==="storico"?"#storico":"#squadra-"+(CUR+1);
@@ -952,6 +992,9 @@ async function boot(){
   if(saved&&Array.isArray(saved.squads)&&saved.squads.length) STORE.savedAt=saved.savedAt||0, STORE.squads=saved.squads.map((q,i)=>({name:q.name||("Squadra "+(i+1)),logo:q.logo||null,players:Array.isArray(q.players)?q.players:[]}));
   for(const sq of STORE.squads) sq.players=sq.players.map(p=>p.canon&&DATA?.teams?.[p.team]?p:resolve(p));
   window.addEventListener("hashchange",route);
+  document.addEventListener("click",e=>{
+    if(e.target&&e.target.id==="btnStorico"){ location.hash="#storico"; }
+  });
   route();
 }
 boot();
