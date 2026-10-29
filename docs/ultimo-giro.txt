@@ -1,22 +1,23 @@
-letto corriere: giornata 9, 14 squadre (3s)
-letto fantacalcio: giornata 9, 20 squadre (6s)
-letto sky: giornata 9, 20 squadre (8s)
+letto corriere: giornata 9, 4 squadre (4s)
+letto fantacalcio: giornata 9, 20 squadre (7s)
 letto sosfanta: giornata ?, 20 squadre (4s)
-letto gazzetta: giornata 9, 14 squadre (13s)
-letto tmw: giornata 9, 18 squadre (22s)
-letto calciomercato: giornata ?, 20 squadre (22s)
-letto goal: giornata 9, 20 squadre (12s)
-letto eurosport: giornata 9, 14 squadre (56s)
-letto lega: giornata ?, 6 squadre (93s)
-Siti letti in 107s
-+ Lega Serie A: 6 formazioni ufficiali
+letto sky: giornata 9, 20 squadre (9s)
+letto gazzetta: giornata 9, 4 squadre (16s)
+letto eurosport: giornata ?, 0 squadre (9s)
+letto tmw: giornata 9, 20 squadre (29s)
+letto goal: giornata 9, 20 squadre (29s)
+letto spm: giornata 9, 4 squadre (93s)
+errore lega: lega: troppo lento, saltato
+Siti letti in 248s
+- Lega Serie A: lega: troppo lento, saltato
 + Sky Sport: 20 squadre
-+ Gazzetta: 14 squadre
-+ Corriere dello Sport: 14 squadre
++ Gazzetta: 4 squadre
++ Corriere dello Sport: 4 squadre
   TuttoMercatoWeb Como: 12 titolari, scartata
-+ TuttoMercatoWeb: 17 squadre
++ TuttoMercatoWeb: 19 squadre
 + SOS Fanta: 20 squadre
-+ Eurosport: 14 squadre
+- Eurosport: le partite non corrispondono alla 9ª giornata
+  Goal.com: nomi non abbinati (1): Lecce:Pierotti
 + Goal.com: 20 squadre
-+ Calciomercato.com: 20 squadre
-OK: 9ª giornata, 9 fonti, 6 formazioni ufficiali, 96 indisponibili. Salvato 28/10/2026 14:17.
++ SportMediaset: 4 squadre
+OK: 9ª giornata, 9 fonti, 16 formazioni ufficiali, 255 indisponibili. Salvato 29/10/2026 11:08.
