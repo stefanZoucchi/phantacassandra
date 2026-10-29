@@ -390,7 +390,7 @@ const isOut=x=>!x.o?0:(x.o.k==="inf"||x.o.k==="squal")?2:x.o.k==="dubbio"?1:0; /
 // peso fonte da accuracy storica (0.75–1.25); con pochi dati resta 1
 function srcWeight(key){
   let hits=0, total=0;
-  for(const r of (DATA.history||[])){ const v=r.stats&&r.stats[key]; if(v&&v.total){ hits+=v.hits; total+=v.total; } }
+  for(const r of statsHist(DATA)){ const v=r.stats&&r.stats[key]; if(v&&v.total){ hits+=v.hits; total+=v.total; } }
   try{ const cur=accuracy(DATA)[key]; if(cur&&cur.total){ hits+=cur.hits; total+=cur.total; } }catch(e){}
   if(total<40) return 1;
   const p=hits/total;
@@ -431,8 +431,12 @@ function renderHomeOld(){
       (SQ.players.length?`<div class="stats"><div class="stat"><b>${sure}</b><span>titolari probabili (≥75%)</span></div><div class="stat"><b>${doubt}</b><span>in bilico</span></div><div class="stat"><b>${out}</b><span>infortunati o squalificati</span></div></div>`+(risky?`<div class="watch">Da tenere d'occhio: ${risky}</div>`:""):`<div class="watch">Apri la squadra e incolla la rosa o importa l'Excel.</div>`)+`</a>`;
   }).join("");
 }
+// classifica delle fonti: conta solo dalla 10ª giornata (la 9ª ha dati incompleti)
+const statsFrom=D=>+(D?.statsFrom??10);
+const statsHist=D=>(D?.history||[]).filter(h=>+h.giornata>=statsFrom(D));
 function accuracy(D){
   const st={};
+  if(+D.giornata<statsFrom(D)) return st;
   for(const T of Object.values(D.teams||{})){
     if(!T.official) continue;
     const off=new Set(T.official.xi);
@@ -448,7 +452,7 @@ function sourcesOrderedByRank(){
   if(!DATA||!DATA.sources) return [];
   const cur=accuracy(DATA);
   const tot={};
-  for(const r of (DATA.history||[])) for(const [k,v] of Object.entries(r.stats||{})){
+  for(const r of statsHist(DATA)) for(const [k,v] of Object.entries(r.stats||{})){
     tot[k]=tot[k]||{hits:0,total:0,teams:0}; tot[k].hits+=v.hits; tot[k].total+=v.total; tot[k].teams+=(v.teams||0);
   }
   for(const [k,v] of Object.entries(cur)){ tot[k]=tot[k]||{hits:0,total:0,teams:0}; tot[k].hits+=v.hits; tot[k].total+=v.total; tot[k].teams+=(v.teams||0); }
@@ -463,6 +467,7 @@ function sourcesOrderedByRank(){
 }
 function accuracyCommon(D){
   // ranking solo sulle squadre dove TUTTE le fonti ok hanno una formazione
+  if(+D.giornata<statsFrom(D)) return {};
   const srcs=(D.sources||[]).filter(s=>s.ok).map(s=>s.key);
   if(srcs.length<2) return accuracy(D);
   const st={}; const common=[];
@@ -482,7 +487,7 @@ function renderFonti(){
   const el=$("fontiView");
   if(!DATA){el.innerHTML="";return}
   const cur=accuracy(DATA);
-  const rounds=[...(DATA.history||[]).filter(h=>h.giornata!=DATA.giornata),{giornata:DATA.giornata,stats:cur,live:true}];
+  const rounds=[...statsHist(DATA).filter(h=>h.giornata!=DATA.giornata),...(+DATA.giornata>=statsFrom(DATA)?[{giornata:DATA.giornata,stats:cur,live:true}]:[])];
   const tot={};
   for(const r of rounds) for(const [k,v] of Object.entries(r.stats||{})){
     tot[k]=tot[k]||{hits:0,total:0,teams:0,g:0};
@@ -519,7 +524,7 @@ function renderFonti(){
      const badge=small?' <span class="pmeta" title="Campione ancora piccolo: la % può oscillare molto">campione piccolo</span>':"";
      return `<tr class="${r&&r<=3?"podio p"+r:""}"><td class="pos">${r?r+"°":(x.t?"n.c.":"–")}</td><td><a href="${esc(x.s.url)}" target="_blank" rel="noopener">${esc(x.s.name)}</a>${meta}${badge}</td><td class="pct">${pctS(x.t)}</td><td>${x.t?x.t.hits+"/"+x.t.total:"—"}</td><td>${x.t&&x.t.teams?x.t.teams:"—"}</td><td>${pctS(x.c)}${x.c&&x.c.teams?` <span class="pmeta">(${x.c.teams})</span>`:""}</td><td>${x.t?x.t.g:0}</td></tr>`;
    }).join("")+
-   `</tbody></table></div><div class="note">Titolari previsti che poi compaiono nella formazione ufficiale (tutte le partite di Serie A, non solo le tue rose). Colonna <b>Squadre</b> = n. squadre con ufficiale confrontate. La % è hits/total; sotto ${MIN_TEAMS} squadre la fonte è n.c. ${nOff?`Giornata in corso: ${nOff} squadre su ${Object.keys(DATA.teams).length} con l'ufficiale.`:"La classifica parte con le prime formazioni ufficiali, circa un'ora prima di ogni partita."} ${commonNote}</div>`;
+   `</tbody></table></div><div class="note">${+DATA.giornata<statsFrom(DATA)?`<b>La classifica parte dalla ${statsFrom(DATA)}ª giornata</b>: la ${DATA.giornata}ª non conta perché alcune fonti hanno dati incompleti. `:`Classifica dalla ${statsFrom(DATA)}ª giornata. `}Titolari previsti che poi compaiono nella formazione ufficiale (tutte le partite di Serie A, non solo le tue rose). Colonna <b>Squadre</b> = n. squadre con ufficiale confrontate. La % è hits/total; sotto ${MIN_TEAMS} squadre la fonte è n.c. ${nOff?`Giornata in corso: ${nOff} squadre su ${Object.keys(DATA.teams).length} con l'ufficiale.`:"La classifica parte con le prime formazioni ufficiali, circa un'ora prima di ogni partita."} ${commonNote}</div>`;
 }
 
 let HIST=null;
