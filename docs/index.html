@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1d6b45"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon.png"><link rel="icon" href="icon-192.png"><style>[hidden]{display:none!important}body{margin:0}:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0f9b9b"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon.png"><link rel="icon" href="icon-192.png"><style>[hidden]{display:none!important}body{margin:0}:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 /* telefono in orizzontale: intestazione compatta */
 @media (orientation:landscape) and (max-height:560px){
   .wrap{padding-block:8px 24px;gap:10px}
@@ -22,16 +22,17 @@
 <style>
 /* Layout: a matchday "distinta" sheet: team band on top, source legend, one dense table of your players grouped by role */
 :root{
-  --bg:#f2f5f1; --surface:#ffffff; --fg:#16211b; --muted:#5d6b62; --line:#d6ded7; --accent:#1d6b45; --accent-ink:#ffffff;
-  --ok:#1f9d57; --bench:#e2a400; --out:#d4412f; --na:#b5bdb7; --chip:#e8eee9; --warnbg:#fff4d6;
+  /* colore ufficiale dell'app: turchese (--brand per scritte grandi, --accent per pulsanti e testi piccoli) */
+  --bg:#f1f5f5; --surface:#ffffff; --fg:#142121; --muted:#5a6a6a; --line:#d4dfdf; --accent:#0b7f7f; --accent-ink:#ffffff; --brand:#0f9b9b;
+  --ok:#1f9d57; --bench:#e2a400; --out:#d4412f; --na:#b5bdb7; --chip:#e6eeee; --warnbg:#fff4d6;
   --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0e1511; --surface:#16201a; --fg:#e4ece6; --muted:#9aa89f; --line:#2a372f; --accent:#3fae78; --accent-ink:#06130c;
-  --ok:#38c172; --bench:#f0b92a; --out:#ef5d4a; --na:#4f5b54; --chip:#1f2b24; --warnbg:#3a3016; color-scheme:dark}}
+  --bg:#0d1515; --surface:#152020; --fg:#e3eded; --muted:#98a9a9; --line:#283838; --accent:#2cc9c4; --accent-ink:#041312; --brand:#2cc9c4;
+  --ok:#38c172; --bench:#f0b92a; --out:#ef5d4a; --na:#4f5b54; --chip:#1d2a2a; --warnbg:#3a3016; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0e1511; --surface:#16201a; --fg:#e4ece6; --muted:#9aa89f; --line:#2a372f; --accent:#3fae78; --accent-ink:#06130c;
-  --ok:#38c172; --bench:#f0b92a; --out:#ef5d4a; --na:#4f5b54; --chip:#1f2b24; --warnbg:#3a3016; color-scheme:dark}
+  --bg:#0d1515; --surface:#152020; --fg:#e3eded; --muted:#98a9a9; --line:#283838; --accent:#2cc9c4; --accent-ink:#041312; --brand:#2cc9c4;
+  --ok:#38c172; --bench:#f0b92a; --out:#ef5d4a; --na:#4f5b54; --chip:#1d2a2a; --warnbg:#3a3016; color-scheme:dark}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45}
 .wrap{max-width:none;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
@@ -52,7 +53,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 
 .topbar{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap}
 .topbar .right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end}
-.brand{font-size:clamp(26px,7.5vw,38px);overflow-wrap:anywhere;line-height:1;letter-spacing:.02em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.brand{font-size:clamp(26px,7.5vw,38px);overflow-wrap:anywhere;line-height:1;letter-spacing:.02em;text-transform:uppercase;color:var(--brand);font-weight:700}
 .seg{display:flex;background:var(--chip);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
 .seg a{padding:7px 14px;border-radius:8px;text-decoration:none;color:var(--fg);font-weight:600;font-size:14px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .seg a[aria-current="page"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12);color:var(--accent)}
@@ -117,9 +118,7 @@ thead th.name{position:sticky;left:0;z-index:12;width:220px}
 .pwhen{font-size:11px;color:var(--muted);line-height:1.2;margin-top:1px}
 /* righe dei ruoli: solo scritta, grande, turchese */
 tr.role td{background:transparent;font:700 22px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:12px 10px 4px;position:static}
-tr.role td{color:#0f9b9b}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) tr.role td{color:#2cc9c4}}
-:root[data-theme="dark"] tr.role td{color:#2cc9c4}
+tr.role td{color:var(--brand)}
 .role-tag{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font:700 13px var(--display);color:#fff;margin-right:8px;vertical-align:middle}
 .r-P{background:#c98a00}.r-D{background:#2f7d4a}.r-C{background:#2d64b3}.r-A{background:#b5352a}.r-X{background:#6b756f}
 .pct{font:700 19px var(--display);min-width:44px;text-align:right}
