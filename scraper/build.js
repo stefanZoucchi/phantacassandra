@@ -195,6 +195,9 @@ function build(raw, prev, mode = "automatico", log = console.log) {
 
   let history = Array.isArray(prev?.history) ? prev.history : [];
   const same = prev && prev.giornata == P.giornata;
+  // nuova stagione: la giornata torna indietro (es. dalla 38ª alla 1ª) → classifica delle fonti da zero, dalla 1ª
+  const newSeason = prev && prev.giornata != null && +P.giornata < +prev.giornata;
+  if (newSeason) log(`Nuova stagione: classifica delle fonti azzerata (si riparte dalla ${P.giornata}ª giornata)`);
   if (same) {
     for (const [t, T] of Object.entries(teams)) {
       const PT = prev.teams?.[t]; if (!PT) continue;
@@ -216,6 +219,8 @@ function build(raw, prev, mode = "automatico", log = console.log) {
       // (es. SportMediaset toglie le partite di oggi e mostra quelle di domani) tengo l'ultima letta
       else for (const [k, L] of Object.entries(PT.lineups || {})) if (!T.lineups[k]) T.lineups[k] = L;
     }
+  } else if (newSeason) {
+    history = [];
   } else if (prev && prev.giornata != null) {
     // chiude la giornata precedente: salva sempre le stats (anche se poche ufficiali)
     try {
@@ -243,8 +248,9 @@ function build(raw, prev, mode = "automatico", log = console.log) {
       ...(s.note ? { note: s.note } : {}),
     };
   });
-  history = history.filter(h => +h.giornata >= statsFrom(prev));
-  return { giornata: P.giornata, generated: now.full, mode, statsFrom: statsFrom(prev), history, sources, teams };
+  const from = newSeason ? +P.giornata : statsFrom(prev);
+  history = history.filter(h => +h.giornata >= from);
+  return { giornata: P.giornata, generated: now.full, mode, statsFrom: from, history, sources, teams };
 }
 
 module.exports = { build, accuracy, SOURCES, nowRome };

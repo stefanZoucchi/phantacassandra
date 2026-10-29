@@ -72,12 +72,30 @@ function nameMapper(cands, team) {
 }
 
 (async () => {
+  // giro notturno programmato due volte (ora solare e legale): vale solo quello tra mezzanotte e le 3 italiane
+  if (process.env.EVENT === "schedule") {
+    const h = +new Intl.DateTimeFormat("it-IT", { timeZone: "Europe/Rome", hour: "2-digit", hour12: false }).format(new Date());
+    if (h >= 3) { console.log(`Ore ${h} a Roma: è il giro previsto per l'altra ora (legale/solare), saltato.`); return; }
+  }
   const data = fs.existsSync(DATA) ? JSON.parse(fs.readFileSync(DATA, "utf8")) : null;
   if (!data || !data.giornata || !data.teams) { log("data.json mancante: niente storico"); return; }
   const H = load();
+  if (process.env.EVENT === "schedule" && H.updated && Date.now() - new Date(H.updated).getTime() < 50 * 60000) { console.log("Storico aggiornato meno di un'ora fa: giro saltato."); return; }
   H.giornate = H.giornate || []; H.players = H.players || {};
   H.matches = H.matches || {}; // giornata -> { idPartita: "Casa-Trasferta" }
   H.outs = H.outs || {};       // giornata -> squadra -> indisponibili pre-gara
+
+  // nuova stagione: Fantacalcio.it è tornato a una giornata precedente all'inizio dello storico (es. 1ª dopo la 38ª).
+  // Il vecchio storico viene messo da parte in docs/history-players-<stagione>.json e se ne apre uno nuovo dalla 1ª.
+  const maxG = Math.max(0, ...H.giornate.map(Number));
+  if (maxG && (+data.giornata < +(H.from || 0) || +data.giornata < maxG - 5)) {
+    const old = String(H.season || "precedente").replace(/[^0-9a-z-]/gi, "");
+    fs.writeFileSync(path.join(__dirname, "..", "docs", `history-players-${old}.json`), JSON.stringify(H));
+    const now = new Date(), y = now.getUTCMonth() >= 6 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
+    for (const k of Object.keys(H)) delete H[k];
+    Object.assign(H, { season: `${y}-${String(y + 1).slice(2)}`, updated: null, giornate: [], players: {}, matches: {}, outs: {} });
+    log(`Nuova stagione ${H.season}: storico ${old} archiviato, si riparte dalla ${data.giornata}ª giornata`);
+  }
 
   // indisponibili della giornata in corso: li conservo, servono per I/S anche dopo che Fantacalcio passa alla giornata dopo
   const gCur = String(data.giornata);

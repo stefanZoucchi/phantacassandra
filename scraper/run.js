@@ -195,6 +195,13 @@ function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di R
 (async () => {
   const prev = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, "utf8")) : null;
   // giro automatico di riserva di GitHub: se cron-job.org ha gia' aggiornato da poco, non serve rifarlo
+  // Ora legale/solare: GitHub ragiona solo in UTC, quindi ogni giro di riserva è programmato due volte
+  // (una per l'ora solare, una per la legale). Qui si tiene solo quello che cade all'orario italiano giusto.
+  if (process.env.EVENT === "schedule") {
+    const t = require("./build").nowRome().full.match(/(\d{2}):(\d{2})$/), m = +t[1] * 60 + +t[2];
+    const SLOTS = ["11:55", "14:25", "17:25", "17:55", "20:10"].map(x => +x.slice(0, 2) * 60 + +x.slice(3));
+    if (!SLOTS.some(sl => m >= sl - 5 && m <= sl + 25)) { console.log(`Ore ${t[0]} a Roma: è il giro previsto per l'altra ora (legale/solare), saltato.`); return; }
+  }
   if (process.env.EVENT === "schedule" && prev) {
     const { full } = require("./build").nowRome();
     const a = romeMinutes(prev.generated), b = romeMinutes(full);
@@ -230,6 +237,9 @@ function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di R
     console.log(`OK: ${data.giornata}ª giornata, ${data.sources.filter(s => s.ok).length} fonti, ${off} formazioni ufficiali, ${nOut} indisponibili. Salvato ${data.generated}.`);
     saveLog();
   } catch (e) {
+    // pausa estiva: senza partite Fantacalcio.it non pubblica formazioni. Non è un errore (niente email di GitHub).
+    const month = +require("./build").nowRome().full.slice(3, 5);
+    if (/Fantacalcio\.it non letto/.test(e.message) && month >= 6 && month <= 8) { console.log("Pausa estiva: nessuna giornata da leggere, riprovo al prossimo giro."); return; }
     console.error("Aggiornamento non salvato: " + e.message); saveLog();
     process.exit(1);
   }
