@@ -10,7 +10,6 @@
   .band{gap:10px}.logo{width:44px;height:44px;font-size:18px;border-radius:10px}
   .title h1{font-size:24px}.title .sub{font-size:12px}
   .legend{font-size:12px;gap:10px}
-  .legend span:last-child{display:none}
   .cards{padding-block:8px}
   .logo.big{width:120px;height:120px}.tile{width:120px}
 }
@@ -86,6 +85,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .lt-D{background:#ee7d1a} .lt-I,.lt-S{background:var(--out)} .lt-na{background:transparent;color:var(--na);font-weight:700}
 .lt:not(.lt-na):not(.lt-Bv):not(.lt-Bg){color:#111}
 .legend span{display:inline-flex;gap:6px;align-items:center}
+.legend-bottom{padding-top:6px;border-top:1px solid var(--line)}
 
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
 .panel h2{font-size:22px;text-transform:uppercase}
@@ -117,7 +117,7 @@ thead th.name{position:sticky;left:0;z-index:12;width:220px}
 .tm-s{display:none}
 .pwhen{font-size:11px;color:var(--muted);line-height:1.2;margin-top:1px}
 /* righe dei ruoli: solo scritta, grande, turchese */
-tr.role td{background:transparent;font:700 22px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:12px 10px 4px;position:static}
+tr.role td{background:transparent;font:700 22px/1.1 var(--display);letter-spacing:.06em;text-transform:uppercase;padding:9px 5px;vertical-align:middle;position:static}
 tr.role td{color:var(--brand)}
 .role-tag{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font:700 13px var(--display);color:#fff;margin-right:8px;vertical-align:middle}
 .r-P{background:#c98a00}.r-D{background:#2f7d4a}.r-C{background:#2d64b3}.r-A{background:#b5352a}.r-X{background:#6b756f}
@@ -149,7 +149,7 @@ th.uff .ab{background:var(--accent);color:var(--accent-ink)}
 .rank .barbox b{position:relative;display:flex;align-items:center;height:100%;padding-left:12px;font:800 18px var(--body);color:var(--fg)}
 .rank .barbox.none b{color:var(--muted);font-weight:700}
 .rank .big{font:700 17px var(--body)}
-@media (max-width:600px){.rank .hm{display:none}.rank td.prec{min-width:120px}.rank td{padding:5px 4px}}
+@media (max-width:600px){.rank .hm{display:none}.rank td.prec{min-width:0;width:auto}.rank td,.rank th{padding:5px 3px}.rank td.big .pmeta{display:none}.rank th{font-size:9px}}
 .pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:0 10px 0 0;height:34px;border-radius:7px;background:var(--chip);font:700 15px var(--body);overflow:hidden}
 .pill .ab{display:flex;align-items:center;height:100%;padding:0 9px;background:var(--fg);color:var(--surface);font:700 15px var(--display);letter-spacing:.04em}
@@ -218,7 +218,6 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
   .title .sub{font-size:11.5px}
   .legend{font-size:11px;gap:4px 9px}
   .legend .lt,.legend .hist-cell{width:auto;min-width:18px;height:18px;font-size:10px;border-radius:4px;padding:0 3px}
-  #squadView .legend span:last-child{display:none}
   .panel{padding:10px}
   .tablewrap{border-radius:8px}
   /* tabella Squadra */
@@ -239,7 +238,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
   th.src small{display:none}
   td.dc{padding:2px 1px}
   td.dc .lt{min-width:0;height:32px;border-radius:4px;font-size:13px}
-  tr.role td{font-size:17px;padding:8px 6px 2px}
+  tr.role td{font-size:17px;padding:7px 4px}
   /* tabella Storico */
   .hist-table th.hist-head{width:auto;min-width:44px;padding:4px 2px}
   .hist-head .ab{height:22px;font-size:12px;border-radius:4px}
@@ -290,17 +289,6 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
     </div>
   </header>
 
-  <div class="legend">
-    <span><i class="lt lt-T">T</i>Titolare</span>
-    <span><i class="lt lt-P">P</i>Panchina</span>
-    <span><i class="lt lt-Bv">B</i>Ballottaggio, in vantaggio</span>
-    <span><i class="lt lt-Bg">B</i>Ballottaggio, in svantaggio</span>
-    <span><i class="lt lt-D">D</i>In dubbio / da valutare</span>
-    <span><i class="lt lt-I">I</i>Infortunato</span>
-    <span><i class="lt lt-S">S</i>Squalificato</span>
-    <span><i class="lt lt-na">–</i>Non ancora pubblicato</span>
-    <span>% impiego = fonti che lo danno titolare ÷ fonti che hanno pubblicato (le fonti storicamente più accurate pesano un po' di più) · sotto ogni fonte: aggiornamento e n. squadre coperte</span>
-  </div>
 
 
 
@@ -333,6 +321,17 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
 
   <div class="tablewrap" id="tableWrap"></div>
   <div class="note" id="foot"></div>
+  <div class="legend legend-bottom">
+    <span><i class="lt lt-T">T</i>Titolare</span>
+    <span><i class="lt lt-P">P</i>Panchina</span>
+    <span><i class="lt lt-Bv">B</i>Ballottaggio, in vantaggio</span>
+    <span><i class="lt lt-Bg">B</i>Ballottaggio, in svantaggio</span>
+    <span><i class="lt lt-D">D</i>In dubbio / da valutare</span>
+    <span><i class="lt lt-I">I</i>Infortunato</span>
+    <span><i class="lt lt-S">S</i>Squalificato</span>
+    <span><i class="lt lt-na">–</i>Non ancora pubblicato</span>
+    <span>% impiego = fonti che lo danno titolare ÷ fonti che hanno pubblicato (le fonti storicamente più accurate pesano un po' di più) · sotto ogni fonte: aggiornamento e n. squadre coperte</span>
+  </div>
   </div>
 </div>
 
@@ -665,14 +664,6 @@ function renderStorico(){
           <div class="sub">${esc(SQ&&SQ.name||"")} · ${gs.length} giornate</div></div>
         <div class="actions">${storicoBtnHTML()}<a class="btn" href="${back}">← Rosa</a></div>
       </div>
-      <div class="legend">
-        <span><i class="hist-cell hist-T">T</i>Titolare</span>
-        <span><i class="hist-cell hist-P">P</i>Panchina</span>
-        <span><i class="hist-cell hist-out">58'</i>Titolare sostituito al minuto</span>
-        <span><i class="hist-cell hist-in">64'</i>Entrato al minuto</span>
-        <span><i class="hist-cell hist-I">I</i>Infortunato</span>
-        <span><i class="hist-cell hist-S">S</i>Squalificato</span>
-      </div>
       <div class="tablewrap fit scroll-y"><table class="hist-table"><thead><tr>
         <th class="name">Giocatore</th>
         ${gs.map(g=>`<th class="hist-head"><span class="ab${DATA&&String(DATA.giornata)===String(g)?" cur":""}">${g}ª</span></th>`).join("")}
@@ -686,6 +677,14 @@ function renderStorico(){
           ${gs.map(g=>`<td class="dc">${cell(Ph&&Ph.g[g])}</td>`).join("")}</tr>`;
       }).join(""):`<tr><td colspan="${gs.length+1}" class="empty">Nessun giocatore della rosa presente nello storico.</td></tr>`)+
       `</tbody></table></div>
+      <div class="legend legend-bottom">
+        <span><i class="hist-cell hist-T">T</i>Titolare</span>
+        <span><i class="hist-cell hist-P">P</i>Panchina</span>
+        <span><i class="hist-cell hist-out">58'</i>Titolare sostituito al minuto</span>
+        <span><i class="hist-cell hist-in">64'</i>Entrato al minuto</span>
+        <span><i class="hist-cell hist-I">I</i>Infortunato</span>
+        <span><i class="hist-cell hist-S">S</i>Squalificato</span>
+      </div>
       <div class="note">Dati dai tabellini della Gazzetta dello Sport, a partita finita. Si aggiorna da solo ogni notte; «Aggiorna storico» lo fa subito. Se le giornate superano lo schermo la tabella scorre in orizzontale — i nomi restano fissi a sinistra. ${H.updated?`Ultimo archivio: ${esc(new Date(H.updated).toLocaleString("it-IT",{timeZone:"Europe/Rome",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}))}`:""}</div>`;
     bindStoricoBtn();
   });
