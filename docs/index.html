@@ -103,17 +103,20 @@ table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
 th,td{padding:6px 5px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
 thead{position:sticky;top:0;z-index:10;background:var(--surface)}
 thead th{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--surface);position:sticky;top:0;z-index:11}
-th.src{text-align:center;vertical-align:top;min-width:38px;padding:6px 2px}
-th.src a,th.src .ab{display:block;height:16px;line-height:16px;color:var(--fg);text-decoration:none;font:700 12px var(--display);letter-spacing:.03em;white-space:nowrap}
-th.src a:hover{color:var(--accent);text-decoration:underline}
-th.src small{display:block;height:12px;font:400 9px/12px var(--body);color:var(--muted);text-transform:none;letter-spacing:0;white-space:nowrap}
-td.dc{text-align:center;padding:6px 2px}
+th.src{text-align:center;vertical-align:top;min-width:44px;padding:6px 3px}
+/* nome della fonte in un rettangolo pieno, ben leggibile */
+th.src a,th.src .ab{display:flex;align-items:center;justify-content:center;height:28px;margin-bottom:4px;border-radius:6px;background:var(--fg);color:var(--surface);text-decoration:none;font:700 15px var(--display);letter-spacing:.04em;white-space:nowrap;padding:0 4px}
+th.src a:hover{background:var(--accent);color:var(--accent-ink)}
+th.src small{display:block;height:13px;font:600 10.5px/13px var(--body);color:var(--muted);text-transform:none;letter-spacing:0;white-space:nowrap}
+td.dc{text-align:center;padding:4px 3px}
+/* stato: rettangolo che riempie la cella */
+td.dc .lt{display:flex;width:100%;min-width:38px;height:50px;border-radius:7px;font:800 18px/1 var(--body);box-sizing:border-box}
 td.name{position:sticky;left:0;background:var(--surface);min-width:140px;max-width:240px;width:220px;z-index:2}
 thead th.name{position:sticky;left:0;z-index:12;width:220px}
 @media (max-width:700px){td.name,thead th.name,.hist-table td.name,.hist-table th.name{min-width:112px;width:130px}.pname{font-size:13px}}
 .pname{font-weight:700;line-height:1.2}
 .pmeta{font-size:12px;color:var(--muted);line-height:1.25}
-.pmeta b.tm{color:var(--fg);font-weight:700;letter-spacing:.02em}
+.pmeta b.tm{color:var(--accent);font-weight:800;letter-spacing:.03em}
 .pwhen{font-size:11px;color:var(--muted);line-height:1.2;margin-top:1px}
 tr.role td{background:var(--chip);font:700 14px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;position:static}
 .role-tag{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font:700 13px var(--display);color:#fff;margin-right:8px;vertical-align:middle}
@@ -126,7 +129,7 @@ th.pc,td.pc{width:56px;min-width:56px;text-align:right;padding-right:10px}
 .b-inf{background:var(--out);color:#fff}.b-squal{background:#7a1f16;color:#fff}.b-dubbio{background:var(--bench);color:#1b1400}.b-nf{background:var(--na);color:var(--fg)}
 th.uff,td.uffc{background:var(--chip)}
 th.uff{color:var(--accent);font:700 13px var(--display);letter-spacing:.04em}
-th.uff .ab{color:var(--accent)}
+th.uff .ab{background:var(--accent);color:var(--accent-ink)}
 .lastupd{font-size:12px;color:var(--muted);text-align:right;margin-top:4px}
 .rank td,.rank th{white-space:nowrap}
 .rank .pos{font:700 20px var(--display);width:34px}
@@ -149,15 +152,19 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
 .unres{font-size:13px}
 @media (prefers-reduced-motion:no-preference){.spin{animation:pulse 1s ease-in-out infinite}@keyframes pulse{50%{opacity:.35}}}
 
-.hist-cell{width:26px;height:26px;border-radius:7px;display:inline-grid;place-items:center;font:800 13px/1 system-ui,sans-serif;color:#111;vertical-align:middle}
+.hist-cell{width:26px;height:26px;border-radius:7px;display:inline-grid;place-items:center;font:800 13px/1 system-ui,sans-serif;color:#111;vertical-align:middle;box-sizing:border-box}
+.hist-table td.dc .hist-cell{display:flex;align-items:center;justify-content:center;width:100%;height:42px;border-radius:7px;font:800 18px/1 var(--body)}
+.legend .hist-cell{width:auto;min-width:26px;padding:0 5px}
+.hist-table th.hist-head{width:92px;min-width:64px;max-width:92px;padding:6px 3px;vertical-align:top}
+.hist-head .ab{display:flex;align-items:center;justify-content:center;height:28px;border-radius:6px;background:var(--fg);color:var(--surface);font:700 15px var(--display);letter-spacing:.04em}
+.hist-head .ab.cur{background:var(--accent);color:var(--accent-ink)}
 .hist-T{background:var(--ok);color:#111}
 .hist-P{background:var(--bench);color:#111}
 .hist-I,.hist-S{background:var(--out);color:#fff}
 .hist-empty{background:transparent;color:var(--na);font-weight:700}
-/* subentrato: freccia su, sfondo e bordo giallo, freccia nera */
-.hist-in{background:#111;color:var(--bench);border:1.5px solid var(--bench)}
-/* titolare uscito: freccia giù, sfondo verde, freccia nera */
-.hist-out{background:var(--ok);color:#111;border:1.5px solid var(--ok)}
+/* subentrato: giallo con il minuto di ingresso; titolare sostituito: verde con il minuto di uscita */
+.hist-in{background:var(--bench);color:#111}
+.hist-out{background:var(--ok);color:#111}
 .hist-table{border-collapse:collapse}
 .hist-table thead{position:sticky;top:0;z-index:10;background:var(--surface)}
 .hist-table thead th{position:sticky;top:0;z-index:11;background:var(--surface)}
@@ -528,14 +535,15 @@ function renderStorico(){
   const SQ = STORE.squads[typeof LAST_SQ==="number"?LAST_SQ:0] || STORE.squads[0];
   el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico · ${esc(SQ&&SQ.name||"Rosa")}</h2><div class="note">Caricamento…</div>`;
   loadHist().then(H=>{
-    if(!H||!H.giornate||!H.giornate.length){
+    if(!H||!(H.giornate||[]).filter(g=>!H.from||+g>=+H.from).length){
       el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico · ${esc(SQ&&SQ.name||"Rosa")}</h2>
         <div class="note">Nessun dato archiviato. Si popola dopo le partite con i tabellini della Gazzetta (ogni notte in automatico, oppure subito con il pulsante qui sotto).</div>
         <div class="row">${storicoBtnHTML()}<a class="btn" href="#squadra-${(typeof LAST_SQ==="number"?LAST_SQ:0)+1}">← Rosa</a></div>`;
       bindStoricoBtn();
       return;
     }
-    const gs=H.giornate;
+    // solo dalla giornata in cui sono iniziati i dati su infortuni e squalifiche
+    const gs=H.giornate.filter(g=>!H.from||+g>=+H.from).sort((a,b)=>a-b);
     const players=SQ&&SQ.players||[];
     let rows=[];
     for(const p of players){
@@ -547,21 +555,13 @@ function renderStorico(){
       rows.push({p, key, H: key?H.players[key]:null});
     }
     const cell=st=>{
-      if(!st) return `<span class="hist-cell hist-empty" title="n.d.">–</span>`;
-      // subentrato dalla panchina
-      if(st.s==="E"){
-        const tip=st.min!=null?`Entrato al ${st.min}'`:"Entrato dalla panchina";
-        return `<span class="hist-cell hist-in" title="${tip}">↑</span>`;
-      }
-      // titolare sostituito (minuto uscita)
-      if(st.out!=null || st.s==="X"){
-        const tip=st.out!=null?`Uscito al ${st.out}'`:(st.min!=null?`Uscito al ${st.min}'`:"Sostituito");
-        return `<span class="hist-cell hist-out" title="${tip}">↓</span>`;
-      }
-      if(st.s==="T") return `<span class="hist-cell hist-T" title="Titolare">T</span>`;
-      if(st.s==="P") return `<span class="hist-cell hist-P" title="Panchina">P</span>`;
-      if(st.s==="I") return `<span class="hist-cell hist-I" title="Infortunato">I</span>`;
-      if(st.s==="S") return `<span class="hist-cell hist-S" title="Squalificato">S</span>`;
+      if(!st) return `<span class="hist-cell hist-empty">–</span>`;
+      if(st.s==="E") return `<span class="hist-cell hist-in">${st.min!=null?st.min+"'":"E"}</span>`;
+      if(st.out!=null) return `<span class="hist-cell hist-out">${st.out}'</span>`;
+      if(st.s==="T") return `<span class="hist-cell hist-T">T</span>`;
+      if(st.s==="P") return `<span class="hist-cell hist-P">P</span>`;
+      if(st.s==="I") return `<span class="hist-cell hist-I">I</span>`;
+      if(st.s==="S") return `<span class="hist-cell hist-S">S</span>`;
       return `<span class="hist-cell hist-empty">–</span>`;
     };
     const back=`#squadra-${(typeof LAST_SQ==="number"?LAST_SQ:0)+1}`;
@@ -573,14 +573,14 @@ function renderStorico(){
       <div class="legend">
         <span><i class="hist-cell hist-T">T</i>Titolare</span>
         <span><i class="hist-cell hist-P">P</i>Panchina</span>
-        <span><i class="hist-cell hist-in">↑</i>Subentrato (hover = minuto)</span>
-        <span><i class="hist-cell hist-out">↓</i>Sostituito (hover = minuto)</span>
+        <span><i class="hist-cell hist-out">58'</i>Titolare sostituito al minuto</span>
+        <span><i class="hist-cell hist-in">64'</i>Entrato al minuto</span>
         <span><i class="hist-cell hist-I">I</i>Infortunato</span>
         <span><i class="hist-cell hist-S">S</i>Squalificato</span>
       </div>
-      <div class="tablewrap scroll-y"><table class="hist-table"><thead><tr>
+      <div class="tablewrap fit scroll-y"><table class="hist-table"><thead><tr>
         <th class="name">Giocatore</th>
-        ${gs.map(g=>`<th class="hist-head">${g}</th>`).join("")}
+        ${gs.map(g=>`<th class="hist-head"><span class="ab${DATA&&String(DATA.giornata)===String(g)?" cur":""}">${g}ª</span></th>`).join("")}
       </tr></thead><tbody>`+
       (rows.length?rows.map(({p,H:Ph})=>{
         const team=p.team||(Ph&&Ph.team)||"";
