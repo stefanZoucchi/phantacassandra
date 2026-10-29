@@ -1,11 +1,18 @@
-name: Storico giocatori (Lega post-gara)
+name: Storico giocatori (tabellini Gazzetta)
 
-# Pacchetto pluto: giro notturno per archiviare T/P/E/I/S dalle lineups Lega
+# Giro notturno: legge i tabellini delle partite finite sulla Gazzetta e aggiorna docs/history-players.json.
+# Il primo giro recupera da solo tutte le giornate già giocate. Per rileggere delle giornate:
+# Actions → Storico giocatori → Run workflow → giornate "1-9" (oppure "8,9").
 on:
   schedule:
-    # 00:15 Europe/Rome ≈ 23:15 UTC (solare) / 22:15 UTC (legale) — usiamo 23:15 UTC
+    # 00:15 a Roma con l'ora solare (01:15 con l'ora legale)
     - cron: "15 23 * * *"
   workflow_dispatch:
+    inputs:
+      giornate:
+        description: "Giornate da rileggere (es. 1-9 oppure 8,9). Vuoto = solo quelle mancanti"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -25,18 +32,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: Prepara il lettore
         run: npm install --no-save --no-audit --no-fund playwright@1.48.2
-      - name: Leggi Lega + aggiorna storico
+      - name: Leggi i tabellini e aggiorna lo storico
         env:
-          EVENT: ${{ github.event_name }}
-          MODE: automatico
           HOME: /root
-        run: node scraper/run.js
+          HIST_GIORNATE: ${{ github.event_name == 'workflow_dispatch' && inputs.giornate || '' }}
+        run: node scraper/storico.js
       - name: Salva
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "PhantaCassandra"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/data.json docs/history-players.json docs/ultimo-giro.txt 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "Storico/formazioni $(TZ=Europe/Rome date '+%d/%m %H:%M')"
+          git add docs/history-players.json docs/ultimo-storico.txt 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Storico giocatori $(TZ=Europe/Rome date '+%d/%m %H:%M')"
           git pull --rebase -q || true
           git push
