@@ -38,7 +38,7 @@
   --ok:#38c172; --bench:#f0b92a; --out:#ef5d4a; --na:#4f5b54; --chip:#1f2b24; --warnbg:#3a3016; color-scheme:dark}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45}
-.wrap{max-width:1180px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.wrap{max-width:none;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
 h1,h2,.disp{font-family:var(--display);letter-spacing:.01em;text-wrap:balance;margin:0}
 a{color:var(--accent)}
 button,.btn{font:600 14px var(--body);border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:8px 14px;cursor:pointer}
@@ -96,17 +96,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .msg{font-size:14px;padding:8px 12px;border-radius:8px;background:var(--warnbg)}
 
 .tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
-table{border-collapse:collapse;width:auto;font-variant-numeric:tabular-nums}
-.tablewrap{width:fit-content;max-width:100%}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+/* le tabelle Squadra e Storico occupano tutta la larghezza; sotto una certa larghezza scorrono in orizzontale */
+.tablewrap{width:100%;box-sizing:border-box;max-width:100%}
+.tablewrap.fit{width:fit-content}.tablewrap.fit table{width:auto}
 th,td{padding:6px 5px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
 thead{position:sticky;top:0;z-index:10;background:var(--surface)}
 thead th{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--surface);position:sticky;top:0;z-index:11}
-th.src{text-align:center;width:32px;min-width:32px;max-width:36px;padding:6px 2px}
-th.src a{display:block;color:var(--fg);text-decoration:none;font:700 12px var(--display);letter-spacing:.03em}
+th.src{text-align:center;vertical-align:top;min-width:38px;padding:6px 2px}
+th.src a,th.src .ab{display:block;height:16px;line-height:16px;color:var(--fg);text-decoration:none;font:700 12px var(--display);letter-spacing:.03em;white-space:nowrap}
 th.src a:hover{color:var(--accent);text-decoration:underline}
-th.src small{display:block;font:400 9px var(--body);color:var(--muted);text-transform:none;letter-spacing:0;line-height:1.2}
+th.src small{display:block;height:12px;font:400 9px/12px var(--body);color:var(--muted);text-transform:none;letter-spacing:0;white-space:nowrap}
 td.dc{text-align:center;padding:6px 2px}
-td.name{position:sticky;left:0;background:var(--surface);min-width:140px;max-width:200px;z-index:2}
+td.name{position:sticky;left:0;background:var(--surface);min-width:140px;max-width:240px;width:220px;z-index:2}
+thead th.name{position:sticky;left:0;z-index:12;width:220px}
+@media (max-width:700px){td.name,thead th.name,.hist-table td.name,.hist-table th.name{min-width:112px;width:130px}.pname{font-size:13px}}
 .pname{font-weight:700;line-height:1.2}
 .pmeta{font-size:12px;color:var(--muted);line-height:1.25}
 .pmeta b.tm{color:var(--fg);font-weight:700;letter-spacing:.02em}
@@ -115,13 +119,14 @@ tr.role td{background:var(--chip);font:700 14px var(--display);letter-spacing:.0
 .role-tag{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font:700 13px var(--display);color:#fff;margin-right:8px;vertical-align:middle}
 .r-P{background:#c98a00}.r-D{background:#2f7d4a}.r-C{background:#2d64b3}.r-A{background:#b5352a}.r-X{background:#6b756f}
 .pct{font:700 19px var(--display);min-width:44px;text-align:right}
+th.pc,td.pc{width:56px;min-width:56px;text-align:right;padding-right:10px}
 .bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;width:54px;margin-top:2px}
 .bar i{display:block;height:100%;background:var(--ok)}
 .badge{display:inline-block;font:700 11px var(--body);text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:999px;white-space:nowrap}
 .b-inf{background:var(--out);color:#fff}.b-squal{background:#7a1f16;color:#fff}.b-dubbio{background:var(--bench);color:#1b1400}.b-nf{background:var(--na);color:var(--fg)}
 th.uff,td.uffc{background:var(--chip)}
 th.uff{color:var(--accent);font:700 13px var(--display);letter-spacing:.04em}
-th.uff small{display:block;font:400 10px var(--body);color:var(--muted)}
+th.uff .ab{color:var(--accent)}
 .lastupd{font-size:12px;color:var(--muted);text-align:right;margin-top:4px}
 .rank td,.rank th{white-space:nowrap}
 .rank .pos{font:700 20px var(--display);width:34px}
@@ -156,7 +161,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
 .hist-table{border-collapse:collapse}
 .hist-table thead{position:sticky;top:0;z-index:10;background:var(--surface)}
 .hist-table thead th{position:sticky;top:0;z-index:11;background:var(--surface)}
-.hist-table td.name,.hist-table th.name{position:sticky;left:0;background:var(--surface);z-index:2;min-width:140px;max-width:200px}
+.hist-table td.name,.hist-table th.name{position:sticky;left:0;background:var(--surface);z-index:2;min-width:140px;max-width:240px;width:220px}
 .hist-table thead th.name{z-index:12;box-shadow:1px 1px 0 var(--line)}
 .hist-head{font-size:11px;color:var(--muted);text-align:center;min-width:28px;padding:6px 2px}
 .hist-table td.dc{text-align:center;padding:6px 2px}
@@ -499,7 +504,7 @@ function renderFonti(){
     commonNote=` · Base comune (solo squadre coperte da tutte le fonti ok, ${nC} sq): `+ranked.slice(0,5).map(x=>`${ABBR[x.k]||x.k} ${Math.round(x.p*1000)/10}%`).join(", ")+".";
   }
   el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Attendibilità delle fonti</h2>
-   <div class="tablewrap"><table class="rank"><thead><tr><th>#</th><th>Fonte</th><th>Totale</th><th>Indovinati</th><th>Squadre</th><th>${DATA.giornata}ª g.</th><th>Giornate</th></tr></thead><tbody>`+
+   <div class="tablewrap fit"><table class="rank"><thead><tr><th>#</th><th>Fonte</th><th>Totale</th><th>Indovinati</th><th>Squadre</th><th>${DATA.giornata}ª g.</th><th>Giornate</th></tr></thead><tbody>`+
    rows.map(x=>{
      const r=rankOf(x);
      const small=x.t&&(x.t.teams||0)>0&&(x.t.teams||0)<MIN_TEAMS;
@@ -525,7 +530,7 @@ function renderStorico(){
   loadHist().then(H=>{
     if(!H||!H.giornate||!H.giornate.length){
       el.innerHTML=`<h2 class="disp" style="font-size:24px;text-transform:uppercase">Storico · ${esc(SQ&&SQ.name||"Rosa")}</h2>
-        <div class="note">Nessun dato archiviato. Si popola dopo le partite (giro notturno Lega).</div>
+        <div class="note">Nessun dato archiviato. Si popola dopo le partite con i tabellini della Gazzetta (giro notturno; dalla pagina Actions di GitHub puoi avviarlo a mano: «Storico giocatori» → Run workflow).</div>
         <p><a href="#${typeof CUR==="number"?"squadra-"+(CUR+1):"home"}">← Torna</a></p>`;
       return;
     }
@@ -585,7 +590,7 @@ function renderStorico(){
           ${gs.map(g=>`<td class="dc">${cell(Ph&&Ph.g[g])}</td>`).join("")}</tr>`;
       }).join(""):`<tr><td colspan="${gs.length+1}" class="empty">Nessun giocatore della rosa presente nello storico.</td></tr>`)+
       `</tbody></table></div>
-      <div class="note">Dati Lega Serie A post-gara. Scroll orizzontale se le giornate superano lo schermo — i nomi restano fissi a sinistra. ${H.updated?`Ultimo archivio: ${esc(H.updated)}`:""}</div>`;
+      <div class="note">Dati dai tabellini della Gazzetta dello Sport, a partita finita. Se le giornate superano lo schermo la tabella scorre in orizzontale — i nomi restano fissi a sinistra. ${H.updated?`Ultimo archivio: ${esc(new Date(H.updated).toLocaleString("it-IT",{timeZone:"Europe/Rome",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}))}`:""}</div>`;
   });
 }
 function nextGiroHint(){
@@ -616,12 +621,14 @@ function render(){
   const rows=rowsFor(ROSA);
   const order=["P","D","C","A",null];
   const names={P:"Portieri",D:"Difensori",C:"Centrocampisti",A:"Attaccanti",null:"Senza ruolo"};
-  let html=`<table><thead><tr><th class="name" style="position:sticky;left:0;z-index:2">Giocatore</th><th>%</th>`+
+  let html=`<table><thead><tr><th class="name">Giocatore</th><th class="pc">%</th>`+
     srcs.map(s=>{
       const cov=s.teams!=null?`${s.teams} sq`:"";
-      const tip=esc(s.name)+(s.note?": "+esc(s.note):"")+(s.teams!=null?` · ${s.teams} squadre coperte`:"");
-      return `<th class="src"><a href="${esc(s.url)}" target="_blank" rel="noopener" title="${tip}">${ABBR[s.key]||s.key}</a><small>${esc(s.updated||"—")}${cov?` · ${cov}`:""}</small></th>`;
-    }).join("")+`<th class="src uff" title="Formazione ufficiale: quando esce sostituisce i pronostici">UFF<small>ufficiale</small></th></tr></thead><tbody>`;
+      const tip=esc(s.name)+(s.note?": "+esc(s.note):"")+(s.updated?` · aggiornato ${esc(s.updated)}`:"")+(s.teams!=null?` · ${s.teams} squadre coperte`:"");
+      // sempre tre righe (data / ora / squadre) così tutte le intestazioni hanno la stessa altezza
+      const [day,time]=String(s.updated||"").trim().split(/\s+/);
+      return `<th class="src"><a href="${esc(s.url)}" target="_blank" rel="noopener" title="${tip}">${ABBR[s.key]||s.key}</a><small>${esc(day||"—")}</small><small>${esc(time||"")||"&nbsp;"}</small><small>${cov||"&nbsp;"}</small></th>`;
+    }).join("")+`<th class="src uff" title="Formazione ufficiale: quando esce sostituisce i pronostici"><span class="ab">UFF</span><small>ufficiale</small><small>&nbsp;</small><small>&nbsp;</small></th></tr></thead><tbody>`;
   for(const ro of order){
     const g=rows.filter(x=>(x.p.ruolo||null)===ro).sort((a,b)=>(isOut(a)-isOut(b))||((b.pct??-1)-(a.pct??-1))||((DATA.teams[b.p.team]?.pct?.[b.p.canon]||0)-(DATA.teams[a.p.team]?.pct?.[a.p.canon]||0)));
     if(!g.length) continue;
@@ -634,7 +641,7 @@ function render(){
       const chip=(c,b,title)=>{const L=c==="ok"?(b?["Bv","B"]:["T","T"]):c==="bench"?(b?["Bg","B"]:["P","P"]):c==="dubbio"?["D","D"]:c==="inf"?["I","I"]:c==="squal"?["S","S"]:["na","–"];
         return `<i class="lt lt-${L[0]}" title="${esc(title)}: ${label[c]||label.na}${b?(c==="ok"?", ballottaggio in vantaggio":", ballottaggio in svantaggio"):""}">${L[1]}</i>`};
       html+=`<tr><td class="name"><div class="pname">${esc(String(x.p.nome).toUpperCase())}</div><div class="pmeta">${meta||"Controlla nome e squadra nella rosa"}</div>${when?`<div class="pwhen">${when}</div>`:""}</td>`+
-        `<td><div class="pct">${x.pct==null?"—":x.pct+"%"}</div>${x.off?'<div class="pmeta">ufficiale</div>':""}</td>`+
+        `<td class="pc"><div class="pct">${x.pct==null?"—":x.pct+"%"}</div>${x.off?'<div class="pmeta">ufficiale</div>':""}</td>`+
         x.cells.map((c,i)=>`<td class="dc">${chip(c,x.balls?.[i],srcs[i].name)}</td>`).join("")+
         `<td class="dc uffc">${x.off?chip(x.off,false,"Formazione ufficiale"):chip("na",false,"Formazione ufficiale")}</td></tr>`;
     }
@@ -871,7 +878,7 @@ async function refresh(){
         if(PT.official){ // predictions frozen once the official lineup is out
           T.official=PT.official; T.lineups=PT.lineups;
         }else{
-          for(const [k,L] of Object.entries(PT.lineups||{})) if(!T.lineups[k]&&!results[k]) T.lineups[k]=L; // keep last good read
+          for(const [k,L] of Object.entries(PT.lineups||{})) if(!T.lineups[k]) T.lineups[k]=L; // keep last good read, squadra per squadra
         }
       }
     }else if(prev){

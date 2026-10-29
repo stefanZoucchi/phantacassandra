@@ -1,14 +1,14 @@
-letto corriere: giornata 9, 4 squadre (3s)
-letto fantacalcio: giornata 9, 20 squadre (4s)
-letto sosfanta: giornata ?, 20 squadre (3s)
-letto sky: giornata 9, 20 squadre (6s)
-letto eurosport: giornata ?, 0 squadre (3s)
-letto gazzetta: giornata 9, 4 squadre (9s)
+letto corriere: giornata 9, 4 squadre (4s)
+letto fantacalcio: giornata 9, 20 squadre (7s)
+letto sosfanta: giornata ?, 20 squadre (5s)
+letto eurosport: giornata ?, 0 squadre (4s)
+letto sky: giornata 9, 20 squadre (15s)
 errore goal: articolo della giornata non trovato
-letto tmw: giornata 9, 20 squadre (24s)
-letto spm: giornata 9, 4 squadre (87s)
+letto gazzetta: giornata 9, 4 squadre (20s)
+letto tmw: giornata 9, 20 squadre (34s)
+letto spm: giornata 9, 4 squadre (103s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 97s
+Siti letti in 119s
 - Lega Serie A: nessuna partita Lega utilizzabile
 + Sky Sport: 20 squadre
 + Gazzetta: 4 squadre
@@ -19,4 +19,4 @@ Siti letti in 97s
 - Eurosport: le partite non corrispondono alla 9ª giornata
 - Goal.com: articolo della giornata non trovato
 + SportMediaset: 4 squadre
-OK: 9ª giornata, 9 fonti, 16 formazioni ufficiali, 255 indisponibili. Salvato 29/10/2026 11:47.
+OK: 9ª giornata, 9 fonti, 16 formazioni ufficiali, 255 indisponibili. Salvato 29/10/2026 11:36.
