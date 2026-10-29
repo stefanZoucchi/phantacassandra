@@ -84,34 +84,63 @@ async function readLega(page, s) {
   }
   const urls = Object.values(byId).slice(0, 10);
   if (!urls.length) throw new Error("partite non trovate");
-  const res = { teams: {} };
-  for (const u of urls) {
+
+  // La Lega può rallentare su una singola partita. Non facciamo più dipendere
+  // tutto il giro da quella pagina: ogni match ha la sua pagina e il suo timeout.
+  // In questo modo, se 8 gare sono già finite, lo storico può comunque ricevere
+  // i dati delle 8 gare anche se una delle 2 restanti è lenta/non disponibile.
+  const MATCH_TIMEOUT = 35000;
+  const CONCURRENCY = 4;
+  const results = [];
+
+  async function readOne(u) {
+    const p = await page.context().newPage();
     try {
-      const base = u.replace(/\/?$/, "").replace(/\/(lineups|events)\/?$/, "");
-      // 1) lineups: XI + panchina; 2) events: sostituzioni entra/esce; 3) fallback match
-      let r = null;
-      try { await open(page, base + "/lineups"); r = await evalSafe(page, s.fn); }
-      catch (e) { r = null; }
-      if (!r || !Object.keys(r.teams || {}).length) {
-        try { await open(page, base); r = await evalSafe(page, s.fn); } catch (e) { r = { teams: {} }; }
-      }
-      // arricchisci con eventi (sostituzioni) se la pagina match/events li ha
-      try {
-        await open(page, base + "/events");
-        const ev = await evalSafe(page, s.fn);
-        for (const [tn, L] of Object.entries(ev.teams || {})) {
-          if (!r.teams[tn]) r.teams[tn] = L;
-          else {
-            if (L.subs?.length) r.teams[tn].subs = L.subs;
-            if (L.exits?.length) r.teams[tn].exits = L.exits;
-            if (L.bench?.length && !r.teams[tn].bench?.length) r.teams[tn].bench = L.bench;
-          }
+      const run = async () => {
+        const base = u.replace(/\/?$/, "").replace(/\/(lineups|events)\/?$/, "");
+        let r = null;
+        try { await open(p, base + "/lineups"); r = await evalSafe(p, s.fn); }
+        catch (e) { r = null; }
+        if (!r || !Object.keys(r.teams || {}).length) {
+          try { await open(p, base); r = await evalSafe(p, s.fn); }
+          catch (e) { r = { teams: {} }; }
         }
-      } catch (e) {}
-      // se events non ha XI, prova a parsare eventi dalla pagina match già letta
-      Object.assign(res.teams, r.teams || {});
-    } catch (e) {}
+        // Gli eventi servono soprattutto per le sostituzioni/uscite post-gara.
+        try {
+          await open(p, base + "/events");
+          const ev = await evalSafe(p, s.fn);
+          for (const [tn, L] of Object.entries(ev.teams || {})) {
+            if (!r.teams[tn]) r.teams[tn] = L;
+            else {
+              if (L.subs?.length) r.teams[tn].subs = L.subs;
+              if (L.exits?.length) r.teams[tn].exits = L.exits;
+              if (L.bench?.length && !r.teams[tn].bench?.length) r.teams[tn].bench = L.bench;
+            }
+          }
+        } catch (e) {}
+        return r;
+      };
+      const r = await Promise.race([
+        run(),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("match troppo lento")), MATCH_TIMEOUT))
+      ]);
+      return r && r.teams ? r : { teams: {} };
+    } catch (e) {
+      return { teams: {} };
+    } finally {
+      await p.close().catch(() => {});
+    }
   }
+
+  for (let i = 0; i < urls.length; i += CONCURRENCY) {
+    const batch = urls.slice(i, i + CONCURRENCY);
+    const rs = await Promise.all(batch.map(readOne));
+    results.push(...rs);
+  }
+
+  const res = { teams: {} };
+  for (const r of results) Object.assign(res.teams, r.teams || {});
+  if (!Object.keys(res.teams).length) throw new Error("nessuna partita Lega utilizzabile");
   return { ...res, url: s.legaHub };
 }
 
@@ -201,9 +230,22 @@ function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di R
       const LG = raw.lega;
       if (LG && !LG.error && data.giornata) {
         const payload = {}, outMap = {};
+        const kickoffPassed = when => {
+          const m = String(when || "").match(/(?:\w+\s+)?(\d{2})\/(\d{2})\s+(\d{1,2}):\d{2}/);
+          if (!m) return false;
+          const nowM = romeMinutes(require("./build").nowRome().full);
+          if (nowM == null) return false;
+          const cur = new Date();
+          let y = cur.getFullYear();
+          const mm = +m[2], md = +m[1];
+          if (mm === 1 && cur.getMonth() === 11) y++;
+          if (mm === 12 && cur.getMonth() === 0) y--;
+          const km = Date.UTC(y, mm - 1, md, +m[3], 0) / 60000;
+          return km <= nowM;
+        };
         for (const [tn, L] of Object.entries(LG.teams || {})) {
           const t = Object.keys(data.teams).find(x => sameTeam(x, tn));
-          if (!t || !L.xi) continue;
+          if (!t || !L.xi || !kickoffPassed(data.teams[t].when)) continue;
           const roster = data.teams[t].roster || [];
           const cands = [...roster, ...(L.bench || []), ...(L.xi || [])];
           payload[t] = {

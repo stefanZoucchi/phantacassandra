@@ -192,9 +192,18 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   if (same) {
     for (const [t, T] of Object.entries(teams)) {
       const PT = prev.teams?.[t]; if (!PT) continue;
-      if (PT.official) { T.official = { ...PT.official, bench: PT.official.bench?.length ? PT.official.bench : (T.official?.bench || []) }; T.lineups = PT.lineups; T.pct = PT.pct; if (PT.out) T.out = PT.out; }
-      else if (T.official) { // ufficiale appena uscita: i pronostici restano quelli letti prima
-        T.lineups = { ...T.lineups, ...PT.lineups };
+      if (PT.official) {
+        // Una volta uscita l'ufficiale, la previsione visualizzata va CONGELATA.
+        // Non bisogna sostituirla con una nuova lettura dei siti (che spesso
+        // continua a cambiare anche dopo il via). Se l'ufficiale era già uscita
+        // nel giro precedente, ripristiniamo integralmente lo snapshot precedente.
+        T.official = { ...PT.official, bench: PT.official.bench?.length ? PT.official.bench : (T.official?.bench || []) };
+        T.lineups = PT.lineups || {};
+        T.pct = PT.pct;
+        if (PT.out) T.out = PT.out;
+      }
+      else if (T.official) { // ufficiale appena uscita: congela l'ultima previsione disponibile
+        T.lineups = PT.lineups || {};
         if (PT.pct && Object.keys(PT.pct).length) T.pct = PT.pct;
       }
       else for (const [k, L] of Object.entries(PT.lineups || {})) if (!T.lineups[k] && !results[k]) T.lineups[k] = L;
