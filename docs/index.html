@@ -115,7 +115,11 @@ thead th.name{position:sticky;left:0;z-index:12;width:220px}
 .pmeta b.tm{color:var(--accent);font-weight:800;letter-spacing:.03em}
 .tm-s{display:none}
 .pwhen{font-size:11px;color:var(--muted);line-height:1.2;margin-top:1px}
-tr.role td{background:var(--chip);font:700 14px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;position:static}
+/* righe dei ruoli: solo scritta, grande, turchese */
+tr.role td{background:transparent;font:700 22px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:12px 10px 4px;position:static}
+tr.role td{color:#0f9b9b}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) tr.role td{color:#2cc9c4}}
+:root[data-theme="dark"] tr.role td{color:#2cc9c4}
 .role-tag{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font:700 13px var(--display);color:#fff;margin-right:8px;vertical-align:middle}
 .r-P{background:#c98a00}.r-D{background:#2f7d4a}.r-C{background:#2d64b3}.r-A{background:#b5352a}.r-X{background:#6b756f}
 .pct{font:700 19px var(--display);min-width:44px;text-align:right}
@@ -186,6 +190,16 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
 .hist-table td.dc{text-align:center;padding:6px 2px}
 .tablewrap.scroll-y{max-height:min(70vh,640px);overflow:auto}
 
+/* ---------- computer e tablet: quadrati di misura fissa, colonne tutte uguali, tabella compatta ---------- */
+@media (min-width:601px){
+  #tableWrap{width:fit-content}
+  #tableWrap table{width:auto}
+  #tableWrap th.src{width:54px;min-width:54px;max-width:54px}
+  #tableWrap td.dc .lt{width:44px;min-width:44px;height:44px;margin:0 auto}
+  .hist-table th.hist-head{width:54px;min-width:54px;max-width:54px}
+  .hist-table td.dc .hist-cell{width:44px;height:44px;margin:0 auto}
+}
+
 /* ---------- telefono in verticale: tutto compatto, la tabella sta nella larghezza dello schermo ---------- */
 @media (max-width:600px){
   .wrap{padding-block:8px 24px;gap:10px;padding-left:max(6px,env(safe-area-inset-left,0px));padding-right:max(6px,env(safe-area-inset-right,0px))}
@@ -226,7 +240,7 @@ input[type=text]{font:16px var(--body);border:1px solid var(--line);border-radiu
   th.src small{display:none}
   td.dc{padding:2px 1px}
   td.dc .lt{min-width:0;height:32px;border-radius:4px;font-size:13px}
-  tr.role td{font-size:12px;padding:3px 6px}
+  tr.role td{font-size:17px;padding:8px 6px 2px}
   /* tabella Storico */
   .hist-table th.hist-head{width:auto;min-width:44px;padding:4px 2px}
   .hist-head .ab{height:22px;font-size:12px;border-radius:4px}
@@ -716,7 +730,7 @@ function render(){
   for(const ro of order){
     const g=rows.filter(x=>(x.p.ruolo||null)===ro).sort((a,b)=>(isOut(a)-isOut(b))||((b.pct??-1)-(a.pct??-1))||((DATA.teams[b.p.team]?.pct?.[b.p.canon]||0)-(DATA.teams[a.p.team]?.pct?.[a.p.canon]||0)));
     if(!g.length) continue;
-    html+=`<tr class="role"><td colspan="${srcs.length+3}">${names[ro]}</td></tr>`;
+    html+=`<tr class="role ro-${ro||"X"}"><td colspan="${srcs.length+3}">${names[ro]}</td></tr>`;
     for(const x of g){
       const T=x.p.team?DATA.teams[x.p.team]:null;
       const meta=T?matchLabel(x.p.team,T):"";
