@@ -224,41 +224,7 @@ function romeMinutes(str) { // "28/10/2026 10:23" -> minuti dall'epoca (ora di R
     const data = build(raw, prev, MODE, console.log);
     for (const T of Object.values(data.teams || {})) delete T._legaPost;
     fs.writeFileSync(OUT, JSON.stringify(data));
-    try {
-      const { mergeHistory } = require("./history");
-      const { matchName, sameTeam } = require("./names");
-      const LG = raw.lega;
-      if (LG && !LG.error && data.giornata) {
-        const payload = {}, outMap = {};
-        const kickoffPassed = when => {
-          const m = String(when || "").match(/(?:\w+\s+)?(\d{2})\/(\d{2})\s+(\d{1,2}):\d{2}/);
-          if (!m) return false;
-          const nowM = romeMinutes(require("./build").nowRome().full);
-          if (nowM == null) return false;
-          const cur = new Date();
-          let y = cur.getFullYear();
-          const mm = +m[2], md = +m[1];
-          if (mm === 1 && cur.getMonth() === 11) y++;
-          if (mm === 12 && cur.getMonth() === 0) y--;
-          const km = Date.UTC(y, mm - 1, md, +m[3], 0) / 60000;
-          return km <= nowM;
-        };
-        for (const [tn, L] of Object.entries(LG.teams || {})) {
-          const t = Object.keys(data.teams).find(x => sameTeam(x, tn));
-          if (!t || !L.xi || !kickoffPassed(data.teams[t].when)) continue;
-          const roster = data.teams[t].roster || [];
-          const cands = [...roster, ...(L.bench || []), ...(L.xi || [])];
-          payload[t] = {
-            xi: L.xi.map(p => matchName(p, roster, t) || p),
-            bench: (L.bench || []).map(p => matchName(p, cands, t) || p),
-            subs: (L.subs || []).map(s => ({ n: matchName(s.n, cands, t) || s.n, min: s.min })),
-            exits: (L.exits || []).map(s => ({ n: matchName(s.n, cands, t) || s.n, min: s.min })),
-          };
-          if (data.teams[t].out?.length) outMap[t] = data.teams[t].out;
-        }
-        if (Object.keys(payload).length) mergeHistory(data.giornata, payload, outMap, console.log);
-      }
-    } catch (e) { console.log("History giocatori: " + e.message); }
+    // lo storico dei giocatori (T/P/↑/↓/I/S) lo scrive scraper/storico.js dai tabellini della Gazzetta
     const off = Object.values(data.teams).filter(t => t.official).length;
     const nOut = Object.values(data.teams).reduce((a, t) => a + t.out.length, 0);
     console.log(`OK: ${data.giornata}ª giornata, ${data.sources.filter(s => s.ok).length} fonti, ${off} formazioni ufficiali, ${nOut} indisponibili. Salvato ${data.generated}.`);

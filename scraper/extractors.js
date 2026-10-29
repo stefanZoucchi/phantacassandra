@@ -304,4 +304,40 @@ const sportmediaset = function () {
   return { giornata: g ? +g[1] : null, teams, out, updated: head ? head[3] : "" };
 };
 
-module.exports = { lega, skyMatch, lineFormat, fantacalcio, gazzetta, corriere, sosfanta, sportmediaset };
+// Gazzetta, tabellino post-gara (…/partita/casa-trasferta/ID/tabellino/).
+// Schede "In Campo" / "In Panchina": celle di sinistra = casa, di destra = trasferta.
+// Un minuto accanto all'icona di sostituzione vuol dire: in campo → uscito, in panchina → entrato.
+const gazzettaTabellino = function () {
+  const T = document.body.innerText || "";
+  const g = T.match(/Giornata\s+(\d{1,2})/i);
+  const finished = /\n\s*(FINE|Finale|Terminata)\s*\n/i.test(T);
+  const names = [...document.querySelectorAll('[class*="TeamName-"]')].map(e => e.innerText.trim()).filter(Boolean);
+  const home = names[0], away = names[1];
+  const res = { giornata: g ? +g[1] : null, finished, home, away, teams: {} };
+  if (!home || !away || home === away) return res;
+  const mk = () => ({ xi: [], bench: [], subs: [], exits: [] });
+  res.teams[home] = mk(); res.teams[away] = mk();
+  const minOf = cell => {
+    const ic = cell.querySelector('[class*="substitution"]');
+    if (!ic) return null;
+    const s = (ic.nextElementSibling?.innerText || ic.parentElement?.innerText || "").match(/(\d{1,3})\s*(?:\+\s*(\d{1,2}))?\s*'/);
+    return s ? +s[1] + (s[2] ? +s[2] : 0) : 0;
+  };
+  for (const card of document.querySelectorAll('[class*="TabellinoCard-"]')) {
+    const head = (card.querySelector('[class*="TabellinoCardHeader-"]')?.innerText || "").trim().toLowerCase();
+    const kind = /in campo/.test(head) ? "xi" : /panchina/.test(head) ? "bench" : null;
+    if (!kind) continue;
+    for (const [sel, team] of [['[class*="TabellinoCardLeftCell"]', home], ['[class*="TabellinoCardRightCell"]', away]]) {
+      for (const cell of card.querySelectorAll(sel)) {
+        const n = (cell.querySelector('[class*="TabellinoCardCellName"]')?.innerText || "").trim();
+        if (!n) continue;
+        const L = res.teams[team], min = minOf(cell);
+        L[kind].push(n);
+        if (min != null) (kind === "xi" ? L.exits : L.subs).push({ n, min });
+      }
+    }
+  }
+  return res;
+};
+
+module.exports = { lega, skyMatch, lineFormat, fantacalcio, gazzetta, corriere, sosfanta, sportmediaset, gazzettaTabellino };

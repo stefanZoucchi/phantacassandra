@@ -206,7 +206,9 @@ function build(raw, prev, mode = "automatico", log = console.log) {
         T.lineups = PT.lineups || {};
         if (PT.pct && Object.keys(PT.pct).length) T.pct = PT.pct;
       }
-      else for (const [k, L] of Object.entries(PT.lineups || {})) if (!T.lineups[k] && !results[k]) T.lineups[k] = L;
+      // squadra per squadra: se una fonte questa volta non ha più la formazione di questa squadra
+      // (es. SportMediaset toglie le partite di oggi e mostra quelle di domani) tengo l'ultima letta
+      else for (const [k, L] of Object.entries(PT.lineups || {})) if (!T.lineups[k]) T.lineups[k] = L;
     }
   } else if (prev && prev.giornata != null) {
     // chiude la giornata precedente: salva sempre le stats (anche se poche ufficiali)

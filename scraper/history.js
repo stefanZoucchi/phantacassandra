@@ -82,4 +82,38 @@ function fromBuiltData(data, log) {
   return mergeHistory(data.giornata, payload, outMap, log);
 }
 
-module.exports = { load, mergeHistory, fromBuiltData, OUT };
+/**
+ * Archivia UNA partita finita nello storico H (in memoria, senza salvare).
+ * L = { xi:[], bench:[], subs:[{n,min}], exits:[{n,min}] } con nomi già abbinati alla rosa.
+ * outs = indisponibili pre-gara della squadra [{ n, k }] (facoltativi).
+ */
+function mergeMatch(H, giornata, team, L, outs) {
+  const g = String(giornata);
+  if (!H.giornate.includes(g)) { H.giornate.push(g); H.giornate.sort((a, b) => +a - +b); }
+  const xi = new Set(L.xi || []);
+  const subMin = Object.fromEntries((L.subs || []).map(s => [s.n, s.min]));
+  const exitMin = Object.fromEntries((L.exits || []).map(s => [s.n, s.min]));
+  const all = new Set([...xi, ...(L.bench || [])]);
+  for (const n of all) {
+    if (!H.players[n]) H.players[n] = { team, g: {} };
+    H.players[n].team = team;
+    let cell;
+    if (xi.has(n)) cell = exitMin[n] != null ? { s: "T", out: exitMin[n] } : { s: "T" };
+    else if (subMin[n] != null) cell = { s: "E", min: subMin[n] };
+    else cell = { s: "P" };
+    H.players[n].g[g] = cell;
+  }
+  for (const o of outs || []) {
+    if (all.has(o.n) || (o.k !== "inf" && o.k !== "squal")) continue;
+    if (!H.players[o.n]) H.players[o.n] = { team, g: {} };
+    H.players[o.n].team = team;
+    H.players[o.n].g[g] = { s: o.k === "squal" ? "S" : "I" };
+  }
+}
+
+function save(H) {
+  H.updated = new Date().toISOString();
+  fs.writeFileSync(OUT, JSON.stringify(H));
+}
+
+module.exports = { load, save, mergeHistory, mergeMatch, fromBuiltData, OUT };
