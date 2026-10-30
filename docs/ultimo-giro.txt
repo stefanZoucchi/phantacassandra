@@ -1,14 +1,14 @@
-letto corriere: giornata 10, 16 squadre (3s)
+letto corriere: giornata 10, 16 squadre (5s)
 letto fantacalcio: giornata 10, 20 squadre (6s)
-letto sosfanta: giornata ?, 20 squadre (4s)
-letto eurosport: giornata ?, 0 squadre (6s)
-letto sky: giornata 9, 20 squadre (12s)
+letto sky: giornata 9, 20 squadre (9s)
+letto eurosport: giornata ?, 0 squadre (3s)
 errore goal: articolo della giornata non trovato
-letto gazzetta: giornata 10, 20 squadre (26s)
-letto tmw: giornata 9, 18 squadre (31s)
+letto sosfanta: giornata ?, 20 squadre (19s)
+letto gazzetta: giornata 10, 20 squadre (28s)
+letto tmw: giornata 9, 18 squadre (30s)
 errore lega: nessuna partita Lega utilizzabile
 letto spm: giornata 9, 0 squadre (111s)
-Siti letti in 123s
+Siti letti in 127s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: è ancora alla 9ª giornata
   Gazzetta: nomi non abbinati (1): Napoli:Glimour
@@ -20,5 +20,4 @@ Siti letti in 123s
 - Eurosport: le partite non corrispondono alla 10ª giornata
 - Goal.com: articolo della giornata non trovato
 - SportMediaset: è ancora alla 9ª giornata
-History: giornata 9ª esclusa dalla classifica delle fonti
-OK: 10ª giornata, 4 fonti, 10 formazioni ufficiali, 331 indisponibili. Salvato 30/10/2026 09:53.
+OK: 10ª giornata, 4 fonti, 0 formazioni ufficiali, 330 indisponibili. Salvato 30/10/2026 11:27.
