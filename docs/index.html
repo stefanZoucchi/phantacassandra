@@ -260,6 +260,9 @@ th.uff,td.uffc{background:transparent}
   td.dc{padding:2px 1px}
   td.dc .lt{min-width:0;height:32px;border-radius:4px;font-size:13px}
   tr.role td{font-size:17px;padding:7px 4px}
+  /* tabelle che scorrono: occupano tutta la larghezza (si scorre col dito ovunque, la barra sta sul bordo dello schermo)
+     e lo scorrimento resta nella tabella invece di passare alla pagina */
+  .tablewrap.scroll-y,.tablewrap.fit.scroll-y{width:100%;max-height:calc(100dvh - 140px);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
   /* tabella Storico */
   .hist-table th.hist-head{width:auto;min-width:44px;padding:4px 2px}
   .hist-head .ab{height:22px;font-size:12px;border-radius:4px}
