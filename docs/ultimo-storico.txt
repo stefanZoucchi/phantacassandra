@@ -1,11 +1,7 @@
-Nome riabbinato: Koné → Konè I.
-Nome riabbinato: Chalobah → Chalobah T.
-Nome riabbinato: Rodriguez → Rodriguez Je.
-Nome riabbinato: Leysen → Leysen F.
-Nome riabbinato: Hamed Traoré → Traorè Hj.
-Nome riabbinato: Gudmundsson → Gudmundsson A.
-Nome riabbinato: Pellegrini → Pellegrini Lo.
-Nome riabbinato: Idrissi → Idrissi R.
+Nome riabbinato: Alessandro Di Nunzio → Di Nunzio
+Nome riabbinato: Matteo Plaia → Plaia
+Nome riabbinato: Javison Idele → Idele
+Nome riabbinato: Mattia Sonzogni → Sonzogni
 Giornate da controllare: 10
 10ª giornata: nessuna partita nuova
 Storico: 0 partite nuove, 560 giocatori, giornate 9
