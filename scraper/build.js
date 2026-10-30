@@ -67,21 +67,25 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   const P = raw.fantacalcio;
   if (!P || !P.matches || P.matches.length < 5) throw new Error("Fantacalcio.it non letto: serve per partite e rose");
   const now = nowRome();
+  const minsTo = when => { const m = String(when || "").match(/(\d{2})\/(\d{2}) (\d{1,2}):(\d{2})/); if (!m) return null;
+    const n = now.full.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
+    let y = +n[3]; if (+m[2] < +n[2] - 6) y++;
+    return (Date.UTC(y, +m[2] - 1, +m[1], +m[3], +m[4]) - Date.UTC(+n[3], +n[2] - 1, +n[1], +n[4], +n[5])) / 60000; };
+  // una formazione è "ufficiale" solo da 55 minuti prima del calcio d'inizio in poi: prima non escono.
+  // (Fantacalcio.it, prima di pubblicare le percentuali, mette tutti gli 11 al 100% e sembrerebbe un'ufficiale)
+  const nearKickoff = when => { const mt = minsTo(when); return mt == null || mt <= 55; };
   const teams = {};
   for (const m of P.matches) for (const [side, opp] of [["home", "away"], ["away", "home"]]) {
-    const t = m[side], T = P.teams[t];
+    const t = m[side], T = { ...P.teams[t] };
+    if (T.official && !nearKickoff(m.when)) { T.official = false; T.pct = {}; } // 100% di segnaposto: niente percentuali
     teams[t] = { match: m.home + "-" + m.away, home: side === "home", opp: m[opp], when: m.when, roster: [...T.xi, ...(T.bench || [])], pct: T.pct || {},
       lineups: T.official ? {} : { fantacalcio: { mod: T.mod, xi: T.xi } }, out: [] };
     if (T.official) teams[t].official = { xi: T.xi, src: "Fantacalcio.it", bench: T.bench || [] };
     else { const bn = ballOf(P, t, t, teams[t].roster); if (bn.length) teams[t].lineups.fantacalcio.b = bn; }
   }
   const teamKey = n => Object.keys(teams).find(k => sameTeam(k, n));
-  // Formazioni ufficiali della Lega Serie A: valgono solo da 60 minuti prima del calcio d'inizio
+  // Formazioni ufficiali della Lega Serie A: valgono solo da 55 minuti prima del calcio d'inizio
   // (prima la pagina della partita potrebbe mostrare altro)
-  const minsTo = when => { const m = String(when || "").match(/(\d{2})\/(\d{2}) (\d{1,2}):(\d{2})/); if (!m) return null;
-    const n = now.full.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
-    let y = +n[3]; if (+m[2] < +n[2] - 6) y++;
-    return (Date.UTC(y, +m[2] - 1, +m[1], +m[3], +m[4]) - Date.UTC(+n[3], +n[2] - 1, +n[1], +n[4], +n[5])) / 60000; };
   const LG = raw.lega;
   if (LG && !LG.error) {
     let n = 0;
@@ -93,7 +97,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
       const subs = (L.subs || []).map(s => ({ n: matchName(s.n, cands, t) || s.n, min: s.min })).filter(s => s.n);
       // ufficiale "live" solo vicino al calcio d'inizio; bench/subs servono anche post-gara per lo storico
       const mt = minsTo(teams[t].when);
-      if (xi.length === 11 && xi.filter(p => teams[t].roster.includes(p)).length >= 9 && mt != null && mt <= 60) {
+      if (xi.length === 11 && xi.filter(p => teams[t].roster.includes(p)).length >= 9 && mt != null && mt <= 55) {
         teams[t].official = { xi, src: "Lega Serie A", bench: bench.length ? bench : (teams[t].official?.bench || []), subs };
         n++;
       } else if (xi.length === 11 && (bench.length || subs.length)) {
@@ -129,7 +133,8 @@ function build(raw, prev, mode = "automatico", log = console.log) {
       }
       xi = [...new Set(xi)];
       if (xi.length !== 11) { log(`  ${s.name} ${t}: ${xi.length} titolari, scartata`); continue; }
-      if (L.official) { if (!teams[t].official) teams[t].official = { xi, src: s.name }; }
+      if (L.official && nearKickoff(teams[t].when)) { if (!teams[t].official) teams[t].official = { xi, src: s.name }; }
+      else if (L.official) { teams[t].lineups[s.key] = { mod: L.mod, xi }; }
       else {
         teams[t].lineups[s.key] = { mod: L.mod, xi };
         const bn = ballOf(R, tn, t, [...new Set([...cands, ...xi])]);
@@ -201,7 +206,7 @@ function build(raw, prev, mode = "automatico", log = console.log) {
   if (same) {
     for (const [t, T] of Object.entries(teams)) {
       const PT = prev.teams?.[t]; if (!PT) continue;
-      if (PT.official) {
+      if (PT.official && nearKickoff(T.when)) {
         // Una volta uscita l'ufficiale, la previsione visualizzata va CONGELATA.
         // Non bisogna sostituirla con una nuova lettura dei siti (che spesso
         // continua a cambiare anche dopo il via). Se l'ufficiale era già uscita

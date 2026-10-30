@@ -24,6 +24,17 @@ const MATCH_TIMEOUT = 45000, CONCURRENCY = 4, MAX_GIORNATE = 12;
 const LOG = [];
 const log = (...a) => { const s = a.join(" "); LOG.push(s); console.log(s); };
 
+// la Gazzetta a volte ricarica la pagina da sola (?refresh_ce) mentre la leggiamo: aspetto e riprovo
+async function safe(page, fn, tries = 4) {
+  for (let i = 0; ; i++) {
+    try { await page.waitForLoadState("load", { timeout: 15000 }).catch(() => {}); return await fn(); }
+    catch (e) {
+      if (i >= tries - 1 || !/context|navigat|destroyed|detached/i.test(String(e.message))) throw e;
+      await page.waitForTimeout(2500);
+    }
+  }
+}
+
 async function open(page, url) {
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
   await page.waitForLoadState("load", { timeout: 15000 }).catch(() => {});
@@ -129,8 +140,8 @@ function nameMapper(cands, team) {
     let urls = [];
     try {
       await open(page, CAL(g));
-      const hrefs = await page.$$eval("a[href]", as => as.map(a => a.href));
-      const html = await page.content();
+      const hrefs = await safe(page, () => page.$$eval("a[href]", as => as.map(a => a.href)));
+      const html = await safe(page, () => page.content());
       const all = [...hrefs, ...[...html.matchAll(/https?:\/\/www\.gazzetta\.it\/calcio\/serie-a\/partita\/[a-z0-9-]+\/\d+\/?/g)].map(m => m[0])];
       const byId = {};
       for (const u of all) { const m = u.match(MATCH_RE); if (m && !byId[m[1]]) byId[m[1]] = u.replace(/[?#].*$/, "").replace(/\/?$/, "/").replace(/\/(tabellino|cronaca|statistiche)\/$/, "/"); }
@@ -142,7 +153,7 @@ function nameMapper(cands, team) {
       const p = await ctx.newPage();
       try {
         return await Promise.race([
-          (async () => { await open(p, u + "tabellino/"); await p.waitForSelector('[class*="TabellinoCardCellName"]', { timeout: 12000 }).catch(() => {}); return { id, u, r: await p.evaluate(X.gazzettaTabellino) }; })(),
+          (async () => { await open(p, u + "tabellino/"); await p.waitForSelector('[class*="TabellinoCardCellName"]', { timeout: 12000 }).catch(() => {}); return { id, u, r: await safe(p, () => p.evaluate(X.gazzettaTabellino)) }; })(),
           new Promise((_, rej) => setTimeout(() => rej(new Error("troppo lento")), MATCH_TIMEOUT)),
         ]);
       } catch (e) { return { id, u, err: String(e.message || e).slice(0, 80) }; }
