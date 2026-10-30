@@ -45,6 +45,14 @@ async function open(page, url) {
   }
 }
 
+// minuti passati dal calcio d'inizio ("Dom 01/11 12:30"), ora di Roma; null se la data non si legge
+function minsSince(when) {
+  const m = String(when || "").match(/(\d{2})\/(\d{2})\s+(\d{1,2}):(\d{2})/); if (!m) return null;
+  const p = Object.fromEntries(new Intl.DateTimeFormat("it-IT", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date()).map(x => [x.type, x.value]));
+  let y = +p.year; if (+m[2] > +p.month + 6) y--;
+  return (Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - Date.UTC(y, +m[2] - 1, +m[1], +m[3], +m[4])) / 60000;
+}
+
 function parseList(s) {
   const out = new Set();
   for (const part of String(s || "").split(",")) {
@@ -71,7 +79,8 @@ function nameMapper(cands, team) {
     const ini = nc.slice(b); // "Cissè A." -> ["a"], "De Winter" -> []
     if (!ini.length) return true;
     const first = norm(full).filter(x => !norm(c).includes(x));
-    return !first.length || ini.some(i => first.some(f => f.startsWith(i)));
+    // "Hj." = Hamed Junior: basta che l'iniziale coincida con quella di un nome di battesimo
+    return !first.length || ini.some(i => first.some(f => f.startsWith(i) || f[0] === i[0]));
   };
   return n => {
     if (map[n]) return map[n];
@@ -121,6 +130,19 @@ function nameMapper(cands, team) {
   for (const g of Object.keys(H.matches)) if (+g < H.from) delete H.matches[g];
   for (const [n, P] of Object.entries(H.players)) if (!Object.keys(P.g || {}).length) delete H.players[n];
 
+  // nomi archiviati come sulla Gazzetta ("Hamed Traoré") che ora si abbinano alla rosa ("Traorè Hj."): li riunisco
+  for (const [n, P] of Object.entries(H.players)) {
+    const T = data.teams[P.team]; if (!T) continue;
+    const cands = [...new Set([...(T.roster || []), ...(T.out || []).map(o => o.n)])];
+    if (cands.includes(n)) continue;
+    const c = nameMapper(cands, P.team)(n);
+    if (!c || c === n) continue;
+    const Q = H.players[c] = H.players[c] || { team: P.team, g: {} };
+    for (const [g, cell] of Object.entries(P.g || {})) if (!Q.g[g]) Q.g[g] = cell;
+    delete H.players[n];
+    log(`Nome riabbinato: ${n} → ${c}`);
+  }
+
   const forced = parseList(process.env.HIST_GIORNATE).filter(g => g >= H.from);
   let todo = forced.length ? forced
     : Array.from({ length: +data.giornata - H.from + 1 }, (_, i) => H.from + i).filter(g => Object.keys(H.matches[g] || {}).length < 10);
@@ -145,7 +167,14 @@ function nameMapper(cands, team) {
       const all = [...hrefs, ...[...html.matchAll(/https?:\/\/www\.gazzetta\.it\/calcio\/serie-a\/partita\/[a-z0-9-]+\/\d+\/?/g)].map(m => m[0])];
       const byId = {};
       for (const u of all) { const m = u.match(MATCH_RE); if (m && !byId[m[1]]) byId[m[1]] = u.replace(/[?#].*$/, "").replace(/\/?$/, "/").replace(/\/(tabellino|cronaca|statistiche)\/$/, "/"); }
-      urls = Object.entries(byId).filter(([id]) => !done[id]).slice(0, 10);
+      urls = Object.entries(byId).filter(([id]) => !done[id]).filter(([id, u]) => {
+        // partite della giornata in corso non ancora giocate: inutile aprirle (il tabellino non c'è)
+        if (g !== +data.giornata) return true;
+        const slug = ((u.match(/partita\/([a-z0-9-]+)\//) || [])[1] || "").replace(/-/g, " ");
+        const t = Object.keys(data.teams).find(k => slug.includes(norm(k).join(" ")));
+        const mt = t ? minsSince(data.teams[t].when) : null;
+        return mt == null || mt >= 105;
+      }).slice(0, 10);
     } catch (e) { log(`${g}ª giornata: calendario non letto (${String(e.message).slice(0, 80)})`); continue; }
     if (!urls.length) { log(`${g}ª giornata: nessuna partita nuova`); continue; }
 
