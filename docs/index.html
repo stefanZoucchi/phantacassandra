@@ -750,7 +750,9 @@ function render(){
       return `<th class="src"><a href="${esc(s.url)}" target="_blank" rel="noopener" title="${tip}">${ABBR[s.key]||s.key}</a><small>${esc(day||"—")}</small><small>${esc(time||"")||"&nbsp;"}</small><small>${cov||"&nbsp;"}</small></th>`;
     }).join("")+`<th class="src uff" title="Formazione ufficiale: quando esce sostituisce i pronostici"><span class="ab">UFF</span><small>ufficiale</small><small>&nbsp;</small><small>&nbsp;</small></th></tr></thead><tbody>`;
   for(const ro of order){
-    const g=rows.filter(x=>(x.p.ruolo||null)===ro).sort((a,b)=>(isOut(a)-isOut(b))||((b.pct??-1)-(a.pct??-1))||((DATA.teams[b.p.team]?.pct?.[b.p.canon]||0)-(DATA.teams[a.p.team]?.pct?.[a.p.canon]||0)));
+    // ordine: vince la % d'impiego; a parità, prima chi non ha segnalazioni, poi chi ha un arancione (in dubbio), in fondo chi ha un rosso (infortunato/squalificato)
+    const flag=x=>{const c=[...x.cells,x.off];return c.some(v=>v==="inf"||v==="squal")?2:c.includes("dubbio")?1:0};
+    const g=rows.filter(x=>(x.p.ruolo||null)===ro).sort((a,b)=>((b.pct??-1)-(a.pct??-1))||(flag(a)-flag(b))||((DATA.teams[b.p.team]?.pct?.[b.p.canon]||0)-(DATA.teams[a.p.team]?.pct?.[a.p.canon]||0)));
     if(!g.length) continue;
     html+=`<tr class="role ro-${ro||"X"}"><td colspan="${srcs.length+3}">${names[ro]}</td></tr>`;
     for(const x of g){
