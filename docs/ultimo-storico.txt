@@ -1,3 +1,14 @@
-Giornate da controllare: 9
+Giornate da controllare: 9, 10
 9ª giornata: calendario non letto (page.$$eval: Execution context was destroyed, most likely because of a navigatio)
+  atalanta-parma: non ancora finita
+  bologna-monza: non ancora finita
+  como-venezia: non ancora finita
+  frosinone-torino: non ancora finita
+  juventus-napoli: non ancora finita
+  lazio-cagliari: non ancora finita
+  lecce-genoa: non ancora finita
+  milan-inter: non ancora finita
+  sassuolo-fiorentina: non ancora finita
+  udinese-roma: non ancora finita
+10ª giornata: 0 partite archiviate (0/10 in totale)
 Storico: 0 partite nuove, 452 giocatori, giornate 9
