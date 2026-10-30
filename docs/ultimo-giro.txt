@@ -1,22 +1,24 @@
-letto corriere: giornata 9, 2 squadre (4s)
-letto fantacalcio: giornata 9, 20 squadre (6s)
-letto sky: giornata 9, 20 squadre (9s)
-letto gazzetta: giornata 9, 2 squadre (14s)
-letto eurosport: giornata ?, 0 squadre (11s)
+letto corriere: giornata 10, 16 squadre (3s)
+letto fantacalcio: giornata 10, 20 squadre (6s)
+letto sosfanta: giornata ?, 20 squadre (4s)
+letto eurosport: giornata ?, 0 squadre (6s)
+letto sky: giornata 9, 20 squadre (12s)
 errore goal: articolo della giornata non trovato
-letto sosfanta: giornata ?, 20 squadre (19s)
-letto tmw: giornata 9, 20 squadre (28s)
+letto gazzetta: giornata 10, 20 squadre (26s)
+letto tmw: giornata 9, 18 squadre (31s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 9, 0 squadre (116s)
-Siti letti in 134s
+letto spm: giornata 9, 0 squadre (111s)
+Siti letti in 123s
 - Lega Serie A: nessuna partita Lega utilizzabile
-+ Sky Sport: 20 squadre
-+ Gazzetta: 2 squadre
-+ Corriere dello Sport: 2 squadre
-  TuttoMercatoWeb Como: 12 titolari, scartata
-+ TuttoMercatoWeb: 19 squadre
+- Sky Sport: è ancora alla 9ª giornata
+  Gazzetta: nomi non abbinati (1): Napoli:Glimour
++ Gazzetta: 20 squadre
+  Corriere dello Sport: nomi non abbinati (2): Milan:Tomori, Lecce:Geubbels
++ Corriere dello Sport: 16 squadre
+- TuttoMercatoWeb: è ancora alla 9ª giornata
 + SOS Fanta: 20 squadre
-- Eurosport: le partite non corrispondono alla 9ª giornata
+- Eurosport: le partite non corrispondono alla 10ª giornata
 - Goal.com: articolo della giornata non trovato
-- SportMediaset: nessuna squadra utilizzabile
-OK: 9ª giornata, 9 fonti, 20 formazioni ufficiali, 254 indisponibili. Salvato 29/10/2026 20:03.
+- SportMediaset: è ancora alla 9ª giornata
+History: giornata 9ª esclusa dalla classifica delle fonti
+OK: 10ª giornata, 4 fonti, 10 formazioni ufficiali, 331 indisponibili. Salvato 30/10/2026 09:53.
