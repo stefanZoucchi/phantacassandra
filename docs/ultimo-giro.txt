@@ -1,14 +1,14 @@
-letto corriere: giornata 10, 18 squadre (5s)
+letto corriere: giornata 10, 18 squadre (4s)
+letto fantacalcio: giornata 10, 20 squadre (8s)
 letto sosfanta: giornata ?, 20 squadre (4s)
-letto fantacalcio: giornata 10, 20 squadre (11s)
-letto gazzetta: giornata 10, 18 squadre (15s)
-letto sky: giornata 10, 20 squadre (15s)
-letto tmw: giornata 10, 20 squadre (27s)
-letto goal: giornata 10, 20 squadre (13s)
-letto spm: giornata 10, 20 squadre (48s)
-letto eurosport: giornata 10, 18 squadre (75s)
+letto sky: giornata 10, 20 squadre (10s)
+letto gazzetta: giornata 10, 18 squadre (29s)
+letto tmw: giornata 10, 20 squadre (33s)
+letto goal: giornata 10, 20 squadre (31s)
+letto spm: giornata 10, 18 squadre (69s)
+letto eurosport: giornata 10, 16 squadre (112s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 113s
+Siti letti in 123s
 - Lega Serie A: nessuna partita Lega utilizzabile
   Sky Sport: nomi non abbinati (2): Venezia:Halal, Parma:Belghali
 + Sky Sport: 20 squadre
@@ -18,9 +18,9 @@ Siti letti in 113s
 + TuttoMercatoWeb: 19 squadre
 + SOS Fanta: 20 squadre
   Eurosport: nomi non abbinati (2): Genoa:Ellertson, Atalanta:Gaetano
-+ Eurosport: 18 squadre
++ Eurosport: 16 squadre
   Goal.com: nomi non abbinati (1): Sassuolo:Waluwiewicz
 + Goal.com: 20 squadre
   SportMediaset: nomi non abbinati (1): Parma:Sierra
-+ SportMediaset: 20 squadre
-OK: 10ª giornata, 9 fonti, 2 formazioni ufficiali, 331 indisponibili. Salvato 31/10/2026 17:05.
++ SportMediaset: 18 squadre
+OK: 10ª giornata, 9 fonti, 4 formazioni ufficiali, 331 indisponibili. Salvato 31/10/2026 17:17.
