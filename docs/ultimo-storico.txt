@@ -1,7 +1,7 @@
-Nome riabbinato: Alessandro Di Nunzio → Di Nunzio
-Nome riabbinato: Matteo Plaia → Plaia
-Nome riabbinato: Javison Idele → Idele
-Nome riabbinato: Mattia Sonzogni → Sonzogni
+Nome riabbinato: Lamine Fanne → Fanne
 Giornate da controllare: 10
-10ª giornata: nessuna partita nuova
-Storico: 0 partite nuove, 560 giocatori, giornate 9
+  + Bologna-Monza
+  + Milan-Inter
+  + Udinese-Roma
+10ª giornata: 3 partite archiviate (3/10 in totale)
+Storico: 3 partite nuove, 562 giocatori, giornate 9,10
