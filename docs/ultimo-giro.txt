@@ -1,26 +1,28 @@
-letto fantacalcio: giornata 10, 20 squadre (4s)
-letto corriere: giornata 10, 10 squadre (4s)
+letto corriere: giornata 10, 8 squadre (3s)
+letto fantacalcio: giornata 10, 20 squadre (6s)
 letto sosfanta: giornata ?, 20 squadre (4s)
-letto sky: giornata 10, 20 squadre (10s)
-letto gazzetta: giornata 10, 12 squadre (16s)
-letto tmw: giornata 10, 16 squadre (25s)
-letto goal: giornata 10, 20 squadre (26s)
-letto eurosport: giornata 10, 14 squadre (81s)
-letto spm: giornata 10, 10 squadre (86s)
+letto sky: giornata 10, 20 squadre (8s)
+letto gazzetta: giornata 10, 8 squadre (17s)
+errore goal: articolo della giornata non trovato
+letto eurosport: giornata 10, 2 squadre (19s)
+letto tmw: giornata 10, 14 squadre (27s)
+letto spm: giornata 10, 8 squadre (83s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 116s
+Siti letti in 111s
 - Lega Serie A: nessuna partita Lega utilizzabile
-  Sky Sport: nomi non abbinati (2): Venezia:Halal, Parma:Belghali
+  Sky Sport: nomi non abbinati (3): Venezia:Halal, Napoli:Rrahmani, Parma:Belghali
 + Sky Sport: 20 squadre
-+ Gazzetta: 12 squadre
-+ Corriere dello Sport: 10 squadre
-  TuttoMercatoWeb: nomi non abbinati (2): Udinese:Davis (56' Unai Gomez). All.: Runjaic, Roma:Malen (60' Castro). All.: Gasperini
-+ TuttoMercatoWeb: 16 squadre
+  Gazzetta: nomi non abbinati (1): Napoli:Rrahmani
++ Gazzetta: 8 squadre
+  Corriere dello Sport: nomi non abbinati (1): Napoli:Rrahmani
++ Corriere dello Sport: 8 squadre
+  TuttoMercatoWeb: nomi non abbinati (3): Udinese:Davis (56' Unai Gomez). All.: Runjaic, Roma:Malen (60' Castro). All.: Gasperini, Napoli:Rrahmani
++ TuttoMercatoWeb: 14 squadre
+  SOS Fanta: nomi non abbinati (1): Napoli:Rrahmani
 + SOS Fanta: 20 squadre
-  Eurosport: nomi non abbinati (2): Genoa:Ellertson, Atalanta:Gaetano
-+ Eurosport: 14 squadre
-  Goal.com: nomi non abbinati (2): Torino:Aboukhal, Sassuolo:Waluwiewicz
-+ Goal.com: 20 squadre
-  SportMediaset: nomi non abbinati (1): Parma:Sierra
-+ SportMediaset: 10 squadre
-OK: 10ª giornata, 9 fonti, 12 formazioni ufficiali, 331 indisponibili. Salvato 01/11/2026 14:17.
+  Eurosport: nomi non abbinati (1): Napoli:Rrahmani
++ Eurosport: 2 squadre
+- Goal.com: articolo della giornata non trovato
+  SportMediaset: nomi non abbinati (2): Napoli:Rrahmani, Parma:Sierra
++ SportMediaset: 8 squadre
+OK: 10ª giornata, 9 fonti, 14 formazioni ufficiali, 332 indisponibili. Salvato 01/11/2026 17:17.
