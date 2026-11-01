@@ -1,7 +1,8 @@
-Nome riabbinato: Lamine Fanne → Fanne
 Giornate da controllare: 10
-  + Bologna-Monza
-  + Milan-Inter
-  + Udinese-Roma
-10ª giornata: 3 partite archiviate (3/10 in totale)
-Storico: 3 partite nuove, 562 giocatori, giornate 9,10
+  + Como-Venezia
+  + Frosinone-Torino
+  + Juventus-Napoli
+  + Lazio-Cagliari
+  + Lecce-Genoa
+10ª giornata: 5 partite archiviate (8/10 in totale)
+Storico: 5 partite nuove, 576 giocatori, giornate 9,10
