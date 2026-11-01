@@ -1,28 +1,28 @@
 letto corriere: giornata 10, 6 squadre (3s)
-letto fantacalcio: giornata 10, 20 squadre (4s)
-letto sosfanta: giornata ?, 20 squadre (3s)
-letto sky: giornata 10, 20 squadre (8s)
-letto gazzetta: giornata 10, 6 squadre (12s)
+letto fantacalcio: giornata 10, 20 squadre (6s)
+letto sosfanta: giornata ?, 20 squadre (4s)
+letto gazzetta: giornata 10, 6 squadre (8s)
+letto sky: giornata 10, 20 squadre (9s)
 errore goal: articolo della giornata non trovato
-letto eurosport: giornata 10, 2 squadre (14s)
-letto tmw: giornata 10, 12 squadre (24s)
-letto spm: giornata 10, 8 squadre (80s)
+letto eurosport: giornata 10, 2 squadre (16s)
+letto tmw: giornata 10, 12 squadre (29s)
+letto spm: giornata 10, 6 squadre (91s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 104s
+Siti letti in 113s
 - Lega Serie A: nessuna partita Lega utilizzabile
-  Sky Sport: nomi non abbinati (3): Venezia:Halal, Napoli:Rrahmani, Parma:Belghali
-+ Sky Sport: 20 squadre
-  Gazzetta: nomi non abbinati (1): Napoli:Rrahmani
+  Sky Sport Napoli: 10 titolari, scartata
+  Sky Sport: nomi non abbinati (2): Venezia:Halal, Parma:Belghali
++ Sky Sport: 19 squadre
+  Gazzetta: nomi non abbinati (1): Napoli:Hojlund
 + Gazzetta: 6 squadre
-  Corriere dello Sport: nomi non abbinati (1): Napoli:Rrahmani
+  Corriere dello Sport: nomi non abbinati (1): Napoli:Højlund
 + Corriere dello Sport: 6 squadre
-  TuttoMercatoWeb: nomi non abbinati (3): Udinese:Davis (56' Unai Gomez). All.: Runjaic, Roma:Malen (60' Castro). All.: Gasperini, Napoli:Rrahmani
+  TuttoMercatoWeb: nomi non abbinati (3): Udinese:Davis (56' Unai Gomez). All.: Runjaic, Roma:Malen (60' Castro). All.: Gasperini, Napoli:Hojlund
 + TuttoMercatoWeb: 12 squadre
-  SOS Fanta: nomi non abbinati (1): Napoli:Rrahmani
 + SOS Fanta: 20 squadre
-  Eurosport: nomi non abbinati (1): Napoli:Rrahmani
+  Eurosport: nomi non abbinati (1): Napoli:Højlund
 + Eurosport: 2 squadre
 - Goal.com: articolo della giornata non trovato
-  SportMediaset: nomi non abbinati (2): Napoli:Rrahmani, Parma:Sierra
-+ SportMediaset: 8 squadre
-OK: 10ª giornata, 9 fonti, 14 formazioni ufficiali, 332 indisponibili. Salvato 01/11/2026 18:19.
+  SportMediaset: nomi non abbinati (1): Parma:Sierra
++ SportMediaset: 6 squadre
+OK: 10ª giornata, 9 fonti, 16 formazioni ufficiali, 333 indisponibili. Salvato 01/11/2026 20:03.
