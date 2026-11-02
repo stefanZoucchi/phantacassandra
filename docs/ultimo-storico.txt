@@ -1,8 +1,5 @@
 Giornate da controllare: 10
-  + Como-Venezia
-  + Frosinone-Torino
-  + Juventus-Napoli
-  + Lazio-Cagliari
-  + Lecce-Genoa
-10ª giornata: 5 partite archiviate (8/10 in totale)
-Storico: 5 partite nuove, 576 giocatori, giornate 9,10
+  + Atalanta-Parma
+  + Sassuolo-Fiorentina
+10ª giornata: 2 partite archiviate (10/10 in totale)
+Storico: 2 partite nuove, 581 giocatori, giornate 9,10
