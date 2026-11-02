@@ -1,25 +1,27 @@
-letto corriere: giornata 10, 4 squadre (3s)
-letto fantacalcio: giornata 10, 20 squadre (8s)
-letto eurosport: giornata ?, 0 squadre (3s)
-letto sky: giornata 10, 20 squadre (11s)
-letto gazzetta: giornata 10, 4 squadre (14s)
+letto corriere: giornata 10, 4 squadre (4s)
+letto fantacalcio: giornata 10, 20 squadre (5s)
+letto sky: giornata 10, 20 squadre (8s)
+letto gazzetta: giornata 10, 4 squadre (10s)
 errore goal: articolo della giornata non trovato
-letto sosfanta: giornata ?, 20 squadre (20s)
-letto tmw: giornata 10, 10 squadre (30s)
-letto spm: giornata 10, 6 squadre (96s)
+letto sosfanta: giornata ?, 20 squadre (18s)
+letto tmw: giornata 10, 10 squadre (23s)
+letto eurosport: giornata 10, 4 squadre (33s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 114s
+letto spm: giornata 10, 4 squadre (90s)
+Siti letti in 108s
 - Lega Serie A: nessuna partita Lega utilizzabile
   Sky Sport Napoli: 10 titolari, scartata
   Sky Sport: nomi non abbinati (3): Venezia:Halal, Parma:Belghali, Parma:Bernabé
 + Sky Sport: 19 squadre
 + Gazzetta: 4 squadre
+  Corriere dello Sport: nomi non abbinati (1): Sassuolo:Volpato
 + Corriere dello Sport: 4 squadre
   TuttoMercatoWeb: nomi non abbinati (2): Udinese:Davis (56' Unai Gomez). All.: Runjaic, Roma:Malen (60' Castro). All.: Gasperini
 + TuttoMercatoWeb: 10 squadre
 + SOS Fanta: 20 squadre
-- Eurosport: le partite non corrispondono alla 10ª giornata
+  Eurosport: nomi non abbinati (2): Atalanta:Gaetano, Parma:Bernabé
++ Eurosport: 4 squadre
 - Goal.com: articolo della giornata non trovato
   SportMediaset: nomi non abbinati (1): Parma:Sierra
-+ SportMediaset: 6 squadre
-OK: 10ª giornata, 9 fonti, 16 formazioni ufficiali, 334 indisponibili. Salvato 02/11/2026 17:17.
++ SportMediaset: 4 squadre
+OK: 10ª giornata, 9 fonti, 18 formazioni ufficiali, 334 indisponibili. Salvato 02/11/2026 17:47.
