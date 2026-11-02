@@ -1,28 +1,27 @@
-letto corriere: giornata 10, 6 squadre (3s)
-letto fantacalcio: giornata 10, 20 squadre (6s)
+letto corriere: giornata 10, 4 squadre (3s)
+letto fantacalcio: giornata 10, 20 squadre (5s)
+letto sky: giornata 10, 20 squadre (8s)
 letto sosfanta: giornata ?, 20 squadre (4s)
-letto gazzetta: giornata 10, 6 squadre (8s)
-letto sky: giornata 10, 20 squadre (9s)
+letto eurosport: giornata ?, 0 squadre (5s)
+letto gazzetta: giornata 10, 4 squadre (11s)
 errore goal: articolo della giornata non trovato
-letto eurosport: giornata 10, 2 squadre (16s)
-letto tmw: giornata 10, 12 squadre (29s)
-letto spm: giornata 10, 6 squadre (91s)
+letto tmw: giornata 10, 10 squadre (24s)
+letto spm: giornata 10, 6 squadre (88s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 113s
+Siti letti in 103s
 - Lega Serie A: nessuna partita Lega utilizzabile
   Sky Sport Napoli: 10 titolari, scartata
-  Sky Sport: nomi non abbinati (2): Venezia:Halal, Parma:Belghali
+  Sky Sport: nomi non abbinati (3): Venezia:Halal, Parma:Belghali, Parma:Bernabé
 + Sky Sport: 19 squadre
-  Gazzetta: nomi non abbinati (1): Napoli:Hojlund
-+ Gazzetta: 6 squadre
-  Corriere dello Sport: nomi non abbinati (1): Napoli:Højlund
-+ Corriere dello Sport: 6 squadre
-  TuttoMercatoWeb: nomi non abbinati (3): Udinese:Davis (56' Unai Gomez). All.: Runjaic, Roma:Malen (60' Castro). All.: Gasperini, Napoli:Hojlund
-+ TuttoMercatoWeb: 12 squadre
+  Gazzetta: nomi non abbinati (1): Parma:Bernabè
++ Gazzetta: 4 squadre
+  Corriere dello Sport: nomi non abbinati (1): Parma:Bernabé
++ Corriere dello Sport: 4 squadre
+  TuttoMercatoWeb: nomi non abbinati (2): Udinese:Davis (56' Unai Gomez). All.: Runjaic, Roma:Malen (60' Castro). All.: Gasperini
++ TuttoMercatoWeb: 10 squadre
 + SOS Fanta: 20 squadre
-  Eurosport: nomi non abbinati (1): Napoli:Højlund
-+ Eurosport: 2 squadre
+- Eurosport: le partite non corrispondono alla 10ª giornata
 - Goal.com: articolo della giornata non trovato
   SportMediaset: nomi non abbinati (1): Parma:Sierra
 + SportMediaset: 6 squadre
-OK: 10ª giornata, 9 fonti, 16 formazioni ufficiali, 333 indisponibili. Salvato 01/11/2026 20:03.
+OK: 10ª giornata, 9 fonti, 16 formazioni ufficiali, 334 indisponibili. Salvato 02/11/2026 11:47.
