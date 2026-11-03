@@ -1,5 +1,3 @@
-Giornate da controllare: 10
-  + Atalanta-Parma
-  + Sassuolo-Fiorentina
-10ª giornata: 2 partite archiviate (10/10 in totale)
-Storico: 2 partite nuove, 581 giocatori, giornate 9,10
+Giornate da controllare: 11
+11ª giornata: nessuna partita nuova
+Storico: 0 partite nuove, 581 giocatori, giornate 9,10
