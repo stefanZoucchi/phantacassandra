@@ -1,14 +1,14 @@
-letto corriere: giornata 11, 2 squadre (4s)
-letto fantacalcio: giornata 11, 20 squadre (6s)
+letto corriere: giornata 11, 2 squadre (3s)
+letto fantacalcio: giornata 11, 20 squadre (5s)
+letto sky: giornata 10, 20 squadre (8s)
 letto sosfanta: giornata ?, 20 squadre (4s)
-letto sky: giornata 10, 20 squadre (9s)
-letto eurosport: giornata ?, 0 squadre (10s)
-letto gazzetta: giornata 11, 20 squadre (19s)
 errore goal: articolo della giornata non trovato
-letto tmw: giornata 10, 8 squadre (37s)
+letto eurosport: giornata ?, 0 squadre (10s)
+letto gazzetta: giornata 11, 20 squadre (16s)
+letto tmw: giornata 10, 8 squadre (18s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 10, 2 squadre (100s)
-Siti letti in 118s
+letto spm: giornata 10, 2 squadre (96s)
+Siti letti in 109s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: è ancora alla 10ª giornata
   Gazzetta: nomi non abbinati (2): Lecce:Monteiro, Parma:Bernabè
@@ -19,4 +19,4 @@ Siti letti in 118s
 - Eurosport: le partite non corrispondono alla 11ª giornata
 - Goal.com: articolo della giornata non trovato
 - SportMediaset: è ancora alla 10ª giornata
-OK: 11ª giornata, 4 fonti, 0 formazioni ufficiali, 340 indisponibili. Salvato 04/11/2026 11:47.
+OK: 11ª giornata, 4 fonti, 0 formazioni ufficiali, 340 indisponibili. Salvato 04/11/2026 14:17.
