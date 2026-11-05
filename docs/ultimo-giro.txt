@@ -1,14 +1,14 @@
 letto corriere: giornata 11, 10 squadre (4s)
-letto fantacalcio: giornata 11, 20 squadre (10s)
-letto sky: giornata 10, 20 squadre (12s)
-letto sosfanta: giornata ?, 20 squadre (14s)
-letto eurosport: giornata ?, 0 squadre (11s)
-letto gazzetta: giornata 11, 20 squadre (22s)
+letto fantacalcio: giornata 11, 20 squadre (7s)
+letto sky: giornata 10, 20 squadre (11s)
+letto eurosport: giornata ?, 0 squadre (4s)
+letto sosfanta: giornata ?, 20 squadre (12s)
 errore goal: articolo della giornata non trovato
-letto tmw: giornata 10, 8 squadre (32s)
+letto gazzetta: giornata 11, 20 squadre (20s)
+letto tmw: giornata 10, 8 squadre (35s)
+letto spm: giornata 10, 2 squadre (100s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 10, 2 squadre (102s)
-Siti letti in 124s
+Siti letti in 119s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: è ancora alla 10ª giornata
   Gazzetta: nomi non abbinati (2): Cagliari:Nzola, Parma:Bernabè
@@ -19,4 +19,4 @@ Siti letti in 124s
 - Eurosport: le partite non corrispondono alla 11ª giornata
 - Goal.com: articolo della giornata non trovato
 - SportMediaset: è ancora alla 10ª giornata
-OK: 11ª giornata, 5 fonti, 0 formazioni ufficiali, 341 indisponibili. Salvato 05/11/2026 14:17.
+OK: 11ª giornata, 5 fonti, 0 formazioni ufficiali, 340 indisponibili. Salvato 05/11/2026 14:44.
