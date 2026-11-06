@@ -1,3 +1,7 @@
+Nome riabbinato: Claudio Lieto → Lieto
+Nome riabbinato: Nikita Melnyk → Melnyk
+Nome riabbinato: Milton Pereyra → Pereyra M.
 Giornate da controllare: 11
-11ª giornata: nessuna partita nuova
-Storico: 0 partite nuove, 581 giocatori, giornate 9,10
+  + Venezia-Udinese
+11ª giornata: 1 partite archiviate (1/10 in totale)
+Storico: 1 partite nuove, 581 giocatori, giornate 9,10,11
