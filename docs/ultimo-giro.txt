@@ -1,23 +1,21 @@
-letto corriere: giornata 11, 20 squadre (3s)
-letto fantacalcio: giornata 11, 20 squadre (4s)
-letto sosfanta: giornata ?, 20 squadre (5s)
-letto sky: giornata 10, 20 squadre (10s)
-letto gazzetta: giornata 11, 20 squadre (14s)
-letto tmw: giornata 10, 8 squadre (27s)
-letto goal: giornata 11, 20 squadre (19s)
-letto eurosport: giornata 11, 20 squadre (77s)
+letto corriere: giornata 11, 20 squadre (4s)
+letto fantacalcio: giornata 11, 20 squadre (9s)
+letto eurosport: giornata ?, 0 squadre (3s)
+letto sosfanta: giornata ?, 20 squadre (12s)
+letto gazzetta: giornata 11, 20 squadre (23s)
+letto goal: giornata 11, 20 squadre (17s)
+letto tmw: giornata 10, 8 squadre (33s)
+letto sky: giornata 11, 2 squadre (41s)
+letto spm: giornata 10, 14 squadre (71s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 10, 2 squadre (104s)
-Siti letti in 118s
+Siti letti in 116s
 - Lega Serie A: nessuna partita Lega utilizzabile
-- Sky Sport: è ancora alla 10ª giornata
-  Gazzetta: nomi non abbinati (1): Torino:Cacciamani
++ Sky Sport: 2 squadre
 + Gazzetta: 20 squadre
 + Corriere dello Sport: 20 squadre
 - TuttoMercatoWeb: è ancora alla 10ª giornata
 + SOS Fanta: 20 squadre
-+ Eurosport: 20 squadre
-  Goal.com: nomi non abbinati (1): Torino:Cacciamani
+- Eurosport: le partite non corrispondono alla 11ª giornata
 + Goal.com: 20 squadre
 - SportMediaset: è ancora alla 10ª giornata
-OK: 11ª giornata, 6 fonti, 0 formazioni ufficiali, 330 indisponibili. Salvato 05/11/2026 23:36.
+OK: 11ª giornata, 7 fonti, 0 formazioni ufficiali, 328 indisponibili. Salvato 06/11/2026 11:10.
