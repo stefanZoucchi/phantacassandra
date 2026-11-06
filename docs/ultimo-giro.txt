@@ -1,21 +1,21 @@
-letto corriere: giornata 11, 20 squadre (4s)
-letto fantacalcio: giornata 11, 20 squadre (9s)
-letto eurosport: giornata ?, 0 squadre (3s)
-letto sosfanta: giornata ?, 20 squadre (12s)
-letto gazzetta: giornata 11, 20 squadre (23s)
-letto goal: giornata 11, 20 squadre (17s)
-letto tmw: giornata 10, 8 squadre (33s)
-letto sky: giornata 11, 2 squadre (41s)
-letto spm: giornata 10, 14 squadre (71s)
+letto corriere: giornata 11, 20 squadre (3s)
+letto fantacalcio: giornata 11, 20 squadre (7s)
+letto gazzetta: giornata 11, 20 squadre (14s)
+letto sosfanta: giornata ?, 20 squadre (19s)
+letto tmw: giornata 10, 8 squadre (30s)
+letto sky: giornata 11, 2 squadre (34s)
+letto goal: giornata 11, 20 squadre (22s)
+letto spm: giornata 10, 20 squadre (65s)
+letto eurosport: giornata 10, 20 squadre (109s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 116s
+Siti letti in 123s
 - Lega Serie A: nessuna partita Lega utilizzabile
 + Sky Sport: 2 squadre
 + Gazzetta: 20 squadre
 + Corriere dello Sport: 20 squadre
 - TuttoMercatoWeb: è ancora alla 10ª giornata
 + SOS Fanta: 20 squadre
-- Eurosport: le partite non corrispondono alla 11ª giornata
+- Eurosport: è ancora alla 10ª giornata
 + Goal.com: 20 squadre
 - SportMediaset: è ancora alla 10ª giornata
-OK: 11ª giornata, 7 fonti, 0 formazioni ufficiali, 328 indisponibili. Salvato 06/11/2026 11:10.
+OK: 11ª giornata, 7 fonti, 0 formazioni ufficiali, 328 indisponibili. Salvato 06/11/2026 11:47.
