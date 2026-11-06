@@ -1,21 +1,25 @@
 letto corriere: giornata 11, 20 squadre (3s)
-letto fantacalcio: giornata 11, 20 squadre (7s)
-letto gazzetta: giornata 11, 20 squadre (14s)
-letto sosfanta: giornata ?, 20 squadre (19s)
-letto tmw: giornata 10, 8 squadre (30s)
-letto sky: giornata 11, 2 squadre (34s)
-letto goal: giornata 11, 20 squadre (22s)
-letto spm: giornata 10, 20 squadre (65s)
-letto eurosport: giornata 10, 20 squadre (109s)
-errore lega: nessuna partita Lega utilizzabile
-Siti letti in 123s
-- Lega Serie A: nessuna partita Lega utilizzabile
-+ Sky Sport: 2 squadre
+letto fantacalcio: giornata 11, 20 squadre (4s)
+letto sky: giornata 11, 20 squadre (8s)
+letto sosfanta: giornata ?, 20 squadre (5s)
+letto gazzetta: giornata 11, 20 squadre (12s)
+errore lega: partite non trovate
+letto tmw: giornata 10, 8 squadre (28s)
+letto goal: giornata 11, 20 squadre (21s)
+letto spm: giornata 11, 20 squadre (44s)
+letto eurosport: giornata 10, 20 squadre (68s)
+Siti letti in 72s
+- Lega Serie A: partite non trovate
+  Sky Sport: nomi non abbinati (2): Venezia:Halal, Parma:Belghali
++ Sky Sport: 20 squadre
 + Gazzetta: 20 squadre
+  Corriere dello Sport: nomi non abbinati (2): Cagliari:Aurelio, Cagliari:Mina
 + Corriere dello Sport: 20 squadre
 - TuttoMercatoWeb: è ancora alla 10ª giornata
 + SOS Fanta: 20 squadre
 - Eurosport: è ancora alla 10ª giornata
+  Goal.com: nomi non abbinati (1): Cagliari:Mina
 + Goal.com: 20 squadre
-- SportMediaset: è ancora alla 10ª giornata
-OK: 11ª giornata, 7 fonti, 0 formazioni ufficiali, 328 indisponibili. Salvato 06/11/2026 11:47.
+  SportMediaset: nomi non abbinati (1): Cagliari:Mina
++ SportMediaset: 20 squadre
+OK: 11ª giornata, 8 fonti, 0 formazioni ufficiali, 332 indisponibili. Salvato 06/11/2026 13:17.
