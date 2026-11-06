@@ -1,14 +1,14 @@
-letto corriere: giornata 11, 20 squadre (4s)
+letto corriere: giornata 11, 20 squadre (5s)
 letto fantacalcio: giornata 11, 20 squadre (8s)
 letto sky: giornata 11, 20 squadre (10s)
 letto eurosport: giornata ?, 0 squadre (3s)
-letto sosfanta: giornata ?, 20 squadre (9s)
-letto gazzetta: giornata 11, 20 squadre (16s)
-letto goal: giornata 11, 20 squadre (13s)
-letto tmw: giornata 11, 20 squadre (33s)
-letto spm: giornata 11, 20 squadre (55s)
+letto gazzetta: giornata 11, 20 squadre (15s)
+letto sosfanta: giornata ?, 20 squadre (19s)
+letto tmw: giornata 11, 20 squadre (28s)
+letto goal: giornata 11, 20 squadre (33s)
+letto spm: giornata 11, 20 squadre (59s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 115s
+Siti letti in 119s
 - Lega Serie A: nessuna partita Lega utilizzabile
   Sky Sport: nomi non abbinati (3): Venezia:Halal, Parma:Belghali, Fiorentina:Brescainini
 + Sky Sport: 20 squadre
@@ -22,4 +22,4 @@ Siti letti in 115s
 + Goal.com: 20 squadre
   SportMediaset: nomi non abbinati (1): Cagliari:Mina
 + SportMediaset: 20 squadre
-OK: 11ª giornata, 9 fonti, 0 formazioni ufficiali, 333 indisponibili. Salvato 06/11/2026 17:17.
+OK: 11ª giornata, 9 fonti, 0 formazioni ufficiali, 333 indisponibili. Salvato 06/11/2026 17:47.
