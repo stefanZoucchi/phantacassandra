@@ -1,28 +1,28 @@
-letto corriere: giornata 11, 14 squadre (4s)
+letto corriere: giornata 11, 12 squadre (4s)
 letto fantacalcio: giornata 11, 20 squadre (6s)
-letto sky: giornata 11, 20 squadre (10s)
-letto gazzetta: giornata 11, 14 squadre (12s)
-letto sosfanta: giornata ?, 20 squadre (19s)
-letto goal: giornata 11, 20 squadre (15s)
-letto tmw: giornata 11, 18 squadre (30s)
-letto eurosport: giornata 10, 14 squadre (72s)
-letto spm: giornata 11, 12 squadre (75s)
+letto sosfanta: giornata ?, 20 squadre (3s)
+letto sky: giornata 11, 20 squadre (7s)
+letto eurosport: giornata ?, 0 squadre (3s)
+letto gazzetta: giornata 11, 14 squadre (13s)
+letto tmw: giornata 11, 18 squadre (24s)
+letto goal: giornata 11, 20 squadre (24s)
+letto spm: giornata 11, 12 squadre (73s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 111s
+Siti letti in 105s
 - Lega Serie A: nessuna partita Lega utilizzabile
   Sky Sport: nomi non abbinati (7): Venezia:Halal, Cagliari:Winks, Frosinone:Terzic, Parma:Belghali, Milan:Pavlovic, Monza:Birindelli, Fiorentina:Brescainini
 + Sky Sport: 20 squadre
   Gazzetta: nomi non abbinati (1): Monza:Birindelli
 + Gazzetta: 14 squadre
-  Corriere dello Sport: nomi non abbinati (2): Milan:Pavlovic, Monza:Birindelli
-+ Corriere dello Sport: 14 squadre
+  Corriere dello Sport: nomi non abbinati (1): Monza:Birindelli
++ Corriere dello Sport: 12 squadre
   TuttoMercatoWeb: nomi non abbinati (1): Monza:Birindelli
 + TuttoMercatoWeb: 18 squadre
   SOS Fanta: nomi non abbinati (1): Monza:Birindelli
 + SOS Fanta: 20 squadre
-- Eurosport: è ancora alla 10ª giornata
-  Goal.com: nomi non abbinati (3): Milan:Pavlovic, Monza:Birindelli, Juventus:Cambiaso
+- Eurosport: le partite non corrispondono alla 11ª giornata
+  Goal.com: nomi non abbinati (2): Monza:Birindelli, Juventus:Cambiaso
 + Goal.com: 20 squadre
   SportMediaset: nomi non abbinati (1): Monza:Birindelli
 + SportMediaset: 12 squadre
-OK: 11ª giornata, 9 fonti, 8 formazioni ufficiali, 339 indisponibili. Salvato 07/11/2026 17:17.
+OK: 11ª giornata, 9 fonti, 8 formazioni ufficiali, 339 indisponibili. Salvato 07/11/2026 17:47.
