@@ -1,28 +1,29 @@
 letto corriere: giornata 11, 12 squadre (4s)
 letto fantacalcio: giornata 11, 20 squadre (6s)
-letto sosfanta: giornata ?, 20 squadre (3s)
-letto sky: giornata 11, 20 squadre (7s)
-letto eurosport: giornata ?, 0 squadre (3s)
-letto gazzetta: giornata 11, 14 squadre (13s)
-letto tmw: giornata 11, 18 squadre (24s)
-letto goal: giornata 11, 20 squadre (24s)
-letto spm: giornata 11, 12 squadre (73s)
+letto sky: giornata 11, 20 squadre (9s)
+letto sosfanta: giornata ?, 20 squadre (6s)
+letto gazzetta: giornata 11, 12 squadre (14s)
+letto tmw: giornata 11, 16 squadre (26s)
+letto goal: giornata 11, 20 squadre (30s)
+letto eurosport: giornata 11, 12 squadre (67s)
+letto spm: giornata 11, 10 squadre (91s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 105s
+Siti letti in 112s
 - Lega Serie A: nessuna partita Lega utilizzabile
   Sky Sport: nomi non abbinati (7): Venezia:Halal, Cagliari:Winks, Frosinone:Terzic, Parma:Belghali, Milan:Pavlovic, Monza:Birindelli, Fiorentina:Brescainini
 + Sky Sport: 20 squadre
   Gazzetta: nomi non abbinati (1): Monza:Birindelli
-+ Gazzetta: 14 squadre
++ Gazzetta: 12 squadre
   Corriere dello Sport: nomi non abbinati (1): Monza:Birindelli
 + Corriere dello Sport: 12 squadre
   TuttoMercatoWeb: nomi non abbinati (1): Monza:Birindelli
-+ TuttoMercatoWeb: 18 squadre
++ TuttoMercatoWeb: 16 squadre
   SOS Fanta: nomi non abbinati (1): Monza:Birindelli
 + SOS Fanta: 20 squadre
-- Eurosport: le partite non corrispondono alla 11ª giornata
-  Goal.com: nomi non abbinati (2): Monza:Birindelli, Juventus:Cambiaso
+  Eurosport: nomi non abbinati (1): Monza:Birindelli
++ Eurosport: 12 squadre
+  Goal.com: nomi non abbinati (1): Monza:Birindelli
 + Goal.com: 20 squadre
   SportMediaset: nomi non abbinati (1): Monza:Birindelli
-+ SportMediaset: 12 squadre
-OK: 11ª giornata, 9 fonti, 8 formazioni ufficiali, 339 indisponibili. Salvato 07/11/2026 17:47.
++ SportMediaset: 10 squadre
+OK: 11ª giornata, 9 fonti, 10 formazioni ufficiali, 339 indisponibili. Salvato 07/11/2026 20:03.
