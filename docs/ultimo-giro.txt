@@ -1,24 +1,25 @@
-letto corriere: giornata 11, 18 squadre (3s)
-letto fantacalcio: giornata 11, 20 squadre (6s)
-letto sky: giornata 11, 20 squadre (7s)
-letto sosfanta: giornata ?, 20 squadre (10s)
-letto gazzetta: giornata 11, 18 squadre (16s)
-letto tmw: giornata 11, 20 squadre (28s)
-letto goal: giornata 11, 20 squadre (27s)
-letto spm: giornata 11, 18 squadre (66s)
-letto eurosport: giornata 10, 20 squadre (97s)
+letto corriere: giornata 11, 18 squadre (5s)
+letto fantacalcio: giornata 11, 20 squadre (5s)
+letto eurosport: giornata ?, 0 squadre (3s)
+letto sky: giornata 11, 20 squadre (11s)
+letto gazzetta: giornata 11, 18 squadre (17s)
+letto sosfanta: giornata ?, 20 squadre (19s)
+letto goal: giornata 11, 20 squadre (18s)
+letto tmw: giornata 11, 18 squadre (30s)
+letto spm: giornata 11, 18 squadre (61s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 114s
+Siti letti in 111s
 - Lega Serie A: nessuna partita Lega utilizzabile
-  Sky Sport: nomi non abbinati (4): Venezia:Halal, Frosinone:Terzic, Parma:Belghali, Fiorentina:Brescainini
+  Sky Sport: nomi non abbinati (5): Venezia:Halal, Frosinone:Terzic, Parma:Belghali, Milan:Pavlovic, Fiorentina:Brescainini
 + Sky Sport: 20 squadre
 + Gazzetta: 18 squadre
-  Corriere dello Sport: nomi non abbinati (1): Cagliari:Mina
+  Corriere dello Sport: nomi non abbinati (2): Cagliari:Mina, Milan:Pavlovic
 + Corriere dello Sport: 18 squadre
-+ TuttoMercatoWeb: 20 squadre
+  TuttoMercatoWeb: nomi non abbinati (1): Cagliari:Grandu
++ TuttoMercatoWeb: 18 squadre
 + SOS Fanta: 20 squadre
-- Eurosport: è ancora alla 10ª giornata
-  Goal.com: nomi non abbinati (1): Cagliari:Mina
+- Eurosport: le partite non corrispondono alla 11ª giornata
+  Goal.com: nomi non abbinati (4): Cagliari:Mina, Roma:Mancini, Milan:Pavlovic, Juventus:Cambiaso
 + Goal.com: 20 squadre
 + SportMediaset: 18 squadre
-OK: 11ª giornata, 9 fonti, 2 formazioni ufficiali, 335 indisponibili. Salvato 07/11/2026 11:47.
+OK: 11ª giornata, 9 fonti, 5 formazioni ufficiali, 336 indisponibili. Salvato 07/11/2026 14:17.
