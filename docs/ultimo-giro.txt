@@ -1,25 +1,28 @@
-letto corriere: giornata 11, 18 squadre (5s)
-letto fantacalcio: giornata 11, 20 squadre (5s)
-letto eurosport: giornata ?, 0 squadre (3s)
-letto sky: giornata 11, 20 squadre (11s)
-letto gazzetta: giornata 11, 18 squadre (17s)
+letto corriere: giornata 11, 14 squadre (4s)
+letto fantacalcio: giornata 11, 20 squadre (6s)
+letto sky: giornata 11, 20 squadre (10s)
+letto gazzetta: giornata 11, 14 squadre (12s)
 letto sosfanta: giornata ?, 20 squadre (19s)
-letto goal: giornata 11, 20 squadre (18s)
+letto goal: giornata 11, 20 squadre (15s)
 letto tmw: giornata 11, 18 squadre (30s)
-letto spm: giornata 11, 18 squadre (61s)
+letto eurosport: giornata 10, 14 squadre (72s)
+letto spm: giornata 11, 12 squadre (75s)
 errore lega: nessuna partita Lega utilizzabile
 Siti letti in 111s
 - Lega Serie A: nessuna partita Lega utilizzabile
-  Sky Sport: nomi non abbinati (5): Venezia:Halal, Frosinone:Terzic, Parma:Belghali, Milan:Pavlovic, Fiorentina:Brescainini
+  Sky Sport: nomi non abbinati (7): Venezia:Halal, Cagliari:Winks, Frosinone:Terzic, Parma:Belghali, Milan:Pavlovic, Monza:Birindelli, Fiorentina:Brescainini
 + Sky Sport: 20 squadre
-+ Gazzetta: 18 squadre
-  Corriere dello Sport: nomi non abbinati (2): Cagliari:Mina, Milan:Pavlovic
-+ Corriere dello Sport: 18 squadre
-  TuttoMercatoWeb: nomi non abbinati (1): Cagliari:Grandu
+  Gazzetta: nomi non abbinati (1): Monza:Birindelli
++ Gazzetta: 14 squadre
+  Corriere dello Sport: nomi non abbinati (2): Milan:Pavlovic, Monza:Birindelli
++ Corriere dello Sport: 14 squadre
+  TuttoMercatoWeb: nomi non abbinati (1): Monza:Birindelli
 + TuttoMercatoWeb: 18 squadre
+  SOS Fanta: nomi non abbinati (1): Monza:Birindelli
 + SOS Fanta: 20 squadre
-- Eurosport: le partite non corrispondono alla 11ª giornata
-  Goal.com: nomi non abbinati (4): Cagliari:Mina, Roma:Mancini, Milan:Pavlovic, Juventus:Cambiaso
+- Eurosport: è ancora alla 10ª giornata
+  Goal.com: nomi non abbinati (3): Milan:Pavlovic, Monza:Birindelli, Juventus:Cambiaso
 + Goal.com: 20 squadre
-+ SportMediaset: 18 squadre
-OK: 11ª giornata, 9 fonti, 5 formazioni ufficiali, 336 indisponibili. Salvato 07/11/2026 14:17.
+  SportMediaset: nomi non abbinati (1): Monza:Birindelli
++ SportMediaset: 12 squadre
+OK: 11ª giornata, 9 fonti, 8 formazioni ufficiali, 339 indisponibili. Salvato 07/11/2026 17:17.
