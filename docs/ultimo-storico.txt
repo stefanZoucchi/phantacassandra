@@ -1,8 +1,8 @@
-Nome riabbinato: De Martis → de Martis
 Giornate da controllare: 11
-  + Cagliari-Frosinone
-  + Parma-Bologna
-  + Roma-Sassuolo
-  + Torino-Lecce
-11ª giornata: 4 partite archiviate (5/10 in totale)
-Storico: 4 partite nuove, 589 giocatori, giornate 9,10,11
+  + Fiorentina-Juventus
+  + Genoa-Milan
+  + Inter-Como
+  + Monza-Atalanta
+  + Napoli-Lazio
+11ª giornata: 5 partite archiviate (10/10 in totale)
+Storico: 5 partite nuove, 591 giocatori, giornate 9,10,11
