@@ -1,24 +1,24 @@
-letto fantacalcio: giornata 11, 20 squadre (3s)
-letto corriere: giornata 11, 10 squadre (3s)
-letto eurosport: giornata ?, 0 squadre (2s)
-letto sosfanta: giornata ?, 20 squadre (3s)
-letto sky: giornata 11, 20 squadre (7s)
-letto gazzetta: giornata 11, 10 squadre (12s)
-letto goal: giornata 11, 20 squadre (15s)
-letto tmw: giornata 11, 14 squadre (25s)
-letto spm: giornata 11, 8 squadre (84s)
+letto corriere: giornata 11, 8 squadre (5s)
+letto fantacalcio: giornata 11, 20 squadre (7s)
+letto eurosport: giornata ?, 0 squadre (4s)
+letto sky: giornata 11, 20 squadre (12s)
+letto sosfanta: giornata ?, 20 squadre (10s)
+letto gazzetta: giornata 11, 8 squadre (18s)
+letto tmw: giornata 11, 14 squadre (37s)
+letto goal: giornata 11, 20 squadre (31s)
+letto spm: giornata 11, 4 squadre (101s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 102s
+Siti letti in 124s
 - Lega Serie A: nessuna partita Lega utilizzabile
   Sky Sport: nomi non abbinati (7): Venezia:Halal, Cagliari:Winks, Frosinone:Terzic, Parma:Belghali, Milan:Pavlovic, Monza:Birindelli, Fiorentina:Brescainini
 + Sky Sport: 20 squadre
   Gazzetta: nomi non abbinati (1): Monza:Birindelli
-+ Gazzetta: 10 squadre
-+ Corriere dello Sport: 10 squadre
++ Gazzetta: 8 squadre
++ Corriere dello Sport: 8 squadre
   TuttoMercatoWeb: nomi non abbinati (1): Monza:Birindelli
 + TuttoMercatoWeb: 14 squadre
 + SOS Fanta: 20 squadre
 - Eurosport: le partite non corrispondono alla 11ª giornata
 + Goal.com: 20 squadre
-+ SportMediaset: 8 squadre
-OK: 11ª giornata, 9 fonti, 12 formazioni ufficiali, 337 indisponibili. Salvato 08/11/2026 11:47.
++ SportMediaset: 4 squadre
+OK: 11ª giornata, 9 fonti, 16 formazioni ufficiali, 337 indisponibili. Salvato 08/11/2026 14:17.
