@@ -1,24 +1,24 @@
-letto corriere: giornata 11, 2 squadre (3s)
-letto fantacalcio: giornata 11, 20 squadre (6s)
-letto eurosport: giornata ?, 0 squadre (3s)
-letto sky: giornata 11, 20 squadre (12s)
-letto sosfanta: giornata ?, 20 squadre (11s)
-letto gazzetta: giornata 11, 4 squadre (18s)
-letto tmw: giornata 11, 14 squadre (33s)
-letto goal: giornata 11, 20 squadre (31s)
+letto corriere: giornata 11, 2 squadre (4s)
+letto fantacalcio: giornata 11, 20 squadre (7s)
+letto sky: giornata 11, 20 squadre (11s)
+letto sosfanta: giornata ?, 20 squadre (8s)
+letto gazzetta: giornata 11, 2 squadre (16s)
+letto tmw: giornata 11, 14 squadre (28s)
+letto goal: giornata 11, 20 squadre (36s)
+letto eurosport: giornata 10, 10 squadre (81s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 11, 2 squadre (110s)
-Siti letti in 124s
+letto spm: giornata 11, 0 squadre (120s)
+Siti letti in 136s
 - Lega Serie A: nessuna partita Lega utilizzabile
   Sky Sport: nomi non abbinati (8): Venezia:Halal, Cagliari:Winks, Frosinone:Terzic, Parma:Belghali, Genoa:Frendrup, Milan:Pavlovic, Monza:Birindelli, Fiorentina:Brescainini
 + Sky Sport: 20 squadre
-+ Gazzetta: 4 squadre
++ Gazzetta: 2 squadre
 + Corriere dello Sport: 2 squadre
-  TuttoMercatoWeb: nomi non abbinati (3): Monza:Goclichidze, Monza:Akinsanniro, Atalanta:Kristovic
+  TuttoMercatoWeb: nomi non abbinati (1): Monza:Robinson (60' Zeballos). All.: Juric
 + TuttoMercatoWeb: 14 squadre
 + SOS Fanta: 20 squadre
-- Eurosport: le partite non corrispondono alla 11ª giornata
+- Eurosport: è ancora alla 10ª giornata
   Goal.com: nomi non abbinati (2): Monza:Goclichidze, Monza:Akinsanniro
 + Goal.com: 20 squadre
-+ SportMediaset: 2 squadre
-OK: 11ª giornata, 9 fonti, 18 formazioni ufficiali, 337 indisponibili. Salvato 08/11/2026 17:47.
+- SportMediaset: nessuna squadra utilizzabile
+OK: 11ª giornata, 9 fonti, 20 formazioni ufficiali, 337 indisponibili. Salvato 08/11/2026 20:03.
