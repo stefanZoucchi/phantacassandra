@@ -1,14 +1,14 @@
-letto fantacalcio: giornata 12, 20 squadre (4s)
-letto sky: giornata 11, 20 squadre (9s)
 letto corriere: giornata 12, 0 squadre (9s)
-letto sosfanta: giornata ?, 20 squadre (6s)
+letto sky: giornata 11, 20 squadre (11s)
+letto sosfanta: giornata ?, 20 squadre (7s)
+letto gazzetta: giornata 11, 0 squadre (17s)
+letto fantacalcio: giornata 12, 20 squadre (21s)
 errore goal: articolo della giornata non trovato
-letto gazzetta: giornata 11, 0 squadre (16s)
-letto eurosport: giornata ?, 0 squadre (10s)
-letto tmw: giornata 11, 10 squadre (28s)
+letto eurosport: giornata ?, 0 squadre (12s)
+letto tmw: giornata 11, 10 squadre (33s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 11, 0 squadre (106s)
-Siti letti in 123s
+letto spm: giornata 11, 0 squadre (110s)
+Siti letti in 132s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: è ancora alla 11ª giornata
 - Gazzetta: è ancora alla 11ª giornata
@@ -18,4 +18,4 @@ Siti letti in 123s
 - Eurosport: le partite non corrispondono alla 12ª giornata
 - Goal.com: articolo della giornata non trovato
 - SportMediaset: è ancora alla 11ª giornata
-OK: 12ª giornata, 2 fonti, 0 formazioni ufficiali, 321 indisponibili. Salvato 11/11/2026 11:47.
+OK: 12ª giornata, 2 fonti, 0 formazioni ufficiali, 321 indisponibili. Salvato 11/11/2026 14:17.
