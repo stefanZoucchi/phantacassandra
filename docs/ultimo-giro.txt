@@ -1,22 +1,22 @@
+letto corriere: giornata ?, 4 squadre (3s)
 letto fantacalcio: giornata 12, 20 squadre (5s)
-letto sosfanta: giornata ?, 20 squadre (4s)
-letto corriere: giornata ?, 0 squadre (9s)
-letto gazzetta: giornata 12, 20 squadre (11s)
-errore sky: articoli delle partite non trovati
-letto eurosport: giornata ?, 0 squadre (9s)
+letto sosfanta: giornata ?, 20 squadre (5s)
+letto tmw: giornata 11, 10 squadre (8s)
+letto gazzetta: giornata 12, 20 squadre (10s)
+letto eurosport: giornata ?, 0 squadre (7s)
 errore goal: articolo della giornata non trovato
-letto tmw: giornata 11, 10 squadre (25s)
-letto spm: giornata 12, 20 squadre (44s)
+errore sky: articoli delle partite non trovati
+letto spm: giornata 12, 20 squadre (46s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 103s
+Siti letti in 105s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: articoli delle partite non trovati
   Gazzetta: nomi non abbinati (1): Parma:Ndiaye
 + Gazzetta: 20 squadre
-- Corriere dello Sport: le partite non corrispondono alla 12ª giornata
++ Corriere dello Sport: 4 squadre
 - TuttoMercatoWeb: è ancora alla 11ª giornata
 + SOS Fanta: 20 squadre
 - Eurosport: le partite non corrispondono alla 12ª giornata
 - Goal.com: articolo della giornata non trovato
 + SportMediaset: 20 squadre
-OK: 12ª giornata, 4 fonti, 0 formazioni ufficiali, 334 indisponibili. Salvato 18/11/2026 14:44.
+OK: 12ª giornata, 5 fonti, 0 formazioni ufficiali, 334 indisponibili. Salvato 18/11/2026 17:18.
