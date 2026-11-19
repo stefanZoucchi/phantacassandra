@@ -1,17 +1,17 @@
 letto corriere: giornata ?, 20 squadre (4s)
-letto fantacalcio: giornata 12, 20 squadre (6s)
-letto sosfanta: giornata ?, 20 squadre (5s)
-letto tmw: giornata 12, 18 squadre (12s)
-letto gazzetta: giornata 12, 20 squadre (12s)
+letto fantacalcio: giornata 12, 20 squadre (5s)
+letto sosfanta: giornata ?, 20 squadre (4s)
+letto tmw: giornata 12, 18 squadre (9s)
 errore goal: articolo della giornata non trovato
+letto gazzetta: giornata 12, 20 squadre (17s)
 errore sky: articoli delle partite non trovati
-letto spm: giornata 12, 20 squadre (55s)
+letto spm: giornata 12, 20 squadre (60s)
+letto eurosport: giornata 12, 20 squadre (82s)
 errore lega: nessuna partita Lega utilizzabile
-letto eurosport: giornata 12, 20 squadre (102s)
-Siti letti in 109s
+Siti letti in 105s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: articoli delle partite non trovati
-  Gazzetta: nomi non abbinati (2): Cagliari:Winks, Parma:Ndiaye
+  Gazzetta: nomi non abbinati (1): Cagliari:Winks
 + Gazzetta: 20 squadre
   Corriere dello Sport: nomi non abbinati (1): Cagliari:Winks
 + Corriere dello Sport: 18 squadre
@@ -21,4 +21,4 @@ Siti letti in 109s
 + Eurosport: 20 squadre
 - Goal.com: articolo della giornata non trovato
 + SportMediaset: 20 squadre
-OK: 12ª giornata, 7 fonti, 0 formazioni ufficiali, 333 indisponibili. Salvato 19/11/2026 17:17.
+OK: 12ª giornata, 7 fonti, 0 formazioni ufficiali, 333 indisponibili. Salvato 19/11/2026 17:47.
