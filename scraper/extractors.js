@@ -17,10 +17,14 @@ const lineFormat = function () {
     const list = (lab) => { const r = tail.match(new RegExp(lab + "\\s*:\\s*([^\\n]+)", "i")); return r ? r[1].split(/,\s*(?![^()]*\))/).map(s => ({ n: s.replace(/\(.*?\)/g, "").trim().replace(/\.$/, ""), note: (s.match(/\((.*?)\)/) || [])[1] || "" })).filter(o => o.n && !/^nessun/i.test(o.n) && o.n !== "-") : []; };
     const o = [...list("Squalificat[io]").map(x => ({ n: x.n, k: "squal" })), ...list("(?:Indisponibili|Infortunati|Assenti)").map(x => ({ n: x.n, k: /valutar|\bin dubbio\b|\bin forse\b/i.test(x.note) ? "dubbio" : "inf" }))];
     if (o.length) out[h.name] = o;
-    const b = list("Ballottagg[io]").map(x => x.n.replace(/\s*\d+\s*%.*$/, "").trim()).filter(x => /-/.test(x));
+    const b = list("Ballottagg[io]").map(x => x.n.replace(/\s*\d+\s*%\s*-\s*/, "-").replace(/\s*\d+\s*%.*$/, "").trim()).filter(x => /-/.test(x));
     if (b.length) ball[h.name] = b;
   });
-  const g = t.match(/(\d{1,2})\s*(?:\^|ª|a|°)\s*giornata/i) || t.match(/giornata\s+(\d{1,2})\b/i);
+  // il numero di giornata si legge prima dal titolo (titolo + primo h1): nel testo dell'articolo
+  // ci possono essere refusi (es. Goal: titolo "giornata 12", introduzione "11ª giornata")
+  const head = document.title + "\n" + (document.querySelector("h1")?.innerText || "");
+  const GR = [/(\d{1,2})\s*(?:\^|ª|a|°)\s*giornata/i, /giornata\s+(\d{1,2})\b/i];
+  const g = GR.map(r => head.match(r)).find(Boolean) || t.match(GR[0]) || t.match(GR[1]);
   const upd = (t.match(/(\d{1,2}\s+\w{3}\s+\d{4}\s*-\s*\d{1,2}:\d{2})/) || [])[1] || "";
   return { giornata: g ? +g[1] : null, teams, out, ball, updated: upd };
 };
