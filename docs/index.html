@@ -491,7 +491,24 @@ function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt
 function renderHeader(){
   $("teamName").textContent=ROSA.name||("Squadra "+(Number(CUR)+1));
   $("logo").innerHTML=logoHTML(ROSA);
-  if(DATA) $("sub").textContent=`Serie A · ${DATA.giornata}ª giornata · aggiornato ${DATA.generated} · ${ROSA.players.length} giocatori`;
+  if(DATA){
+    $("sub").innerHTML=`Serie A · ${DATA.giornata}ª giornata · aggiornato ${esc(DATA.generated)} · ${ROSA.players.length} giocatori`+(()=>{
+      const k=kickoffInfo(); return k?`<br><b>Inizio giornata (termine formazioni)</b>: ${esc(k.match)} · ${esc(k.day)} ore ${esc(k.time)}`:"";
+    })();
+  }
+}
+// prima partita della giornata = scadenza per schierare la formazione al fantacalcio
+function kickoffInfo(){
+  if(!DATA||!DATA.teams) return null;
+  const g=String(DATA.generated||"").match(/(\d{2})\/(\d{2})\/(\d{4})/); if(!g) return null;
+  let best=null;
+  for(const T of Object.values(DATA.teams)){
+    const m=String(T.when||"").match(/^(\S+)\s+(\d{2})\/(\d{2}) (\d{1,2}):(\d{2})/); if(!m) continue;
+    let y=+g[3]; if(+m[3]<+g[2]-6) y++; // giornata a cavallo d'anno
+    const t=Date.UTC(y,+m[3]-1,+m[2],+m[4],+m[5]);
+    if(!best||t<best.t) best={t,match:T.match,day:`${m[1]} ${m[2]}/${m[3]}`,time:`${m[4].padStart(2,"0")}:${m[5]}`};
+  }
+  return best;
 }
 const isOut=x=>!x.o?0:(x.o.k==="inf"||x.o.k==="squal")?2:x.o.k==="dubbio"?1:0; // in fondo: prima gli in dubbio, poi infortunati e squalificati
 // peso fonte da accuracy storica (0.75–1.25); con pochi dati resta 1
