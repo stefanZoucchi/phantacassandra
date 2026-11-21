@@ -1,4 +1,7 @@
-Nome riabbinato: Rodriguez Je. → Rodríguez
 Giornate da controllare: 12
-12ª giornata: nessuna partita nuova
-Storico: 0 partite nuove, 591 giocatori, giornate 9,10,11
+  + Como-Cagliari
+  + Lazio-Lecce
+  + Napoli-Torino
+  + Parma-Roma
+12ª giornata: 4 partite archiviate (4/10 in totale)
+Storico: 4 partite nuove, 594 giocatori, giornate 9,10,11,12
