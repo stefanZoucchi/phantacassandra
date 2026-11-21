@@ -1,16 +1,16 @@
-letto corriere: giornata ?, 20 squadre (5s)
-letto fantacalcio: giornata 12, 20 squadre (8s)
+letto corriere: giornata ?, 20 squadre (3s)
+letto fantacalcio: giornata 12, 20 squadre (5s)
+letto sosfanta: giornata ?, 20 squadre (4s)
 letto eurosport: giornata ?, 0 squadre (3s)
-letto sosfanta: giornata ?, 20 squadre (9s)
-letto sky: giornata 12, 20 squadre (14s)
-letto gazzetta: giornata 12, 20 squadre (18s)
-letto goal: giornata 12, 20 squadre (17s)
-letto tmw: giornata 12, 19 squadre (31s)
-letto spm: giornata 12, 20 squadre (54s)
+letto sky: giornata 12, 20 squadre (8s)
+letto gazzetta: giornata 12, 20 squadre (10s)
+letto goal: giornata 12, 20 squadre (10s)
+letto tmw: giornata 12, 19 squadre (19s)
+letto spm: giornata 12, 20 squadre (44s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 122s
+Siti letti in 102s
 - Lega Serie A: nessuna partita Lega utilizzabile
-  Sky Sport: nomi non abbinati (3): Parma:Creamschi, Venezia:Halal, Frosinone:Terzic
+  Sky Sport: nomi non abbinati (4): Parma:Creamschi, Parma:Elphegei, Venezia:Halal, Frosinone:Terzic
 + Sky Sport: 20 squadre
   Gazzetta: nomi non abbinati (2): Frosinone:Terzic, Frosinone:Biriligea
 + Gazzetta: 20 squadre
@@ -23,4 +23,4 @@ Siti letti in 122s
   Goal.com: nomi non abbinati (2): Monza:Goclichidze, Monza:Akinsanniro
 + Goal.com: 20 squadre
 + SportMediaset: 20 squadre
-OK: 12ª giornata, 9 fonti, 0 formazioni ufficiali, 318 indisponibili. Salvato 21/11/2026 11:47.
+OK: 12ª giornata, 9 fonti, 0 formazioni ufficiali, 319 indisponibili. Salvato 21/11/2026 13:50.
