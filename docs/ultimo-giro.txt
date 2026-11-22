@@ -1,23 +1,24 @@
-letto corriere: giornata ?, 4 squadre (4s)
-letto fantacalcio: giornata 12, 20 squadre (4s)
-letto eurosport: giornata ?, 0 squadre (3s)
+letto corriere: giornata ?, 20 squadre (3s)
+letto fantacalcio: giornata 12, 20 squadre (5s)
 letto sky: giornata 12, 20 squadre (8s)
 letto sosfanta: giornata ?, 20 squadre (5s)
-letto gazzetta: giornata 12, 6 squadre (12s)
+letto eurosport: giornata ?, 0 squadre (6s)
+letto gazzetta: giornata 12, 4 squadre (11s)
 errore goal: articolo della giornata non trovato
-letto tmw: giornata 12, 8 squadre (28s)
+letto tmw: giornata 12, 6 squadre (26s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 12, 4 squadre (100s)
-Siti letti in 110s
+letto spm: giornata 12, 2 squadre (100s)
+Siti letti in 111s
 - Lega Serie A: nessuna partita Lega utilizzabile
   Sky Sport: nomi non abbinati (6): Parma:Creamschi, Parma:Elphegei, Venezia:Halal, Venezia:Basic, Venezia:Mazzocchi, Udinese:Davis
 + Sky Sport: 20 squadre
-  Gazzetta: nomi non abbinati (1): Frosinone:Biriligea
-+ Gazzetta: 6 squadre
-+ Corriere dello Sport: 4 squadre
-+ TuttoMercatoWeb: 8 squadre
++ Gazzetta: 4 squadre
+  Corriere dello Sport: nomi non abbinati (3): Venezia:Basic, Venezia:Mazzocchi, Udinese:Davis
++ Corriere dello Sport: 18 squadre
+  TuttoMercatoWeb: nomi non abbinati (1): Inter:Martinez J
++ TuttoMercatoWeb: 6 squadre
 + SOS Fanta: 20 squadre
 - Eurosport: le partite non corrispondono alla 12ª giornata
 - Goal.com: articolo della giornata non trovato
-+ SportMediaset: 4 squadre
-OK: 12ª giornata, 9 fonti, 16 formazioni ufficiali, 319 indisponibili. Salvato 22/11/2026 17:47.
++ SportMediaset: 2 squadre
+OK: 12ª giornata, 9 fonti, 18 formazioni ufficiali, 319 indisponibili. Salvato 22/11/2026 20:03.
