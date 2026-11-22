@@ -1,26 +1,25 @@
 letto corriere: giornata ?, 20 squadre (4s)
-letto fantacalcio: giornata 12, 20 squadre (4s)
-letto eurosport: giornata ?, 0 squadre (3s)
-letto sosfanta: giornata ?, 20 squadre (6s)
-letto sky: giornata 12, 20 squadre (10s)
-letto gazzetta: giornata 12, 14 squadre (12s)
-letto goal: giornata 12, 20 squadre (13s)
-letto tmw: giornata 12, 15 squadre (26s)
-letto spm: giornata 12, 12 squadre (67s)
+letto fantacalcio: giornata 12, 20 squadre (6s)
+letto sky: giornata 12, 20 squadre (8s)
+letto gazzetta: giornata 12, 12 squadre (10s)
+letto tmw: giornata 12, 11 squadre (11s)
+letto eurosport: giornata ?, 0 squadre (8s)
+errore goal: articolo della giornata non trovato
+letto sosfanta: giornata ?, 20 squadre (18s)
+letto spm: giornata 12, 10 squadre (73s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 104s
+Siti letti in 106s
 - Lega Serie A: nessuna partita Lega utilizzabile
-  Sky Sport: nomi non abbinati (4): Parma:Creamschi, Parma:Elphegei, Venezia:Halal, Frosinone:Terzic
+  Sky Sport: nomi non abbinati (5): Parma:Creamschi, Parma:Elphegei, Venezia:Halal, Venezia:Basic, Venezia:Mazzocchi
 + Sky Sport: 20 squadre
-  Gazzetta: nomi non abbinati (2): Frosinone:Terzic, Frosinone:Biriligea
-+ Gazzetta: 14 squadre
-  Corriere dello Sport: nomi non abbinati (1): Frosinone:Terzic
+  Gazzetta: nomi non abbinati (1): Frosinone:Biriligea
++ Gazzetta: 12 squadre
+  Corriere dello Sport: nomi non abbinati (2): Venezia:Basic, Venezia:Mazzocchi
 + Corriere dello Sport: 18 squadre
-  TuttoMercatoWeb: nomi non abbinati (2): Frosinone:Terzic, Frosinone:Schimd
-+ TuttoMercatoWeb: 15 squadre
+  TuttoMercatoWeb: nomi non abbinati (1): Frosinone:Schimd
++ TuttoMercatoWeb: 11 squadre
 + SOS Fanta: 20 squadre
 - Eurosport: le partite non corrispondono alla 12ª giornata
-  Goal.com: nomi non abbinati (2): Monza:Goclichidze, Monza:Akinsanniro
-+ Goal.com: 20 squadre
-+ SportMediaset: 12 squadre
-OK: 12ª giornata, 9 fonti, 6 formazioni ufficiali, 319 indisponibili. Salvato 21/11/2026 20:03.
+- Goal.com: articolo della giornata non trovato
++ SportMediaset: 10 squadre
+OK: 12ª giornata, 9 fonti, 9 formazioni ufficiali, 319 indisponibili. Salvato 22/11/2026 11:47.
