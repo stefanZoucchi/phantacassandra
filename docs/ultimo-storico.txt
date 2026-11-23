@@ -1,9 +1,4 @@
-Nome riabbinato: Cody Drameh → Drameh
 Giornate da controllare: 12
-  + Atalanta-Inter
-  + Bologna-Udinese
-  + Juventus-Venezia
-  + Milan-Frosinone
-  + Sassuolo-Genoa
-12ª giornata: 5 partite archiviate (9/10 in totale)
-Storico: 5 partite nuove, 599 giocatori, giornate 9,10,11,12
+  + Monza-Fiorentina
+12ª giornata: 1 partite archiviate (10/10 in totale)
+Storico: 1 partite nuove, 599 giocatori, giornate 9,10,11,12
