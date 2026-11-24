@@ -1,14 +1,14 @@
 letto fantacalcio: giornata 13, 20 squadre (5s)
-letto sky: giornata 12, 20 squadre (8s)
+letto sky: giornata 12, 20 squadre (7s)
+letto sosfanta: giornata ?, 20 squadre (4s)
+letto gazzetta: giornata 13, 20 squadre (9s)
 letto corriere: giornata ?, 0 squadre (9s)
-letto sosfanta: giornata ?, 20 squadre (5s)
-letto gazzetta: giornata 13, 20 squadre (14s)
-letto eurosport: giornata ?, 0 squadre (9s)
+letto tmw: giornata 12, 2 squadre (9s)
+letto eurosport: giornata ?, 0 squadre (3s)
 errore goal: articolo della giornata non trovato
-letto tmw: giornata 12, 2 squadre (26s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 12, 0 squadre (108s)
-Siti letti in 122s
+letto spm: giornata 12, 0 squadre (99s)
+Siti letti in 108s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: è ancora alla 12ª giornata
   Gazzetta: nomi non abbinati (2): Torino:Ismajli, Cagliari:Prati
@@ -20,4 +20,4 @@ Siti letti in 122s
 - Eurosport: le partite non corrispondono alla 13ª giornata
 - Goal.com: articolo della giornata non trovato
 - SportMediaset: è ancora alla 12ª giornata
-OK: 13ª giornata, 3 fonti, 0 formazioni ufficiali, 316 indisponibili. Salvato 24/11/2026 17:48.
+OK: 13ª giornata, 3 fonti, 0 formazioni ufficiali, 315 indisponibili. Salvato 24/11/2026 20:03.
