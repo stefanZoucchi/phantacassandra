@@ -1,14 +1,14 @@
 letto corriere: giornata ?, 4 squadre (3s)
-letto fantacalcio: giornata 13, 20 squadre (5s)
-letto sosfanta: giornata ?, 20 squadre (3s)
-letto sky: giornata 12, 20 squadre (6s)
-letto eurosport: giornata ?, 0 squadre (2s)
-letto gazzetta: giornata 13, 20 squadre (9s)
-letto tmw: giornata 12, 2 squadre (10s)
+letto fantacalcio: giornata 13, 20 squadre (7s)
+letto sky: giornata 12, 20 squadre (9s)
+letto sosfanta: giornata ?, 20 squadre (7s)
+letto gazzetta: giornata 13, 20 squadre (17s)
+letto eurosport: giornata ?, 0 squadre (11s)
 errore goal: articolo della giornata non trovato
+letto tmw: giornata 12, 2 squadre (27s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 12, 0 squadre (102s)
-Siti letti in 109s
+letto spm: giornata 12, 0 squadre (108s)
+Siti letti in 126s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: è ancora alla 12ª giornata
   Gazzetta: nomi non abbinati (1): Cagliari:Prati
@@ -20,4 +20,4 @@ Siti letti in 109s
 - Eurosport: le partite non corrispondono alla 13ª giornata
 - Goal.com: articolo della giornata non trovato
 - SportMediaset: è ancora alla 12ª giornata
-OK: 13ª giornata, 4 fonti, 0 formazioni ufficiali, 316 indisponibili. Salvato 25/11/2026 17:31.
+OK: 13ª giornata, 4 fonti, 0 formazioni ufficiali, 316 indisponibili. Salvato 25/11/2026 17:47.
