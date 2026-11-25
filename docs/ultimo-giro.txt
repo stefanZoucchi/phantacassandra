@@ -1,23 +1,24 @@
-letto corriere: giornata ?, 4 squadre (3s)
-letto fantacalcio: giornata 13, 20 squadre (7s)
-letto sky: giornata 12, 20 squadre (9s)
-letto sosfanta: giornata ?, 20 squadre (7s)
-letto gazzetta: giornata 13, 20 squadre (17s)
-letto eurosport: giornata ?, 0 squadre (11s)
-errore goal: articolo della giornata non trovato
-letto tmw: giornata 12, 2 squadre (27s)
+letto corriere: giornata ?, 6 squadre (3s)
+letto fantacalcio: giornata 13, 20 squadre (3s)
+letto eurosport: giornata ?, 0 squadre (2s)
+letto sosfanta: giornata ?, 20 squadre (3s)
+letto sky: giornata 12, 20 squadre (7s)
+letto gazzetta: giornata 13, 20 squadre (10s)
+letto goal: giornata 13, 20 squadre (16s)
+letto tmw: giornata 12, 2 squadre (26s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 12, 0 squadre (108s)
-Siti letti in 126s
+letto spm: giornata 12, 0 squadre (101s)
+Siti letti in 109s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: è ancora alla 12ª giornata
-  Gazzetta: nomi non abbinati (1): Cagliari:Prati
+  Gazzetta: nomi non abbinati (3): Venezia:Basic, Venezia:Mazzocchi, Cagliari:Prati
 + Gazzetta: 20 squadre
-+ Corriere dello Sport: 4 squadre
++ Corriere dello Sport: 6 squadre
 - TuttoMercatoWeb: è ancora alla 12ª giornata
   SOS Fanta: nomi non abbinati (1): Napoli:Di Lorenzo
 + SOS Fanta: 20 squadre
 - Eurosport: le partite non corrispondono alla 13ª giornata
-- Goal.com: articolo della giornata non trovato
+  Goal.com: nomi non abbinati (1): Sassuolo:Walukewicz
++ Goal.com: 20 squadre
 - SportMediaset: è ancora alla 12ª giornata
-OK: 13ª giornata, 4 fonti, 0 formazioni ufficiali, 316 indisponibili. Salvato 25/11/2026 17:47.
+OK: 13ª giornata, 5 fonti, 0 formazioni ufficiali, 317 indisponibili. Salvato 25/11/2026 20:03.
