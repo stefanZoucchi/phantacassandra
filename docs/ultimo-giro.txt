@@ -1,14 +1,14 @@
-letto corriere: giornata ?, 12 squadre (3s)
-letto fantacalcio: giornata 13, 20 squadre (9s)
-letto sky: giornata 12, 20 squadre (13s)
-letto sosfanta: giornata ?, 20 squadre (12s)
+letto corriere: giornata ?, 12 squadre (4s)
+letto fantacalcio: giornata 13, 20 squadre (5s)
+letto sky: giornata 12, 20 squadre (8s)
+letto sosfanta: giornata ?, 20 squadre (11s)
+letto gazzetta: giornata 13, 20 squadre (19s)
 errore goal: articolo della giornata non trovato
-letto gazzetta: giornata 13, 20 squadre (22s)
-letto tmw: giornata 12, 2 squadre (35s)
-letto eurosport: giornata 13, 20 squadre (103s)
+letto tmw: giornata 12, 2 squadre (29s)
+letto eurosport: giornata 13, 20 squadre (94s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 12, 0 squadre (114s)
-Siti letti in 137s
+letto spm: giornata 12, 0 squadre (110s)
+Siti letti in 129s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: è ancora alla 12ª giornata
 + Gazzetta: 20 squadre
@@ -21,4 +21,4 @@ Siti letti in 137s
 + Eurosport: 20 squadre
 - Goal.com: articolo della giornata non trovato
 - SportMediaset: è ancora alla 12ª giornata
-OK: 13ª giornata, 6 fonti, 0 formazioni ufficiali, 318 indisponibili. Salvato 26/11/2026 17:18.
+OK: 13ª giornata, 6 fonti, 0 formazioni ufficiali, 318 indisponibili. Salvato 26/11/2026 17:48.
