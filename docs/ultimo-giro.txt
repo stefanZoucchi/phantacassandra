@@ -1,17 +1,17 @@
 letto corriere: giornata ?, 8 squadre (3s)
-letto fantacalcio: giornata 13, 20 squadre (6s)
-letto sky: giornata 12, 20 squadre (8s)
-letto eurosport: giornata ?, 0 squadre (3s)
-letto sosfanta: giornata ?, 20 squadre (7s)
-letto gazzetta: giornata 13, 20 squadre (13s)
-letto tmw: giornata 12, 2 squadre (26s)
-letto goal: giornata 13, 20 squadre (20s)
+letto fantacalcio: giornata 13, 20 squadre (5s)
+letto sky: giornata 12, 20 squadre (7s)
+letto sosfanta: giornata ?, 20 squadre (6s)
+letto gazzetta: giornata 13, 20 squadre (11s)
+letto tmw: giornata 12, 2 squadre (11s)
+letto eurosport: giornata ?, 0 squadre (7s)
+letto goal: giornata 13, 20 squadre (15s)
 errore lega: nessuna partita Lega utilizzabile
-letto spm: giornata 12, 0 squadre (104s)
-Siti letti in 114s
+letto spm: giornata 12, 0 squadre (106s)
+Siti letti in 117s
 - Lega Serie A: nessuna partita Lega utilizzabile
 - Sky Sport: è ancora alla 12ª giornata
-  Gazzetta: nomi non abbinati (3): Venezia:Basic, Venezia:Mazzocchi, Inter:Bastoni
+  Gazzetta: nomi non abbinati (2): Venezia:Basic, Venezia:Mazzocchi
 + Gazzetta: 20 squadre
   Corriere dello Sport: nomi non abbinati (1): Inter:Bastoni
 + Corriere dello Sport: 8 squadre
@@ -22,4 +22,4 @@ Siti letti in 114s
   Goal.com: nomi non abbinati (2): Inter:Bastoni, Sassuolo:Walukewicz
 + Goal.com: 20 squadre
 - SportMediaset: è ancora alla 12ª giornata
-OK: 13ª giornata, 5 fonti, 0 formazioni ufficiali, 317 indisponibili. Salvato 26/11/2026 11:48.
+OK: 13ª giornata, 5 fonti, 0 formazioni ufficiali, 317 indisponibili. Salvato 26/11/2026 14:17.
