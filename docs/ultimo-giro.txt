@@ -1,19 +1,19 @@
-letto corriere: giornata ?, 16 squadre (3s)
-letto sky: giornata ?, 20 squadre (4s)
-letto fantacalcio: giornata 13, 20 squadre (6s)
+letto corriere: giornata ?, 18 squadre (3s)
+letto fantacalcio: giornata 13, 20 squadre (4s)
+letto sky: giornata ?, 20 squadre (5s)
+letto sosfanta: giornata ?, 20 squadre (4s)
 letto gazzetta: giornata 13, 20 squadre (11s)
-letto sosfanta: giornata ?, 20 squadre (19s)
-letto tmw: giornata 13, 20 squadre (25s)
-letto goal: giornata 13, 20 squadre (20s)
-letto spm: giornata 13, 20 squadre (48s)
-letto eurosport: giornata 13, 20 squadre (91s)
+letto goal: giornata 13, 20 squadre (11s)
+letto tmw: giornata 13, 20 squadre (24s)
+letto spm: giornata 13, 18 squadre (58s)
+letto eurosport: giornata 13, 20 squadre (78s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 109s
+Siti letti in 105s
 - Lega Serie A: nessuna partita Lega utilizzabile
-  Sky Sport: nomi non abbinati (1): Genoa:Ostigard L.
 + Sky Sport: 20 squadre
 + Gazzetta: 20 squadre
-+ Corriere dello Sport: 16 squadre
+  Corriere dello Sport: nomi non abbinati (1): Napoli:De Bruyne
++ Corriere dello Sport: 18 squadre
   TuttoMercatoWeb: nomi non abbinati (1): Juventus:Conceio
 + TuttoMercatoWeb: 20 squadre
 + SOS Fanta: 20 squadre
@@ -22,5 +22,5 @@ Siti letti in 109s
   Goal.com: nomi non abbinati (3): Inter:Bastoni, Genoa:Ostigard, Sassuolo:Walukewicz
 + Goal.com: 20 squadre
   SportMediaset: nomi non abbinati (1): Torino:Belghali
-+ SportMediaset: 20 squadre
-OK: 13ª giornata, 9 fonti, 0 formazioni ufficiali, 326 indisponibili. Salvato 27/11/2026 17:47.
++ SportMediaset: 18 squadre
+OK: 13ª giornata, 9 fonti, 2 formazioni ufficiali, 326 indisponibili. Salvato 27/11/2026 19:59.
