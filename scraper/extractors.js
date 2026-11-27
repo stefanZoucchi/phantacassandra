@@ -9,12 +9,15 @@ const lineFormat = function () {
   let m;
   while ((m = re.exec(t))) hits.push({ i: m.index, end: re.lastIndex, name: m[1].trim(), mod: m[2], body: m[3] });
   hits.forEach((h, k) => {
-    const body = h.body.replace(/\.?\s*(All\.|Allenatore:?)\s.*$/i, "");
+    // alcuni siti (Sky) scrivono sulla stessa riga: "...; Douvikas Squalificati: nessuno Indisponibili: Addai, Diao"
+    const LAB = /\s(?:Squalificat[io]|Indisponibil[ei]|Infortunat[io]|Assenti|Ballottagg[io])\s*:/i;
+    const cut = h.body.search(LAB), inline = cut >= 0 ? h.body.slice(cut) : "";
+    const body = (cut >= 0 ? h.body.slice(0, cut) : h.body).replace(/\.?\s*(All\.|Allenatore:?)\s.*$/i, "");
     const xi = body.split(/[;,]/).map(s => s.trim().replace(/\.$/, "")).filter(Boolean);
     if (xi.length < 10 || xi.length > 12 || teams[h.name]) return; // 10: virgola mancante sul sito, sistemata dopo
     teams[h.name] = { mod: h.mod, xi };
-    const tail = t.slice(h.end, k + 1 < hits.length ? hits[k + 1].i : h.end + 800);
-    const list = (lab) => { const r = tail.match(new RegExp(lab + "\\s*:\\s*([^\\n]+)", "i")); return r ? r[1].split(/,\s*(?![^()]*\))/).map(s => ({ n: s.replace(/\(.*?\)/g, "").trim().replace(/\.$/, ""), note: (s.match(/\((.*?)\)/) || [])[1] || "" })).filter(o => o.n && !/^nessun/i.test(o.n) && o.n !== "-") : []; };
+    const tail = inline + "\n" + t.slice(h.end, k + 1 < hits.length ? hits[k + 1].i : h.end + 800);
+    const list = (lab) => { const r = tail.match(new RegExp(lab + "\\s*:\\s*([^\\n]+)", "i")); return r ? r[1].split(LAB)[0].split(/,\s*(?![^()]*\))/).map(s => ({ n: s.replace(/\(.*?\)/g, "").trim().replace(/\.$/, ""), note: (s.match(/\((.*?)\)/) || [])[1] || "" })).filter(o => o.n && !/^nessun/i.test(o.n) && o.n !== "-") : []; };
     const o = [...list("Squalificat[io]").map(x => ({ n: x.n, k: "squal" })), ...list("(?:Indisponibili|Infortunati|Assenti)").map(x => ({ n: x.n, k: /valutar|\bin dubbio\b|\bin forse\b/i.test(x.note) ? "dubbio" : "inf" }))];
     if (o.length) out[h.name] = o;
     const b = list("Ballottagg[io]").map(x => x.n.replace(/\s*\d+\s*%\s*-\s*/, "-").replace(/\s*\d+\s*%.*$/, "").trim()).filter(x => /-/.test(x));
