@@ -62,12 +62,12 @@ const links = (page, re) => page.$$eval("a[href]", (as, src) => { const r = new 
 
 // un articolo per partita: prende quelli della giornata più alta e li legge uno per uno
 async function readPerMatch(page, s) {
-  const P = s.perMatch, all = new Set();
-  for (const h of P.hubs) { try { await open(page, h); (await allLinks(page, P.link)).forEach(u => all.add(u.replace(/[?#].*$/, ""))); } catch (e) {} }
+  const P = s.perMatch, all = new Set(), seenPages = [];
+  for (const h of P.hubs) { try { await open(page, h); (await allLinks(page, P.link)).forEach(u => all.add(u.replace(/[?#].*$/, ""))); seenPages.push(`"${(await page.title().catch(() => "")).slice(0, 40)}"`); } catch (e) { seenPages.push("non aperta: " + String(e.message).slice(0, 40)); } }
   const gOf = u => +((u.match(/-(\d+)-giornata/) || [])[1] || 0);
   const g = Math.max(0, ...[...all].map(gOf));
   const urls = [...all].filter(u => gOf(u) === g).slice(0, 10);
-  if (!urls.length) throw new Error("articoli delle partite non trovati");
+  if (!urls.length) throw new Error(`articoli delle partite non trovati (pagine aperte: ${seenPages.join(", ") || "nessuna"})`);
   const res = { giornata: g || null, teams: {}, out: {}, updated: "" };
   for (const u of urls) {
     try { await open(page, u); const r = await evalSafe(page, P.fn); Object.assign(res.teams, r.teams); if (r.updated > res.updated) res.updated = r.updated; } catch (e) {}
@@ -173,7 +173,7 @@ async function readSource(page, s) {
   let found = await allLinks(page, s.link);
   for (const h of hubs.slice(1)) { if (found.length) break; await open(page, h); found = await allLinks(page, s.link); }
   if (!found.length && s.perMatch) return readPerMatch(page, s);
-  if (!found.length) throw new Error("articolo della giornata non trovato");
+  if (!found.length) throw new Error(`articolo della giornata non trovato (ultima pagina: "${(await page.title().catch(() => "")).slice(0, 40)}")`);
   // l'articolo con il numero di giornata più alto
   const pick = found.sort((a, b) => (+(b.match(/(\d+)a?-giornata|giornata-(\d+)/) || []).slice(1).find(Boolean) || 0) - (+(a.match(/(\d+)a?-giornata|giornata-(\d+)/) || []).slice(1).find(Boolean) || 0))[0];
   await open(page, pick);
