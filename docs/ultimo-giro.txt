@@ -1,23 +1,24 @@
-letto corriere: giornata ?, 16 squadre (3s)
+letto corriere: giornata ?, 16 squadre (4s)
 letto sky: giornata ?, 20 squadre (5s)
 letto fantacalcio: giornata 13, 20 squadre (7s)
-letto sosfanta: giornata ?, 20 squadre (4s)
-letto gazzetta: giornata 13, 20 squadre (13s)
+letto tmw: giornata 12, 2 squadre (11s)
+letto gazzetta: giornata 13, 20 squadre (12s)
+letto sosfanta: giornata ?, 20 squadre (19s)
 letto goal: giornata 13, 20 squadre (14s)
-letto tmw: giornata 12, 2 squadre (27s)
-letto eurosport: giornata 13, 20 squadre (92s)
-letto spm: giornata 12, 8 squadre (92s)
+letto spm: giornata 13, 20 squadre (54s)
+letto eurosport: giornata 13, 20 squadre (95s)
 errore lega: nessuna partita Lega utilizzabile
-Siti letti in 112s
+Siti letti in 110s
 - Lega Serie A: nessuna partita Lega utilizzabile
+  Sky Sport: nomi non abbinati (1): Genoa:Ostigard L.
 + Sky Sport: 20 squadre
 + Gazzetta: 20 squadre
 + Corriere dello Sport: 16 squadre
 - TuttoMercatoWeb: è ancora alla 12ª giornata
 + SOS Fanta: 20 squadre
-  Eurosport: nomi non abbinati (2): Lazio:Taylor, Sassuolo:Walukewicz
+  Eurosport: nomi non abbinati (3): Lazio:Taylor, Genoa:Ostigard, Sassuolo:Walukewicz
 + Eurosport: 20 squadre
-  Goal.com: nomi non abbinati (2): Inter:Bastoni, Sassuolo:Walukewicz
+  Goal.com: nomi non abbinati (3): Inter:Bastoni, Genoa:Ostigard, Sassuolo:Walukewicz
 + Goal.com: 20 squadre
-- SportMediaset: è ancora alla 12ª giornata
-OK: 13ª giornata, 7 fonti, 0 formazioni ufficiali, 323 indisponibili. Salvato 27/11/2026 11:47.
++ SportMediaset: 20 squadre
+OK: 13ª giornata, 8 fonti, 0 formazioni ufficiali, 326 indisponibili. Salvato 27/11/2026 14:17.
