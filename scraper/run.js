@@ -11,7 +11,7 @@ const MODE = process.env.MODE || "automatico";
 
 const PLAN = [
   { key: "fantacalcio", url: "https://www.fantacalcio.it/probabili-formazioni-serie-a", fn: X.fantacalcio },
-  { key: "sky", hub: ["https://sport.sky.it/calcio/serie-a/probabili-formazioni", "https://sport.sky.it/calcio/serie-a"], link: /sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/probabili-formazioni-serie-a[^"#?\s]*/, fn: X.lineFormat,
+  { key: "sky", direct: { url: "https://sport.sky.it/calcio/serie-a/probabili-formazioni", fn: X.skyHub }, hub: ["https://sport.sky.it/calcio/serie-a/probabili-formazioni", "https://sport.sky.it/calcio/serie-a"], link: /sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/probabili-formazioni-serie-a[^"#?\s]*/, fn: X.lineFormat,
     // nei turni infrasettimanali Sky pubblica un articolo per partita
     perMatch: { hubs: ["https://sport.sky.it/calcio/serie-a/probabili-formazioni", "https://sport.sky.it/calcio/serie-a"], link: /sport\.sky\.it\/calcio\/serie-a\/\d{4}\/\d{2}\/\d{2}\/[a-z0-9-]+-probabili-formazioni-\d+-giornata/, fn: X.skyMatch } },
   { key: "gazzetta", url: "https://www.gazzetta.it/Calcio/prob_form/", fn: X.gazzetta },
@@ -146,6 +146,10 @@ async function readLega(page, s) {
 
 async function readSource(page, s) {
   if (s.legaHub) return readLega(page, s);
+  if (s.direct) { // pagina con tutte le partite già pronte; se non si legge, si prova con gli articoli
+    try { await open(page, s.direct.url); const r = await evalSafe(page, s.direct.fn); if (Object.keys(r.teams || {}).length) return { ...r, url: s.direct.url }; console.log(`${s.key}: pagina diretta senza formazioni (${(await page.title().catch(() => "")).slice(0, 40)}), provo gli articoli`); }
+    catch (e) { console.log(`${s.key}: pagina diretta non letta (${String(e.message).slice(0, 60)}), provo gli articoli`); }
+  }
   if (s.url) { await open(page, s.url); return { ...(await evalSafe(page, s.fn)), url: s.url }; }
   if (s.pages) { // l'articolo della giornata si trova scorrendo le pagine delle notizie
     for (let i = 1; i <= 8; i++) {

@@ -170,6 +170,43 @@ const skyMatch = function () {
   return { giornata: g ? +g[1] : null, teams, out: {}, updated: d ? `${d[3]}/${d[2]}` : "" };
 };
 
+// Sky, pagina "Probabili Formazioni Serie A": un blocco per partita con data, squadre, moduli e poi
+// Titolari (11 della casa, poi 11 della trasferta; ogni riga è "numero" + "nome"), Riserve, In dubbio,
+// Squalificati, Indisponibili, Allenatore (sempre prima la casa, poi la trasferta; "-" = nessuno)
+const skyHub = function () {
+  const t = document.body.innerText;
+  const g = t.match(/Giornata\s+(\d{1,2})\b/);
+  const u = t.match(/Aggiornato:\s*(\d{1,2}\/\d{1,2}),?\s*(\d{1,2}:\d{2})/);
+  const parts = t.split(/\n\s*(?:Lunedì|Martedì|Mercoledì|Giovedì|Venerdì|Sabato|Domenica) \d{1,2} \w+ \d{4} ore \d{1,2}[:.]\d{2}\s*\n/);
+  const teams = {}, out = {};
+  for (const blk of parts.slice(1)) {
+    const L = blk.split("\n").map(x => x.trim()).filter(Boolean);
+    const vs = L.indexOf("VS"); if (vs < 1) continue;
+    const home = L[0], away = L[vs + 1];
+    const mods = L.filter(x => /^\d(-\d){2,3}$/.test(x));
+    const i = L.indexOf("Titolari"), r = L.indexOf("Riserve");
+    if (!away || i < 0 || r < i || mods.length < 2) continue;
+    const names = L.slice(i + 1, r).filter(x => !/^\d{1,3}$/.test(x));
+    if (names.length !== 22) continue;
+    teams[home] = { mod: mods[0], xi: names.slice(0, 11) };
+    teams[away] = { mod: mods[1], xi: names.slice(11) };
+    const STOP = /^(In dubbio|Squalificati|Indisponibili|Allenatore|Riserve)$/;
+    const sec = lab => {
+      const k = L.indexOf(lab); if (k < 0) return [[], []];
+      const nx = L.findIndex((x, y) => y > k && STOP.test(x));
+      const part = L.slice(k + 1, nx < 0 ? undefined : nx);
+      return part.length === 2 ? part.map(x => x === "-" ? [] : x.split(/,\s*/).map(y => y.trim()).filter(Boolean)) : [[], []];
+    };
+    [home, away].forEach((tn, side) => {
+      const seen = new Set(), o = [];
+      for (const [lab, k] of [["Squalificati", "squal"], ["Indisponibili", "inf"], ["In dubbio", "dubbio"]])
+        for (const n of sec(lab)[side]) if (!seen.has(n)) { seen.add(n); o.push({ n, k }); }
+      out[tn] = o;
+    });
+  }
+  return { giornata: g ? +g[1] : null, teams, out, updated: u ? `${u[1]} ${u[2]}` : "" };
+};
+
 // Lega Serie A, pagina della partita: "Sassuolo\n4-3-3\nPosizione\n14th\nLazio\n4-3-3\n1st\nPosizione\n80\nTurati\n26\n..." fino ad "Allenatori"
 const lega = function () {
   const t = document.body.innerText;
@@ -347,4 +384,4 @@ const gazzettaTabellino = function () {
   return res;
 };
 
-module.exports = { lega, skyMatch, lineFormat, fantacalcio, gazzetta, corriere, sosfanta, sportmediaset, gazzettaTabellino };
+module.exports = { lega, skyHub, skyMatch, lineFormat, fantacalcio, gazzetta, corriere, sosfanta, sportmediaset, gazzettaTabellino };
